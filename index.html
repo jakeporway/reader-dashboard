@@ -352,6 +352,13 @@
             font-size: 0.875rem;
         }
 
+        .card-title a {
+            color: inherit;
+            text-decoration: none;
+        }
+        .card-title a:hover {
+            color: var(--accent);
+        }
         .card-title {
             font-size: 1.1rem;
             font-weight: 600;
@@ -908,6 +915,7 @@
             customItems: [],
             currentTab: 'library',
             currentView: 'board',
+            activeSource: null,
             currentFilter: { type: 'all', favorites: false, today: false },
             searchQuery: ''
         };
@@ -951,7 +959,7 @@
         }
 
         function getTodayString() {
-            return new Date().toISOString().split('T')[0];
+            return new Date().toLocaleDateString('en-CA', {timeZone: 'America/New_York'});
         }
 
         function isToday(dateStr) {
@@ -1070,7 +1078,7 @@
                             ${item.paywall ? '<span class="paywall-icon">🔒</span>' : ''}
                         </div>
                         
-                        <h3 class="card-title" onclick="markAsRead('${item.id}')">${item.headline}</h3>
+                        <h3 class="card-title"><a href="${item.url}" target="_blank" onclick="markAsRead('${item.id}')">${item.headline}</a></h3>
                         
                         <div class="card-description ${appData.currentView === 'board' ? 'truncated' : ''}" id="desc-${item.id}">
                             ${item.description}
@@ -1165,16 +1173,53 @@
         function renderSources() {
             const container = document.getElementById('source-feeds');
             
-            container.innerHTML = SOURCE_FEEDS.map(source => `
-                <div class="source-card">
-                    <h3 class="source-title">${source.name}</h3>
-                    <p class="source-desc">RSS feed providing daily content updates</p>
-                    <div class="source-stats">
-                        <span>📡 RSS</span>
-                        <span>🔄 Active</span>
+            container.innerHTML = `
+                <div style="display:flex;gap:20px;min-height:60vh;">
+                    <div style="min-width:180px;">
+                        <h3 style="font-size:13px;color:var(--text-secondary);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.5px;">Sources</h3>
+                        ${SOURCE_FEEDS.map(s => `
+                            <div style="padding:8px 12px;border-radius:var(--radius-sm);cursor:pointer;font-size:13px;margin-bottom:2px;transition:var(--transition);${appData.activeSource===s.name?'background:var(--accent);color:white;font-weight:500;':'color:var(--text-secondary);'}" 
+                                 onmouseover="if(appData.activeSource!=='${s.name.replace(/'/g,"\'")}')this.style.background='var(--bg-secondary)'" 
+                                 onmouseout="if(appData.activeSource!=='${s.name.replace(/'/g,"\'")}')this.style.background='transparent'"
+                                 onclick="loadFeed('${s.url.replace(/'/g,"\'")}','${s.name.replace(/'/g,"\'")}')">
+                                ${s.name}
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div style="flex:1;" id="feed-content">
+                        <div class="empty-state"><p>Pick a source to browse its latest content.</p></div>
                     </div>
                 </div>
-            `).join('');
+            `;
+        }
+
+        async function loadFeed(url, name) {
+            appData.activeSource = name;
+            renderSources();
+            const fc = document.getElementById('feed-content');
+            fc.innerHTML = '<div style="padding:40px;text-align:center;color:var(--text-secondary);">Loading... ⏳</div>';
+            try {
+                const resp = await fetch('https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(url));
+                const data = await resp.json();
+                if (data.status === 'ok' && data.items) {
+                    fc.innerHTML = data.items.slice(0, 20).map(item => `
+                        <article class="content-card" style="margin-bottom:12px;">
+                            ${item.thumbnail ? '<img class="card-image" src="' + item.thumbnail + '" onerror="this.style.display=\'none\'">' : ''}
+                            <div class="card-content">
+                                <div class="card-meta">
+                                    <span class="source-name">${name} · ${new Date(item.pubDate).toLocaleDateString()}</span>
+                                </div>
+                                <h3 class="card-title"><a href="${item.link}" target="_blank">${item.title}</a></h3>
+                                <div class="card-description" style="font-size:13px;">${(item.description || '').replace(/<[^>]*>/g, '').slice(0, 250)}...</div>
+                            </div>
+                        </article>
+                    `).join('');
+                } else {
+                    fc.innerHTML = '<div class="empty-state"><p>Could not load this feed.</p></div>';
+                }
+            } catch(e) {
+                fc.innerHTML = '<div class="empty-state"><p>Feed unavailable.</p></div>';
+            }
         }
 
         function renderCurrentTab() {
@@ -1622,6 +1667,7 @@
         window.openHighlightModal = openHighlightModal;
         window.toggleDescription = toggleDescription;
         window.saveDraftIntro = saveDraftIntro;
+        window.loadFeed = loadFeed;
     </script>
 </body>
 </html>
