@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lindsay's Curation Dashboard</title>
+<title>✨ Curation Lab</title>
 <style>
   :root {
     --bg: #faf9f7;
@@ -14,460 +14,132 @@
     --accent-light: #fff0ee;
     --border: #e8e6e3;
     --tag-bg: #f0eeeb;
-    --green: #4caf50;
-    --yellow: #ff9800;
-    --blue: #2196f3;
-    --purple: #9c27b0;
     --shadow: 0 1px 3px rgba(0,0,0,0.06);
     --shadow-hover: 0 4px 12px rgba(0,0,0,0.1);
     --radius: 12px;
   }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif; background:var(--bg); color:var(--text); line-height:1.6; }
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+  .header { background:white; border-bottom:1px solid var(--border); padding:12px 24px; position:sticky; top:0; z-index:100; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+  .header h1 { font-size:18px; font-weight:700; white-space:nowrap; }
+  .header-actions { display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
+  .nav { display:flex; gap:3px; background:var(--tag-bg); border-radius:8px; padding:3px; }
+  .nav button { padding:5px 10px; border:none; background:none; border-radius:6px; cursor:pointer; font-size:12px; font-weight:500; color:var(--text-muted); transition:all 0.2s; white-space:nowrap; }
+  .nav button.active { background:white; color:var(--text); box-shadow:var(--shadow); }
+  .btn-sm { padding:5px 10px; border:1px solid var(--border); border-radius:8px; background:white; cursor:pointer; font-size:12px; color:var(--text-muted); white-space:nowrap; }
+  .btn-sm:hover { border-color:var(--accent); color:var(--accent); }
 
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    line-height: 1.6;
-  }
+  /* Content Type Filters */
+  .filters { padding:10px 24px; display:flex; gap:6px; flex-wrap:wrap; border-bottom:1px solid var(--border); background:white; align-items:center; }
+  .filter-chip { padding:4px 10px; border:1px solid var(--border); border-radius:20px; font-size:11px; cursor:pointer; background:white; color:var(--text-muted); transition:all 0.2s; white-space:nowrap; }
+  .filter-chip:hover, .filter-chip.active { background:var(--accent-light); border-color:var(--accent); color:var(--accent); }
+  .date-nav { display:flex; align-items:center; gap:8px; margin-left:auto; }
+  .date-nav button { background:none; border:none; cursor:pointer; font-size:16px; padding:2px 6px; border-radius:4px; }
+  .date-nav button:hover { background:var(--tag-bg); }
+  .date-label { font-size:13px; font-weight:500; color:var(--text); min-width:140px; text-align:center; }
 
-  /* Header */
-  .header {
-    background: white;
-    border-bottom: 1px solid var(--border);
-    padding: 16px 24px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
+  .main { max-width:900px; margin:0 auto; padding:20px 24px; }
+  .pull-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
+  .pull-header h2 { font-size:15px; color:var(--text-muted); font-weight:500; }
+  .pull-stats { font-size:12px; color:var(--text-muted); }
 
-  .header h1 {
-    font-size: 20px;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
+  /* Cards */
+  .card { background:var(--card-bg); border:1px solid var(--border); border-radius:var(--radius); margin-bottom:12px; transition:all 0.2s; overflow:hidden; }
+  .card:hover { box-shadow:var(--shadow-hover); border-color:#d0cec9; }
+  .card-image { width:100%; height:180px; object-fit:cover; display:block; }
+  .card-body { padding:16px 20px; }
+  .card-type { display:inline-block; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; padding:2px 8px; border-radius:4px; margin-bottom:8px; }
+  .type-article { background:#e3f2fd; color:#1565c0; }
+  .type-video { background:#fce4ec; color:#c62828; }
+  .type-interactive { background:#e8f5e9; color:#2e7d32; }
+  .type-framework { background:#fff3e0; color:#e65100; }
+  .type-project { background:#f3e5f5; color:#6a1b9a; }
+  .type-toolkit { background:#fff8e1; color:#f57f17; }
+  .type-podcast { background:#fce4ec; color:#ad1457; }
+  .type-visual-art { background:#ede7f6; color:#4527a0; }
+  .type-audio { background:#e0f7fa; color:#00695c; }
+  .type-immersive { background:#e8eaf6; color:#283593; }
+  .card-source { font-size:11px; color:var(--accent); font-weight:600; display:inline; margin-left:8px; }
+  .card-headline { font-size:17px; font-weight:600; line-height:1.4; margin-bottom:10px; }
+  .card-headline a { color:var(--text); text-decoration:none; }
+  .card-headline a:hover { color:var(--accent); }
+  .card-description { font-size:14px; color:#444; line-height:1.7; margin-bottom:12px; }
+  .card-description blockquote { border-left:3px solid var(--accent); padding-left:12px; margin:8px 0; font-style:italic; color:var(--text-muted); }
+  .card-meta { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .tag { font-size:10px; padding:2px 8px; background:var(--tag-bg); border-radius:4px; color:var(--text-muted); }
+  .alignment { font-size:11px; font-weight:600; padding:2px 8px; border-radius:4px; }
+  .alignment-5 { background:#e8f5e9; color:#2e7d32; }
+  .alignment-4 { background:#f1f8e9; color:#558b2f; }
+  .alignment-3 { background:#fff8e1; color:#f57f17; }
+  .alignment-2 { background:#fff3e0; color:#e65100; }
+  .alignment-1 { background:#fce4ec; color:#c62828; }
+  .paywall-flag { font-size:10px; color:#ff9800; font-weight:600; }
 
-  .header-actions {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-  }
+  .card-actions { display:flex; align-items:center; gap:5px; padding:12px 20px; border-top:1px solid var(--border); background:#fafaf9; }
+  .rate-btn { padding:5px 10px; border:1px solid var(--border); border-radius:8px; background:white; cursor:pointer; font-size:14px; transition:all 0.15s; }
+  .rate-btn:hover { transform:scale(1.1); box-shadow:var(--shadow); }
+  .rate-btn.selected { border-color:var(--accent); background:var(--accent-light); }
+  .rate-btn .label { font-size:10px; color:var(--text-muted); }
+  .comment-toggle { margin-left:auto; padding:5px 10px; border:1px solid var(--border); border-radius:8px; background:white; cursor:pointer; font-size:11px; color:var(--text-muted); }
+  .comment-box { padding:0 20px 16px; display:none; }
+  .comment-box.open { display:block; }
+  .comment-box textarea { width:100%; padding:10px; border:1px solid var(--border); border-radius:8px; font-family:inherit; font-size:13px; resize:vertical; min-height:50px; outline:none; }
+  .comment-box textarea:focus { border-color:var(--accent); }
+  .comment-box .save-comment { margin-top:6px; padding:4px 12px; background:var(--accent); color:white; border:none; border-radius:6px; font-size:11px; cursor:pointer; }
 
-  /* Navigation */
-  .nav {
-    display: flex;
-    gap: 4px;
-    background: var(--tag-bg);
-    border-radius: 8px;
-    padding: 3px;
-  }
+  /* Grid */
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:14px; }
+  .grid .card { margin-bottom:0; }
+  .grid .card-headline { font-size:14px; }
+  .grid .card-description { font-size:12px; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
+  .grid .card-image { height:140px; }
 
-  .nav button {
-    padding: 6px 14px;
-    border: none;
-    background: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--text-muted);
-    transition: all 0.2s;
-  }
+  .empty-state { text-align:center; padding:60px 20px; color:var(--text-muted); }
+  .empty-state .emoji { font-size:48px; margin-bottom:12px; }
 
-  .nav button.active {
-    background: white;
-    color: var(--text);
-    box-shadow: var(--shadow);
-  }
+  /* Draft */
+  .draft-section { background:white; border:1px solid var(--border); border-radius:var(--radius); padding:24px; }
+  .draft-preview { font-family:Georgia,serif; line-height:1.8; padding:20px; background:var(--bg); border-radius:8px; margin-top:12px; }
+  .draft-preview h4 { font-size:15px; margin-bottom:4px; }
+  .draft-preview .draft-link { color:var(--accent); text-decoration:none; }
+  .draft-preview .draft-desc { font-size:14px; color:var(--text-muted); margin-bottom:16px; }
+  .copy-draft { padding:8px 16px; background:var(--accent); color:white; border:none; border-radius:8px; cursor:pointer; font-size:13px; margin-top:12px; }
 
-  /* Filters */
-  .filters {
-    padding: 12px 24px;
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    border-bottom: 1px solid var(--border);
-    background: white;
-  }
+  /* Modal */
+  .modal-overlay { display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.4); z-index:200; }
+  .modal-overlay.open { display:flex; align-items:center; justify-content:center; }
+  .modal { background:white; max-width:500px; width:90%; border-radius:12px; padding:24px; }
+  .modal input, .modal textarea { width:100%; padding:10px; border:1px solid var(--border); border-radius:8px; font-size:14px; outline:none; box-sizing:border-box; font-family:inherit; }
+  .modal textarea { min-height:60px; resize:vertical; margin-top:8px; font-size:13px; }
 
-  .filter-chip {
-    padding: 5px 12px;
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    font-size: 12px;
-    cursor: pointer;
-    background: white;
-    color: var(--text-muted);
-    transition: all 0.2s;
-  }
+  .toast { position:fixed; bottom:24px; right:24px; background:var(--text); color:white; padding:10px 18px; border-radius:8px; font-size:13px; opacity:0; transform:translateY(10px); transition:all 0.3s; z-index:1000; }
+  .toast.show { opacity:1; transform:translateY(0); }
 
-  .filter-chip:hover, .filter-chip.active {
-    background: var(--accent-light);
-    border-color: var(--accent);
-    color: var(--accent);
-  }
-
-  /* Main Content */
-  .main {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 24px;
-  }
-
-  .pull-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-  }
-
-  .pull-header h2 {
-    font-size: 16px;
-    color: var(--text-muted);
-    font-weight: 500;
-  }
-
-  .pull-stats {
-    font-size: 13px;
-    color: var(--text-muted);
-  }
-
-  /* Cards - List View */
-  .card {
-    background: var(--card-bg);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 20px;
-    margin-bottom: 12px;
-    transition: all 0.2s;
-    position: relative;
-  }
-
-  .card:hover {
-    box-shadow: var(--shadow-hover);
-    border-color: #d0cec9;
-  }
-
-  .card-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 12px;
-  }
-
-  .card-source {
-    font-size: 12px;
-    color: var(--accent);
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 6px;
-  }
-
-  .card-headline {
-    font-size: 17px;
-    font-weight: 600;
-    line-height: 1.4;
-    margin-bottom: 8px;
-  }
-
-  .card-headline a {
-    color: var(--text);
-    text-decoration: none;
-  }
-
-  .card-headline a:hover {
-    color: var(--accent);
-  }
-
-  .card-description {
-    font-size: 14px;
-    color: var(--text-muted);
-    line-height: 1.6;
-    margin-bottom: 12px;
-  }
-
-  .card-meta {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
-  }
-
-  .tag {
-    font-size: 11px;
-    padding: 3px 8px;
-    background: var(--tag-bg);
-    border-radius: 4px;
-    color: var(--text-muted);
-  }
-
-  .alignment {
-    font-size: 12px;
-    font-weight: 600;
-    padding: 2px 8px;
-    border-radius: 4px;
-  }
-
-  .alignment-5 { background: #e8f5e9; color: #2e7d32; }
-  .alignment-4 { background: #f1f8e9; color: #558b2f; }
-  .alignment-3 { background: #fff8e1; color: #f57f17; }
-  .alignment-2 { background: #fff3e0; color: #e65100; }
-  .alignment-1 { background: #fce4ec; color: #c62828; }
-
-  .paywall-flag {
-    font-size: 11px;
-    color: var(--yellow);
-    font-weight: 600;
-  }
-
-  /* Rating System */
-  .card-actions {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    margin-top: 14px;
-    padding-top: 14px;
-    border-top: 1px solid var(--border);
-  }
-
-  .rate-btn {
-    padding: 6px 12px;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    background: white;
-    cursor: pointer;
-    font-size: 16px;
-    transition: all 0.15s;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-  }
-
-  .rate-btn:hover {
-    transform: scale(1.1);
-    box-shadow: var(--shadow);
-  }
-
-  .rate-btn.selected {
-    border-color: var(--accent);
-    background: var(--accent-light);
-  }
-
-  .rate-btn .label {
-    font-size: 11px;
-    color: var(--text-muted);
-  }
-
-  .comment-toggle {
-    margin-left: auto;
-    padding: 6px 12px;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    background: white;
-    cursor: pointer;
-    font-size: 12px;
-    color: var(--text-muted);
-  }
-
-  .comment-toggle:hover {
-    border-color: var(--accent);
-    color: var(--accent);
-  }
-
-  .comment-box {
-    margin-top: 10px;
-    display: none;
-  }
-
-  .comment-box.open {
-    display: block;
-  }
-
-  .comment-box textarea {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    font-family: inherit;
-    font-size: 13px;
-    resize: vertical;
-    min-height: 60px;
-    outline: none;
-  }
-
-  .comment-box textarea:focus {
-    border-color: var(--accent);
-  }
-
-  .comment-box .save-comment {
-    margin-top: 6px;
-    padding: 5px 12px;
-    background: var(--accent);
-    color: white;
-    border: none;
-    border-radius: 6px;
-    font-size: 12px;
-    cursor: pointer;
-  }
-
-  /* Board/Grid View */
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 16px;
-  }
-
-  .grid .card {
-    margin-bottom: 0;
-  }
-
-  .grid .card-headline {
-    font-size: 15px;
-  }
-
-  .grid .card-description {
-    font-size: 13px;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-
-  /* Favorites View */
-  .empty-state {
-    text-align: center;
-    padding: 60px 20px;
-    color: var(--text-muted);
-  }
-
-  .empty-state .emoji {
-    font-size: 48px;
-    margin-bottom: 16px;
-  }
-
-  /* Draft Builder */
-  .draft-section {
-    background: white;
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 24px;
-  }
-
-  .draft-section h3 {
-    margin-bottom: 16px;
-  }
-
-  .draft-preview {
-    font-family: Georgia, serif;
-    line-height: 1.8;
-    padding: 20px;
-    background: var(--bg);
-    border-radius: 8px;
-    margin-top: 12px;
-  }
-
-  .draft-preview h4 {
-    font-size: 15px;
-    margin-bottom: 4px;
-  }
-
-  .draft-preview .draft-link {
-    color: var(--accent);
-    text-decoration: none;
-  }
-
-  .draft-preview .draft-desc {
-    font-size: 14px;
-    color: var(--text-muted);
-    margin-bottom: 16px;
-  }
-
-  .copy-draft {
-    padding: 8px 16px;
-    background: var(--accent);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 13px;
-    margin-top: 12px;
-  }
-
-  /* Export */
-  .export-btn {
-    padding: 6px 14px;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    background: white;
-    cursor: pointer;
-    font-size: 13px;
-    color: var(--text-muted);
-  }
-
-  .export-btn:hover {
-    border-color: var(--accent);
-    color: var(--accent);
-  }
-
-  /* Responsive */
-  @media (max-width: 640px) {
-    .header { padding: 12px 16px; }
-    .main { padding: 16px; }
-    .filters { padding: 10px 16px; }
-    .nav button { padding: 5px 10px; font-size: 12px; }
-    .grid { grid-template-columns: 1fr; }
-  }
-
-  /* Toast */
-  .toast {
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
-    background: var(--text);
-    color: white;
-    padding: 12px 20px;
-    border-radius: 8px;
-    font-size: 13px;
-    opacity: 0;
-    transform: translateY(10px);
-    transition: all 0.3s;
-    z-index: 1000;
-  }
-
-  .toast.show {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  @media(max-width:640px) { .header{padding:10px 16px;} .main{padding:16px;} .nav button{padding:4px 8px;font-size:11px;} .grid{grid-template-columns:1fr;} }
 </style>
 </head>
 <body>
 
 <div class="header">
-  <h1>✨ Lindsay's Curation Lab</h1>
+  <h1>✨ Curation Lab</h1>
   <div class="header-actions">
     <nav class="nav">
-      <button class="active" onclick="setView('feed')">📰 Daily Feed</button>
+      <button class="active" onclick="setView('feed')">📰 Feed</button>
       <button onclick="setView('board')">📌 Board</button>
       <button onclick="setView('favorites')">⭐ Favorites</button>
-      <button onclick="setView('draft')">✍️ Draft Builder</button>
+      <button onclick="setView('draft')">✍️ Draft</button>
       <button onclick="setView('sources')">📡 Sources</button>
     </nav>
-    <span id="sync-status" style="font-size:12px;color:#666;">☁️ Connecting...</span>
-    <button class="export-btn" onclick="toggleAddLink()">➕ Add Link</button>
-    <button class="export-btn" onclick="exportFeedback()">📤 Export</button>
+    <button class="btn-sm" onclick="toggleAddLink()">➕ Add Link</button>
+    <button class="btn-sm" onclick="exportFeedback()">📤 Export</button>
+    <span id="sync-status" style="font-size:11px;color:#ccc;">☁️</span>
   </div>
 </div>
 
 <div class="filters" id="filters"></div>
 
-<div class="main" id="main-content">
+<div class="main">
   <div class="pull-header">
     <h2 id="pull-title">Loading...</h2>
     <span class="pull-stats" id="pull-stats"></span>
@@ -475,484 +147,264 @@
   <div id="cards-container"></div>
 </div>
 
+<div class="modal-overlay" id="add-link-modal">
+  <div class="modal">
+    <h3 style="margin-bottom:12px;">➕ Add Your Own Link</h3>
+    <input id="custom-url" type="url" placeholder="Paste URL here...">
+    <textarea id="custom-note" placeholder="Why is this interesting? (optional)"></textarea>
+    <div style="display:flex;gap:8px;margin-top:12px;">
+      <button onclick="addCustomLink()" style="padding:8px 16px;background:var(--accent);color:white;border:none;border-radius:8px;cursor:pointer;font-size:13px;">Add Link</button>
+      <button onclick="toggleAddLink()" style="padding:8px 16px;background:white;border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:13px;color:#666;">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
-// State
 let currentView = 'feed';
 let activeFilters = new Set();
+let allData = {};
 let items = [];
-let feedback = JSON.parse(localStorage.getItem('lindsay-feedback') || '{}');
+let currentDate = null;
+let availableDates = [];
+let feedback = JSON.parse(localStorage.getItem('curator-feedback-v2') || '{}');
 
-// Load data
+const CONTENT_TYPES = [
+  { key:'article', label:'📝 Articles', icon:'📝' },
+  { key:'project', label:'🎨 Projects', icon:'🎨' },
+  { key:'visual-art', label:'🖼️ Visual Art', icon:'🖼️' },
+  { key:'interactive', label:'🎮 Interactive', icon:'🎮' },
+  { key:'video', label:'🎥 Video', icon:'🎥' },
+  { key:'audio', label:'🎧 Audio', icon:'🎧' },
+  { key:'podcast', label:'🎙️ Podcast', icon:'🎙️' },
+  { key:'framework', label:'🧰 Framework', icon:'🧰' },
+  { key:'toolkit', label:'🔧 Toolkit', icon:'🔧' },
+  { key:'immersive', label:'✨ Immersive', icon:'✨' },
+];
+
 async function loadData() {
   try {
-    const resp = await fetch('data.json');
+    const resp = await fetch('data.json?v=' + Date.now());
     const data = await resp.json();
-    items = data.items || data;
-    document.getElementById('pull-title').textContent = data.pullDate || 'First Pull';
+    if (data.days) {
+      allData = data.days;
+      availableDates = Object.keys(allData).sort().reverse();
+      currentDate = availableDates[0];
+      items = allData[currentDate]?.items || [];
+    } else if (data.items) {
+      allData = { 'today': { pullDate: data.pullDate, items: data.items } };
+      availableDates = ['today'];
+      currentDate = 'today';
+      items = data.items;
+    }
+    loadCustomItems();
     renderFilters();
     renderCards();
     updateStats();
+    updateTitle();
   } catch(e) {
     document.getElementById('pull-title').textContent = 'Waiting for first content pull...';
-    document.getElementById('cards-container').innerHTML = `
-      <div class="empty-state">
-        <div class="emoji">🔍</div>
-        <p>JawnBot is scanning your sources for the first batch of content.<br>Check back soon!</p>
-      </div>`;
+    document.getElementById('cards-container').innerHTML = '<div class="empty-state"><div class="emoji">🔍</div><p>Content incoming! Check back soon.</p></div>';
   }
 }
 
-// Get all unique topics
-function getAllTopics() {
-  const topics = new Set();
-  items.forEach(item => {
-    (item.tags || []).forEach(t => topics.add(t));
-  });
-  return [...topics].sort();
+function updateTitle() {
+  const d = allData[currentDate];
+  document.getElementById('pull-title').textContent = d?.pullDate || currentDate;
 }
 
-// Render filter chips
+function navigateDate(dir) {
+  const idx = availableDates.indexOf(currentDate);
+  const newIdx = idx + dir;
+  if (newIdx >= 0 && newIdx < availableDates.length) {
+    currentDate = availableDates[newIdx];
+    items = allData[currentDate]?.items || [];
+    loadCustomItems();
+    renderCards();
+    updateStats();
+    updateTitle();
+  }
+}
+
 function renderFilters() {
-  const topics = getAllTopics();
   const container = document.getElementById('filters');
+  const types = CONTENT_TYPES.filter(t => items.some(i => i.contentType === t.key));
   container.innerHTML = `
-    <span class="filter-chip ${activeFilters.size === 0 ? 'active' : ''}" onclick="clearFilters()">All</span>
-    ${topics.map(t => `
-      <span class="filter-chip ${activeFilters.has(t) ? 'active' : ''}" onclick="toggleFilter('${t}')">${t}</span>
-    `).join('')}
+    <span class="filter-chip ${activeFilters.size===0?'active':''}" onclick="clearFilters()">All</span>
+    ${types.map(t => `<span class="filter-chip ${activeFilters.has(t.key)?'active':''}" onclick="toggleFilter('${t.key}')">${t.label}</span>`).join('')}
+    <div class="date-nav">
+      <button onclick="navigateDate(1)" title="Previous day">◀</button>
+      <span class="date-label" id="date-label">${allData[currentDate]?.pullDate || ''}</span>
+      <button onclick="navigateDate(-1)" title="Next day">▶</button>
+    </div>
   `;
 }
 
-function toggleFilter(topic) {
-  if (activeFilters.has(topic)) activeFilters.delete(topic);
-  else activeFilters.add(topic);
-  renderFilters();
-  renderCards();
-  updateStats();
-}
+function toggleFilter(type) { if(activeFilters.has(type)) activeFilters.delete(type); else activeFilters.add(type); renderFilters(); renderCards(); updateStats(); }
+function clearFilters() { activeFilters.clear(); renderFilters(); renderCards(); updateStats(); }
 
-function clearFilters() {
-  activeFilters.clear();
-  renderFilters();
-  renderCards();
-  updateStats();
-}
-
-// Filter items
 function getFilteredItems() {
-  let filtered = items;
-  if (activeFilters.size > 0) {
-    filtered = items.filter(item =>
-      (item.tags || []).some(t => activeFilters.has(t))
-    );
-  }
-  if (currentView === 'favorites') {
-    filtered = filtered.filter(item =>
-      feedback[item.id]?.rating === 'fire' || feedback[item.id]?.rating === 'good'
-    );
-  }
-  return filtered;
+  let f = items;
+  if (activeFilters.size > 0) f = f.filter(i => activeFilters.has(i.contentType));
+  if (currentView === 'favorites') f = f.filter(i => feedback[i.id]?.rating === 'fire' || feedback[i.id]?.rating === 'good');
+  return f;
 }
 
-// Render cards
 function renderCards() {
   const container = document.getElementById('cards-container');
   const filtered = getFilteredItems();
 
   if (currentView === 'sources') { renderSources(container); return; }
-  if (currentView === 'draft') {
-    renderDraft(container, filtered);
-    return;
-  }
+  if (currentView === 'draft') { renderDraft(container); return; }
 
   const isGrid = currentView === 'board';
   container.className = isGrid ? 'grid' : '';
 
-  if (filtered.length === 0) {
-    container.innerHTML = `
-      <div class="empty-state">
-        <div class="emoji">${currentView === 'favorites' ? '⭐' : '🔍'}</div>
-        <p>${currentView === 'favorites'
-          ? 'No favorites yet! Rate items with 🔥 or 👍 to save them here.'
-          : 'No items match this filter.'}</p>
-      </div>`;
+  if (!filtered.length) {
+    container.innerHTML = `<div class="empty-state"><div class="emoji">${currentView==='favorites'?'⭐':'🔍'}</div><p>${currentView==='favorites'?'No favorites yet! Rate items to save them here.':'No items match this filter.'}</p></div>`;
     return;
   }
 
   container.innerHTML = filtered.map(item => {
     const fb = feedback[item.id] || {};
+    const typeClass = 'type-' + (item.contentType || 'article');
+    const desc = (item.description || '').replace(/\"([^\"]{20,})\"/g, '<blockquote>"$1"</blockquote>');
     return `
-    <div class="card" data-id="${item.id}">
-      <div class="card-top">
-        <div style="flex:1">
-          <div class="card-source">${item.source || ''}${item.paywall ? ' <span class="paywall-flag">🔒 Paywall</span>' : ''}</div>
-          <div class="card-headline"><a href="${item.url}" target="_blank">${item.headline}</a></div>
-          <div class="card-description">${item.description}</div>
-          <div class="card-meta">
-            ${(item.tags || []).map(t => `<span class="tag">${t}</span>`).join('')}
-            ${item.alignment ? `<span class="alignment alignment-${item.alignment}">Match: ${item.alignment}/5</span>` : ''}
-          </div>
+    <div class="card">
+      ${item.image ? `<img class="card-image" src="${item.image}" onerror="this.style.display='none'" alt="">` : ''}
+      <div class="card-body">
+        <span class="card-type ${typeClass}">${item.contentType || 'article'}</span>
+        <span class="card-source">${item.source}${item.paywall ? ' · <span class="paywall-flag">🔒 Paywall</span>' : ''}</span>
+        <div class="card-headline"><a href="${item.url}" target="_blank">${item.headline}</a></div>
+        <div class="card-description">${desc}</div>
+        <div class="card-meta">
+          ${(item.tags||[]).map(t => `<span class="tag">${t}</span>`).join('')}
+          ${item.alignment ? `<span class="alignment alignment-${item.alignment}">Match: ${item.alignment}/5</span>` : ''}
         </div>
       </div>
       <div class="card-actions">
-        <button class="rate-btn ${fb.rating === 'fire' ? 'selected' : ''}" onclick="rate('${item.id}','fire')">🔥 <span class="label">Perfect</span></button>
-        <button class="rate-btn ${fb.rating === 'good' ? 'selected' : ''}" onclick="rate('${item.id}','good')">👍 <span class="label">Good</span></button>
-        <button class="rate-btn ${fb.rating === 'meh' ? 'selected' : ''}" onclick="rate('${item.id}','meh')">😐 <span class="label">Meh</span></button>
-        <button class="rate-btn ${fb.rating === 'nope' ? 'selected' : ''}" onclick="rate('${item.id}','nope')">👎 <span class="label">Not this</span></button>
-        <button class="comment-toggle" onclick="toggleComment('${item.id}')">💬 Comment</button>
+        <button class="rate-btn ${fb.rating==='fire'?'selected':''}" onclick="rate('${item.id}','fire')">🔥</button>
+        <button class="rate-btn ${fb.rating==='good'?'selected':''}" onclick="rate('${item.id}','good')">👍</button>
+        <button class="rate-btn ${fb.rating==='meh'?'selected':''}" onclick="rate('${item.id}','meh')">😐</button>
+        <button class="rate-btn ${fb.rating==='nope'?'selected':''}" onclick="rate('${item.id}','nope')">👎</button>
+        <button class="comment-toggle" onclick="toggleComment('${item.id}')">💬</button>
       </div>
-      <div class="comment-box ${fb.showComment ? 'open' : ''}" id="comment-${item.id}">
-        <textarea placeholder="What do you like or dislike about this? This helps me refine..." id="textarea-${item.id}">${fb.comment || ''}</textarea>
+      <div class="comment-box ${fb.comment?'open':''}" id="comment-${item.id}">
+        <textarea placeholder="What do you think? This helps me learn your taste..." id="textarea-${item.id}">${fb.comment||''}</textarea>
         <button class="save-comment" onclick="saveComment('${item.id}')">Save</button>
       </div>
     </div>`;
   }).join('');
 }
 
-// Draft builder
-function renderDraft(container, filtered) {
-  const favorites = items.filter(item =>
-    feedback[item.id]?.rating === 'fire' || feedback[item.id]?.rating === 'good'
-  );
-
+function renderDraft(container) {
+  const allItems = Object.values(allData).flatMap(d => d.items || []);
+  const favs = allItems.filter(i => feedback[i.id]?.rating === 'fire' || feedback[i.id]?.rating === 'good');
   container.className = '';
   container.innerHTML = `
     <div class="draft-section">
       <h3>✍️ Weekly Draft Builder</h3>
-      <p style="color:var(--text-muted); font-size:14px; margin-bottom:16px;">
-        Your 🔥 and 👍 rated items compiled into a shareable format. Copy and paste into Substack!
-      </p>
-      ${favorites.length === 0
-        ? '<div class="empty-state"><div class="emoji">✍️</div><p>Rate some items first, then come back here to build your weekly draft!</p></div>'
-        : `<div class="draft-preview">
-            <h2 style="font-size:22px; margin-bottom:20px;">This Week's Finds ✨</h2>
-            ${favorites.map(item => `
-              <h4><a class="draft-link" href="${item.url}" target="_blank">${item.headline}</a></h4>
-              <p class="draft-desc">${item.description}</p>
-            `).join('')}
-          </div>
-          <button class="copy-draft" onclick="copyDraft()">📋 Copy Draft to Clipboard</button>`
-      }
+      <p style="color:var(--text-muted);font-size:13px;margin-bottom:16px;">Your 🔥 and 👍 items compiled for Substack. ${favs.length} items ready.</p>
+      ${!favs.length ? '<div class="empty-state"><div class="emoji">✍️</div><p>Rate some items first!</p></div>'
+        : `<div class="draft-preview">${favs.map(i => `<h4><a class="draft-link" href="${i.url}" target="_blank">${i.headline}</a></h4><p class="draft-desc">${(i.description||'').replace(/<[^>]*>/g,'').slice(0,200)}...</p>`).join('')}</div>
+           <button class="copy-draft" onclick="copyDraft()">📋 Copy to Clipboard</button>`}
     </div>`;
 }
 
-// Actions
-function rate(id, rating) {
-  if (!feedback[id]) feedback[id] = {};
-  feedback[id].rating = feedback[id].rating === rating ? null : rating;
-  feedback[id].timestamp = new Date().toISOString();
-  saveFeedback();
-  renderCards();
-  updateStats();
-  showToast(feedback[id].rating ? `Rated ${rating === 'fire' ? '🔥' : rating === 'good' ? '👍' : rating === 'meh' ? '😐' : '👎'}` : 'Rating cleared');
-}
-
-function toggleComment(id) {
-  const box = document.getElementById(`comment-${id}`);
-  box.classList.toggle('open');
-}
-
-function saveComment(id) {
-  const textarea = document.getElementById(`textarea-${id}`);
-  if (!feedback[id]) feedback[id] = {};
-  feedback[id].comment = textarea.value;
-  feedback[id].timestamp = new Date().toISOString();
-  saveFeedback();
-  showToast('Comment saved! 💬');
-}
-
-function saveFeedback() {
-  localStorage.setItem('lindsay-feedback', JSON.stringify(feedback));
-}
-
-function exportFeedback() {
-  const data = items.map(item => ({
-    headline: item.headline,
-    source: item.source,
-    url: item.url,
-    rating: feedback[item.id]?.rating || 'unrated',
-    comment: feedback[item.id]?.comment || '',
-    tags: item.tags
-  }));
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `lindsay-feedback-${new Date().toISOString().split('T')[0]}.json`;
-  a.click();
-  showToast('Feedback exported! 📤');
-}
-
-function copyDraft() {
-  const favorites = items.filter(item =>
-    feedback[item.id]?.rating === 'fire' || feedback[item.id]?.rating === 'good'
-  );
-  const text = `This Week's Finds ✨\n\n` +
-    favorites.map(item => `${item.headline}\n${item.url}\n${item.description}\n`).join('\n');
-  navigator.clipboard.writeText(text);
-  showToast('Draft copied! 📋');
-}
-
-function setView(view) {
-  currentView = view;
-  document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll('.nav button').forEach(b => {
-    if (b.textContent.toLowerCase().includes(view === 'feed' ? 'daily' : view)) b.classList.add('active');
-  });
-  renderCards();
-  updateStats();
-}
-
-function updateStats() {
-  const filtered = getFilteredItems();
-  const rated = filtered.filter(i => feedback[i.id]?.rating).length;
-  document.getElementById('pull-stats').textContent =
-    `${filtered.length} items · ${rated} rated`;
-}
-
-function showToast(msg) {
-  const toast = document.getElementById('toast');
-  toast.textContent = msg;
-  toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 2000);
-}
-
-
-
-// === SOURCES BROWSER ===
+// Sources
 const SOURCE_FEEDS = [
-  { name: 'Colossal', url: 'https://www.thisiscolossal.com/feed/', site: 'thisiscolossal.com' },
-  { name: 'Kottke', url: 'https://feeds.kottke.org/main', site: 'kottke.org' },
-  { name: 'Aeon', url: 'https://aeon.co/feed.rss', site: 'aeon.co' },
-  { name: 'The Marginalian', url: 'https://feeds.feedburner.com/brainpickings/rss', site: 'themarginalian.org' },
-  { name: 'Boing Boing', url: 'https://boingboing.net/feed', site: 'boingboing.net' },
-  { name: 'Atlas Obscura', url: 'https://www.atlasobscura.com/feeds/latest', site: 'atlasobscura.com' },
-  { name: 'It\'s Nice That', url: 'https://feeds.feedburner.com/itsnicethat/SlXC', site: 'itsnicethat.com' },
-  { name: 'Dense Discovery', url: 'https://www.densediscovery.com/feed/', site: 'densediscovery.com' },
-  { name: 'Austin Kleon', url: 'https://austinkleon.com/feed/', site: 'austinkleon.com' },
-  { name: 'Works in Progress', url: 'https://www.worksinprogress.co/feed/', site: 'worksinprogress.co' },
-  { name: 'SSIR', url: 'https://ssir.org/site/rss_feed', site: 'ssir.org' },
-  { name: 'Eye on Design', url: 'https://eyeondesign.aiga.org/feed/', site: 'eyeondesign.aiga.org' },
-  { name: 'Behavioral Scientist', url: 'https://behavioralscientist.org/feed/', site: 'behavioralscientist.org' },
-  { name: 'Nautilus', url: 'https://nautil.us/feed/', site: 'nautil.us' },
-  { name: 'Places Journal', url: 'https://placesjournal.org/feed/', site: 'placesjournal.org' },
-  { name: 'Farnam Street', url: 'https://fs.blog/feed/', site: 'fs.blog' },
+  {name:'Colossal',url:'https://www.thisiscolossal.com/feed/'},{name:'Kottke',url:'https://feeds.kottke.org/main'},
+  {name:'Aeon',url:'https://aeon.co/feed.rss'},{name:'The Marginalian',url:'https://feeds.feedburner.com/brainpickings/rss'},
+  {name:'Boing Boing',url:'https://boingboing.net/feed'},{name:'Atlas Obscura',url:'https://www.atlasobscura.com/feeds/latest'},
+  {name:'It\'s Nice That',url:'https://feeds.feedburner.com/itsnicethat/SlXC'},{name:'Dense Discovery',url:'https://www.densediscovery.com/feed/'},
+  {name:'Austin Kleon',url:'https://austinkleon.com/feed/'},{name:'SSIR',url:'https://ssir.org/site/rss_feed'},
+  {name:'Behavioral Scientist',url:'https://behavioralscientist.org/feed/'},{name:'Nautilus',url:'https://nautil.us/feed/'},
+  {name:'Places Journal',url:'https://placesjournal.org/feed/'},{name:'Farnam Street',url:'https://fs.blog/feed/'},
 ];
-
-let rssCache = {};
 let activeSource = null;
 
 function renderSources(container) {
   container.className = '';
-  container.innerHTML = `
-    <div style="display:flex; gap:20px; min-height:60vh;">
-      <div style="min-width:200px; max-width:220px;">
-        <h3 style="font-size:14px; color:var(--text-muted); margin-bottom:12px; text-transform:uppercase; letter-spacing:0.5px;">Sources</h3>
-        ${SOURCE_FEEDS.map(s => `
-          <div class="source-item" onclick="loadFeed('${s.url}', '${s.name}')" 
-               style="padding:8px 12px; border-radius:8px; cursor:pointer; font-size:13px; margin-bottom:4px;
-                      background:${activeSource === s.name ? 'var(--accent-light)' : 'transparent'};
-                      color:${activeSource === s.name ? 'var(--accent)' : 'var(--text)'};
-                      border:1px solid ${activeSource === s.name ? 'var(--accent)' : 'transparent'};">
-            ${s.name}
-          </div>
-        `).join('')}
-      </div>
-      <div style="flex:1;" id="feed-content">
-        <div class="empty-state">
-          <div class="emoji">📡</div>
-          <p>Pick a source on the left to browse their recent posts.<br>Like something? Rate it or add it to your feed!</p>
-        </div>
-      </div>
-    </div>`;
+  container.innerHTML = `<div style="display:flex;gap:20px;min-height:60vh;">
+    <div style="min-width:180px;max-width:200px;">
+      <h3 style="font-size:13px;color:var(--text-muted);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.5px;">Sources</h3>
+      ${SOURCE_FEEDS.map(s => `<div style="padding:7px 10px;border-radius:8px;cursor:pointer;font-size:12px;margin-bottom:3px;background:${activeSource===s.name?'var(--accent-light)':'transparent'};color:${activeSource===s.name?'var(--accent)':'var(--text)'};border:1px solid ${activeSource===s.name?'var(--accent)':'transparent'}" onclick="loadFeed('${s.url}','${s.name}')">${s.name}</div>`).join('')}
+    </div>
+    <div style="flex:1;" id="feed-content">
+      <div class="empty-state"><div class="emoji">📡</div><p>Pick a source to browse recent posts.</p></div>
+    </div>
+  </div>`;
 }
 
-async function loadFeed(feedUrl, name) {
+async function loadFeed(url, name) {
   activeSource = name;
-  const feedContent = document.getElementById('feed-content') || document.querySelector('#cards-container #feed-content');
-  
-  // Re-render sidebar to update active state
   renderCards();
-  
   const fc = document.getElementById('feed-content');
-  fc.innerHTML = '<div style="padding:40px; text-align:center; color:var(--text-muted);">Loading feed... ⏳</div>';
-  
+  fc.innerHTML = '<div style="padding:40px;text-align:center;color:var(--text-muted);">Loading... ⏳</div>';
   try {
-    // Use a CORS proxy to fetch RSS
-    const proxyUrl = 'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(feedUrl);
-    const resp = await fetch(proxyUrl);
+    const resp = await fetch('https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(url));
     const data = await resp.json();
-    
     if (data.status === 'ok' && data.items) {
-      fc.innerHTML = data.items.slice(0, 20).map(item => `
-        <div class="card" style="margin-bottom:12px;">
-          ${item.thumbnail ? '<img src="' + item.thumbnail + '" style="width:100%; max-height:200px; object-fit:cover; border-radius:8px; margin-bottom:12px;" onerror="this.style.display=\'none\'">' : ''}
-          <div class="card-source">${name} · ${new Date(item.pubDate).toLocaleDateString()}</div>
-          <div class="card-headline"><a href="${item.link}" target="_blank">${item.title}</a></div>
-          <div class="card-description" style="font-size:13px;">${(item.description || '').replace(/<[^>]*>/g, '').slice(0, 200)}...</div>
-          <button class="export-btn" style="margin-top:10px;" onclick="addFromFeed('${item.link.replace(/'/g, "\\'")}', '${item.title.replace(/'/g, "\\'")}', '${name}')">
-            ➕ Add to my feed
-          </button>
-        </div>
-      `).join('');
-    } else {
-      fc.innerHTML = '<div style="padding:40px; text-align:center; color:var(--text-muted);">Couldn\'t load this feed. Try visiting <a href="' + feedUrl.replace(/\/feed.*/, '') + '" target="_blank">the site directly</a>.</div>';
-    }
-  } catch(e) {
-    fc.innerHTML = '<div style="padding:40px; text-align:center; color:var(--text-muted);">Feed unavailable. Try visiting the site directly.</div>';
-  }
+      fc.innerHTML = data.items.slice(0,20).map(item => `
+        <div class="card" style="margin-bottom:10px;">
+          ${item.thumbnail?`<img class="card-image" src="${item.thumbnail}" onerror="this.style.display='none'">`:''} 
+          <div class="card-body">
+            <div class="card-source">${name} · ${new Date(item.pubDate).toLocaleDateString()}</div>
+            <div class="card-headline"><a href="${item.link}" target="_blank">${item.title}</a></div>
+            <div class="card-description" style="font-size:13px;">${(item.description||'').replace(/<[^>]*>/g,'').slice(0,200)}...</div>
+            <button class="btn-sm" style="margin-top:8px;" onclick="addFromFeed('${item.link.replace(/'/g,"\\'")}','${item.title.replace(/'/g,"\\'")}','${name}')">➕ Add to my feed</button>
+          </div>
+        </div>`).join('');
+    } else { fc.innerHTML = '<div style="padding:40px;text-align:center;color:var(--text-muted);">Couldn\'t load feed.</div>'; }
+  } catch(e) { fc.innerHTML = '<div style="padding:40px;text-align:center;color:var(--text-muted);">Feed unavailable.</div>'; }
 }
 
-function addFromFeed(url, title, source) {
-  const newItem = {
-    id: 'feed-' + Date.now(),
-    headline: title,
-    source: source,
-    url: url,
-    description: 'Added from ' + source + ' feed',
-    tags: ['from-feed'],
-    alignment: null,
-    paywall: false,
-    custom: true
-  };
-  items.unshift(newItem);
-  const customs = JSON.parse(localStorage.getItem('curator-custom-items') || '[]');
-  customs.push(newItem);
-  localStorage.setItem('curator-custom-items', JSON.stringify(customs));
-  showToast('Added to your feed! ✨');
+function addFromFeed(url,title,source) {
+  const n = {id:'feed-'+Date.now(),headline:title,source:source,url:url,description:'Added from '+source,tags:['from-feed'],contentType:'article',alignment:null,paywall:false,custom:true};
+  items.unshift(n);
+  const c = JSON.parse(localStorage.getItem('curator-custom-items')||'[]'); c.push(n); localStorage.setItem('curator-custom-items',JSON.stringify(c));
+  showToast('Added! ✨');
 }
 
-// === AUTO-SYNC ===
+// Actions
+function rate(id,rating) { if(!feedback[id])feedback[id]={}; feedback[id].rating=feedback[id].rating===rating?null:rating; feedback[id].timestamp=new Date().toISOString(); saveFeedback(); renderCards(); updateStats(); showToast(feedback[id].rating?`Rated ${({fire:'🔥',good:'👍',meh:'😐',nope:'👎'})[rating]}`:'Cleared'); }
+function toggleComment(id) { document.getElementById('comment-'+id)?.classList.toggle('open'); }
+function saveComment(id) { const t=document.getElementById('textarea-'+id); if(!feedback[id])feedback[id]={}; feedback[id].comment=t.value; feedback[id].timestamp=new Date().toISOString(); saveFeedback(); showToast('Saved! 💬'); }
+function saveFeedback() { localStorage.setItem('curator-feedback-v2',JSON.stringify(feedback)); syncFeedback(); }
+function toggleAddLink() { document.getElementById('add-link-modal').classList.toggle('open'); }
+function addCustomLink() { const u=document.getElementById('custom-url').value.trim(),n=document.getElementById('custom-note').value.trim(); if(!u)return; const item={id:'custom-'+Date.now(),headline:n||u,source:'Custom',url:u,description:n||'Custom link',tags:['custom'],contentType:'article',alignment:null,paywall:false,custom:true}; items.unshift(item); const c=JSON.parse(localStorage.getItem('curator-custom-items')||'[]'); c.push(item); localStorage.setItem('curator-custom-items',JSON.stringify(c)); document.getElementById('custom-url').value=''; document.getElementById('custom-note').value=''; toggleAddLink(); renderCards(); updateStats(); showToast('Added! ✨'); }
+function loadCustomItems() { JSON.parse(localStorage.getItem('curator-custom-items')||'[]').forEach(c => { if(!items.find(i=>i.id===c.id)) items.unshift(c); }); }
+
+function exportFeedback() {
+  const data = Object.values(allData).flatMap(d => d.items||[]).map(i => ({headline:i.headline,source:i.source,url:i.url,contentType:i.contentType,rating:feedback[i.id]?.rating||'unrated',comment:feedback[i.id]?.comment||'',tags:i.tags}));
+  const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a = document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`feedback-${new Date().toISOString().split('T')[0]}.json`; a.click();
+  showToast('Exported! 📤');
+}
+
+function copyDraft() {
+  const allItems = Object.values(allData).flatMap(d => d.items||[]);
+  const favs = allItems.filter(i=>feedback[i.id]?.rating==='fire'||feedback[i.id]?.rating==='good');
+  navigator.clipboard.writeText(`This Week's Finds ✨\n\n`+favs.map(i=>`${i.headline}\n${i.url}\n${(i.description||'').replace(/<[^>]*>/g,'').slice(0,200)}\n`).join('\n'));
+  showToast('Copied! 📋');
+}
+
+function setView(v) { currentView=v; document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active')); document.querySelectorAll('.nav button').forEach(b=>{const t=b.textContent.toLowerCase(); if((v==='feed'&&t.includes('feed'))||(v==='board'&&t.includes('board'))||(v==='favorites'&&t.includes('fav'))||(v==='draft'&&t.includes('draft'))||(v==='sources'&&t.includes('source')))b.classList.add('active');}); renderCards(); updateStats(); }
+function updateStats() { const f=getFilteredItems(); document.getElementById('pull-stats').textContent=`${f.length} items · ${f.filter(i=>feedback[i.id]?.rating).length} rated`; }
+function showToast(m) { const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2000); }
+
+// Sync
 const SYNC_URL = 'https://jsonblob.com/api/jsonBlob';
 let syncBlobId = localStorage.getItem('curator-sync-id') || null;
-
 async function initSync() {
-  if (!syncBlobId) {
-    try {
-      const resp = await fetch(SYNC_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-        body: JSON.stringify({ feedback: {}, lastSync: new Date().toISOString() })
-      });
-      if (resp.ok) {
-        const blobUrl = resp.headers.get('Location') || '';
-        syncBlobId = blobUrl.split('/').pop() || null;
-        if (syncBlobId) {
-          localStorage.setItem('curator-sync-id', syncBlobId);
-          document.getElementById('sync-status').textContent = '☁️ Connected';
-          console.log('Sync ID:', syncBlobId);
-          // Show sync ID subtly in footer for discovery
-          let sid = document.getElementById('sync-id-display');
-          if (!sid) {
-            sid = document.createElement('div');
-            sid.id = 'sync-id-display';
-            sid.style.cssText = 'position:fixed;bottom:4px;left:8px;font-size:10px;color:#ccc;';
-            document.body.appendChild(sid);
-          }
-          sid.textContent = 'sync:' + syncBlobId;
-        }
-      }
-    } catch(e) { console.error('Sync init failed:', e); }
-  } else {
-    document.getElementById('sync-status').textContent = '☁️ Connected';
-  }
+  if (!syncBlobId) { try { const r=await fetch(SYNC_URL,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({feedback:{},lastSync:new Date().toISOString()})}); if(r.ok){const l=r.headers.get('Location')||'';syncBlobId=l.split('/').pop()||null;if(syncBlobId){localStorage.setItem('curator-sync-id',syncBlobId);}} }catch(e){} }
+  if(syncBlobId) document.getElementById('sync-status').textContent='☁️ Synced';
 }
-
-async function syncFeedback() {
-  if (!syncBlobId) await initSync();
-  if (!syncBlobId) return;
-  try {
-    await fetch(SYNC_URL + '/' + syncBlobId, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-      body: JSON.stringify({
-        feedback: feedback,
-        lastSync: new Date().toISOString(),
-        ratedCount: Object.keys(feedback).filter(k => feedback[k]?.rating).length
-      })
-    });
-  } catch(e) { console.error('Sync failed:', e); }
-}
-
-// Auto-sync on every save
-const _origSave = saveFeedback;
-saveFeedback = function() {
-  _origSave();
-  syncFeedback();
-};
-
-// === ADD YOUR OWN LINK ===
-function toggleAddLink() {
-  const modal = document.getElementById('add-link-modal');
-  modal.style.display = modal.style.display === 'block' ? 'none' : 'block';
-}
-
-function addCustomLink() {
-  const url = document.getElementById('custom-url').value.trim();
-  const note = document.getElementById('custom-note').value.trim();
-  if (!url) return;
-  
-  const newItem = {
-    id: 'custom-' + Date.now(),
-    headline: note || url,
-    source: 'Added by curator',
-    url: url,
-    description: note || 'Custom link added for review',
-    tags: ['custom'],
-    alignment: null,
-    paywall: false,
-    custom: true
-  };
-  
-  items.unshift(newItem);
-  
-  // Save custom items
-  const customs = JSON.parse(localStorage.getItem('curator-custom-items') || '[]');
-  customs.push(newItem);
-  localStorage.setItem('curator-custom-items', JSON.stringify(customs));
-  
-  document.getElementById('custom-url').value = '';
-  document.getElementById('custom-note').value = '';
-  toggleAddLink();
-  renderCards();
-  updateStats();
-  showToast('Link added! ✨');
-}
-
-// Load custom items on start
-function loadCustomItems() {
-  const customs = JSON.parse(localStorage.getItem('curator-custom-items') || '[]');
-  customs.forEach(c => items.unshift(c));
-}
-
-// Patch loadData to include customs
-const _origLoad = loadData;
-loadData = async function() {
-  await _origLoad();
-  loadCustomItems();
-  renderCards();
-  updateStats();
-};
+async function syncFeedback() { if(!syncBlobId)await initSync(); if(!syncBlobId)return; try{await fetch(SYNC_URL+'/'+syncBlobId,{method:'PUT',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({feedback,lastSync:new Date().toISOString(),ratedCount:Object.keys(feedback).filter(k=>feedback[k]?.rating).length})});}catch(e){} }
 
 initSync();
-
-// Init
 loadData();
 </script>
-
-<div id="add-link-modal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.4); z-index:200; display:none;">
-  <div style="background:white; max-width:500px; margin:100px auto; border-radius:12px; padding:24px;">
-    <h3 style="margin-bottom:16px;">➕ Add Your Own Link</h3>
-    <input id="custom-url" type="url" placeholder="Paste URL here..." style="width:100%; padding:10px; border:1px solid #e8e6e3; border-radius:8px; font-size:14px; margin-bottom:10px; outline:none; box-sizing:border-box;">
-    <textarea id="custom-note" placeholder="Why is this interesting? (optional)" style="width:100%; padding:10px; border:1px solid #e8e6e3; border-radius:8px; font-size:13px; min-height:60px; font-family:inherit; resize:vertical; outline:none; box-sizing:border-box;"></textarea>
-    <div style="display:flex; gap:8px; margin-top:12px;">
-      <button onclick="addCustomLink()" style="padding:8px 16px; background:#e85d4a; color:white; border:none; border-radius:8px; cursor:pointer; font-size:13px;">Add Link</button>
-      <button onclick="toggleAddLink()" style="padding:8px 16px; background:white; border:1px solid #e8e6e3; border-radius:8px; cursor:pointer; font-size:13px; color:#666;">Cancel</button>
-    </div>
-  </div>
-</div>
 </body>
 </html>
-
