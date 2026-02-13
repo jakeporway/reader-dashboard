@@ -41,6 +41,46 @@
             overflow-x: hidden;
         }
 
+        
+        .card-date {
+            font-size: 0.75rem;
+            color: var(--text-light);
+        }
+        .audience-badge {
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+        .audience-newsletter { background: #e3f2fd; color: #1565c0; }
+        .audience-friends { background: #fce4ec; color: #c62828; }
+        .alignment-badge {
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+        .alignment-5 { background: #e8f5e9; color: #2e7d32; }
+        .alignment-4 { background: #f1f8e9; color: #558b2f; }
+        .alignment-3 { background: #fff8e1; color: #f57f17; }
+        .alignment-2 { background: #fff3e0; color: #e65100; }
+        .alignment-1 { background: #fce4ec; color: #c62828; }
+        .card-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-top: 8px;
+        }
+        .tag {
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            background: var(--bg-secondary);
+            border-radius: 4px;
+            color: var(--text-secondary);
+        }
+
         /* Header */
         .header {
             background: var(--bg-card);
@@ -754,7 +794,8 @@
             
             <div class="header-actions">
                 <button class="btn btn-primary" id="add-link-btn">+ Add Link</button>
-                <button class="btn btn-secondary" id="sync-btn">Sync</button>
+                <button class="btn btn-secondary" id="sync-btn">☁️ Sync</button>
+                <button class="btn btn-secondary" id="export-btn">📤 Export</button>
             </div>
         </div>
     </header>
@@ -987,6 +1028,7 @@
             localStorage.setItem('curator-custom-items', JSON.stringify(appData.customItems));
             localStorage.setItem('curator-favorites', JSON.stringify([...appData.favorites]));
             localStorage.setItem('curator-read-items', JSON.stringify([...appData.readItems]));
+            syncData(true);  // auto-sync silently
         }
 
         // Data Loading
@@ -1075,7 +1117,10 @@
                         <div class="card-meta">
                             <span class="content-type ${item.contentType.toLowerCase()}">${item.contentType}</span>
                             <span class="source-name">${item.source}</span>
+                            <span class="card-date">${item.pullDate || item.date}</span>
                             ${item.paywall ? '<span class="paywall-icon">🔒</span>' : ''}
+                            ${item.audience && item.audience !== 'both' ? `<span class="audience-badge audience-${item.audience}">${item.audience === 'friends' ? '🎉 Friends' : '🏢 Newsletter'}</span>` : ''}
+                            ${item.alignment ? `<span class="alignment-badge alignment-${item.alignment}">Match: ${item.alignment}/5</span>` : ''}
                         </div>
                         
                         <h3 class="card-title"><a href="${item.url}" target="_blank" onclick="markAsRead('${item.id}')">${item.headline}</a></h3>
@@ -1093,11 +1138,12 @@
                             </div>
                         ` : ''}
                         
+                        ${(item.tags && item.tags.length) ? `<div class="card-tags">${item.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>` : ''}
                         <div class="card-actions">
                             <button class="action-btn star-btn ${isFavorited ? 'active' : ''}" onclick="toggleFavorite('${item.id}')" title="Star as favorite">⭐</button>
                             <button class="action-btn" onclick="openCommentModal('${item.id}')" title="Add comment">💬</button>
                             <button class="action-btn" onclick="openHighlightModal('${item.id}')" title="Add highlight">✏️</button>
-                            <a href="${item.url}" target="_blank" class="action-btn" onclick="markAsRead('${item.id}')" title="Read article">🔗</a>
+                            
                             
                             <div class="rating-group">
                                 <button class="rating-btn ${feedback?.rating === 'up' ? 'active' : ''}" onclick="setRating('${item.id}', 'up')" title="Good">👍</button>
@@ -1414,6 +1460,28 @@
             showToast('Link added to library');
         }
 
+        
+        function exportFeedback() {
+            const data = appData.items.map(i => ({
+                headline: i.headline,
+                source: i.source,
+                url: i.url,
+                contentType: i.contentType,
+                date: i.date,
+                rating: appData.feedback[i.id]?.rating || 'unrated',
+                comment: appData.feedback[i.id]?.comment || '',
+                highlights: (appData.highlights[i.id] || []).map(h => h.text),
+                favorited: appData.favorites.has(i.id),
+                tags: i.tags
+            }));
+            const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'feedback-' + new Date().toISOString().split('T')[0] + '.json';
+            a.click();
+            showToast('Exported! 📤');
+        }
+
         // Draft Export Functions
         function exportAsMarkdown() {
             const favorites = appData.items.filter(item => appData.favorites.has(item.id));
@@ -1515,36 +1583,46 @@
         }
 
         // Sync Functions
-        async function syncData() {
-            const syncId = localStorage.getItem('curator-sync-id');
-            if (!syncId) {
-                showToast('No sync ID found');
-                return;
-            }
-
-            const syncData = {
+        async function syncData(silent) {
+            let syncId = localStorage.getItem('curator-sync-id');
+            
+            const payload = {
                 feedback: appData.feedback,
                 highlights: appData.highlights,
                 readItems: [...appData.readItems],
                 favorites: [...appData.favorites],
                 customItems: appData.customItems,
-                lastSync: Date.now()
+                lastSync: new Date().toISOString(),
+                ratedCount: Object.keys(appData.feedback).filter(k => appData.feedback[k]?.rating).length
             };
 
             try {
-                const response = await fetch(SYNC_URL_BASE + syncId, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(syncData)
-                });
-
-                if (response.ok) {
-                    showToast('Synced successfully');
-                } else {
-                    showToast('Sync failed');
+                if (!syncId) {
+                    // Auto-create sync blob
+                    const createResp = await fetch('https://jsonblob.com/api/jsonBlob', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    if (createResp.ok) {
+                        const loc = createResp.headers.get('Location') || '';
+                        syncId = loc.split('/').pop() || null;
+                        if (syncId) {
+                            localStorage.setItem('curator-sync-id', syncId);
+                            if (!silent) showToast('Sync created ☁️');
+                        }
+                    }
+                    return;
                 }
+
+                await fetch(SYNC_URL_BASE + syncId, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (!silent) showToast('Synced ☁️');
             } catch (error) {
-                showToast('Sync error');
+                if (!silent) showToast('Sync error');
                 console.error('Sync error:', error);
             }
         }
@@ -1552,6 +1630,7 @@
         // Event Listeners
         document.addEventListener('DOMContentLoaded', () => {
             loadData();
+            syncData(true);  // init sync on load
 
             // Tab navigation
             document.querySelectorAll('.nav-tab').forEach(tab => {
@@ -1638,7 +1717,8 @@
             document.getElementById('copy-text-btn').addEventListener('click', exportAsText);
 
             // Sync
-            document.getElementById('sync-btn').addEventListener('click', syncData);
+            document.getElementById('sync-btn').addEventListener('click', () => syncData(false));
+            document.getElementById('export-btn').addEventListener('click', exportFeedback);
 
             // Modal backdrop clicks
             document.querySelectorAll('.modal').forEach(modal => {
@@ -1668,6 +1748,7 @@
         window.toggleDescription = toggleDescription;
         window.saveDraftIntro = saveDraftIntro;
         window.loadFeed = loadFeed;
+        window.exportFeedback = exportFeedback;
     </script>
 </body>
 </html>
