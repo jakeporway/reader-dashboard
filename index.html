@@ -114,6 +114,21 @@
   .modal input, .modal textarea { width:100%; padding:10px; border:1px solid var(--border); border-radius:8px; font-size:14px; outline:none; box-sizing:border-box; font-family:inherit; }
   .modal textarea { min-height:60px; resize:vertical; margin-top:8px; font-size:13px; }
 
+
+  .highlights { padding:0 20px 16px; }
+  .highlight-item { background:linear-gradient(120deg, #fff9c4 0%, #fff59d 100%); padding:8px 12px; border-radius:6px; font-size:13px; font-style:italic; line-height:1.5; margin-bottom:6px; position:relative; border-left:3px solid #fdd835; }
+  .highlight-item .remove-hl { position:absolute; top:4px; right:6px; background:none; border:none; cursor:pointer; font-size:10px; color:#999; opacity:0; transition:opacity 0.2s; }
+  .highlight-item:hover .remove-hl { opacity:1; }
+  .add-highlight { display:none; padding:0 20px 16px; }
+  .add-highlight.open { display:block; }
+  .add-highlight textarea { width:100%; padding:8px; border:1px solid var(--border); border-radius:6px; font-family:inherit; font-size:13px; resize:vertical; min-height:40px; outline:none; font-style:italic; }
+  .add-highlight textarea:focus { border-color:#fdd835; }
+  .add-highlight textarea::placeholder { color:#ccc; }
+  .hl-actions { display:flex; gap:6px; margin-top:6px; }
+  .hl-actions button { padding:4px 10px; border-radius:6px; font-size:11px; cursor:pointer; }
+  .save-hl { background:#fdd835; color:#333; border:none; }
+  .cancel-hl { background:white; border:1px solid var(--border); color:#666; }
+
   .toast { position:fixed; bottom:24px; right:24px; background:var(--text); color:white; padding:10px 18px; border-radius:8px; font-size:13px; opacity:0; transform:translateY(10px); transition:all 0.3s; z-index:1000; }
   .toast.show { opacity:1; transform:translateY(0); }
 
@@ -284,12 +299,21 @@ function renderCards() {
           ${item.alignment ? `<span class="alignment alignment-${item.alignment}">Match: ${item.alignment}/5</span>` : ''}
         </div>
       </div>
+      <div class="highlights" id="highlights-${item.id}"></div>
+      <div class="add-highlight" id="add-hl-${item.id}">
+        <textarea placeholder="Paste a quote or snippet you loved..." id="hl-textarea-${item.id}"></textarea>
+        <div class="hl-actions">
+          <button class="save-hl" onclick="saveHighlight('${item.id}')">💛 Save Highlight</button>
+          <button class="cancel-hl" onclick="toggleHighlight('${item.id}')">Cancel</button>
+        </div>
+      </div>
       <div class="card-actions">
         <button class="rate-btn ${fb.rating==='fire'?'selected':''}" onclick="rate('${item.id}','fire')">🔥</button>
         <button class="rate-btn ${fb.rating==='good'?'selected':''}" onclick="rate('${item.id}','good')">👍</button>
         <button class="rate-btn ${fb.rating==='meh'?'selected':''}" onclick="rate('${item.id}','meh')">😐</button>
         <button class="rate-btn ${fb.rating==='nope'?'selected':''}" onclick="rate('${item.id}','nope')">👎</button>
         <button class="comment-toggle" onclick="toggleComment('${item.id}')">💬</button>
+        <button class="comment-toggle" onclick="toggleHighlight('${item.id}')" style="margin-left:0;">✏️ Highlight</button>
       </div>
       <div class="comment-box ${fb.comment?'open':''}" id="comment-${item.id}">
         <textarea placeholder="What do you think? This helps me learn your taste..." id="textarea-${item.id}">${fb.comment||''}</textarea>
@@ -402,7 +426,185 @@ async function initSync() {
   if (!syncBlobId) { try { const r=await fetch(SYNC_URL,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({feedback:{},lastSync:new Date().toISOString()})}); if(r.ok){const l=r.headers.get('Location')||'';syncBlobId=l.split('/').pop()||null;if(syncBlobId){localStorage.setItem('curator-sync-id',syncBlobId);}} }catch(e){} }
   if(syncBlobId) document.getElementById('sync-status').textContent='☁️ Synced';
 }
-async function syncFeedback() { if(!syncBlobId)await initSync(); if(!syncBlobId)return; try{await fetch(SYNC_URL+'/'+syncBlobId,{method:'PUT',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({feedback,lastSync:new Date().toISOString(),ratedCount:Object.keys(feedback).filter(k=>feedback[k]?.rating).length})});}catch(e){} }
+async function syncFeedback() { if(!syncBlobId)await 
+// === HIGHLIGHTS ===
+let highlights = JSON.parse(localStorage.getItem('curator-highlights') || '{}');
+
+function toggleHighlight(id) {
+  document.getElementById('add-hl-' + id)?.classList.toggle('open');
+  const ta = document.getElementById('hl-textarea-' + id);
+  if (ta) ta.focus();
+}
+
+function saveHighlight(id) {
+  const ta = document.getElementById('hl-textarea-' + id);
+  const text = ta.value.trim();
+  if (!text) return;
+  if (!highlights[id]) highlights[id] = [];
+  highlights[id].push({ text: text, timestamp: new Date().toISOString() });
+  localStorage.setItem('curator-highlights', JSON.stringify(highlights));
+  ta.value = '';
+  toggleHighlight(id);
+  renderHighlights(id);
+  syncFeedback();
+  showToast('Highlight saved! 💛');
+}
+
+function removeHighlight(id, idx) {
+  if (highlights[id]) {
+    highlights[id].splice(idx, 1);
+    if (!highlights[id].length) delete highlights[id];
+    localStorage.setItem('curator-highlights', JSON.stringify(highlights));
+    renderHighlights(id);
+    syncFeedback();
+  }
+}
+
+function renderHighlights(id) {
+  const container = document.getElementById('highlights-' + id);
+  if (!container) return;
+  const hls = highlights[id] || [];
+  container.innerHTML = hls.map((h, i) => 
+    '<div class="highlight-item">"' + h.text + '"<button class="remove-hl" onclick="removeHighlight(\'' + id + '\',' + i + ')">✕</button></div>'
+  ).join('');
+}
+
+// Render highlights on card render
+const _origRenderCards = renderCards;
+renderCards = function() {
+  _origRenderCards();
+  // Render highlights for visible items
+  Object.keys(highlights).forEach(id => renderHighlights(id));
+};
+
+// Include highlights in sync
+const _origSyncFb = syncFeedback;
+syncFeedback = async function() {
+  if (!syncBlobId) await initSync();
+  if (!syncBlobId) return;
+  try {
+    await fetch(SYNC_URL + '/' + syncBlobId, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({
+        feedback: feedback,
+        highlights: highlights,
+        lastSync: new Date().toISOString(),
+        ratedCount: Object.keys(feedback).filter(k => feedback[k]?.rating).length
+      })
+    });
+  } catch(e) {}
+};
+
+// Include highlights in export
+const _origExport = exportFeedback;
+exportFeedback = function() {
+  const allItems = Object.values(allData).flatMap(d => d.items||[]);
+  const data = allItems.map(i => ({
+    headline: i.headline, source: i.source, url: i.url, contentType: i.contentType,
+    rating: feedback[i.id]?.rating || 'unrated',
+    comment: feedback[i.id]?.comment || '',
+    highlights: (highlights[i.id] || []).map(h => h.text),
+    tags: i.tags
+  }));
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'feedback-' + new Date().toISOString().split('T')[0] + '.json';
+  a.click();
+  showToast('Exported! 📤');
+};
+
+initSync(); if(!syncBlobId)return; try{await fetch(SYNC_URL+'/'+syncBlobId,{method:'PUT',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({feedback,lastSync:new Date().toISOString(),ratedCount:Object.keys(feedback).filter(k=>feedback[k]?.rating).length})});}catch(e){} }
+
+
+// === HIGHLIGHTS ===
+let highlights = JSON.parse(localStorage.getItem('curator-highlights') || '{}');
+
+function toggleHighlight(id) {
+  document.getElementById('add-hl-' + id)?.classList.toggle('open');
+  const ta = document.getElementById('hl-textarea-' + id);
+  if (ta) ta.focus();
+}
+
+function saveHighlight(id) {
+  const ta = document.getElementById('hl-textarea-' + id);
+  const text = ta.value.trim();
+  if (!text) return;
+  if (!highlights[id]) highlights[id] = [];
+  highlights[id].push({ text: text, timestamp: new Date().toISOString() });
+  localStorage.setItem('curator-highlights', JSON.stringify(highlights));
+  ta.value = '';
+  toggleHighlight(id);
+  renderHighlights(id);
+  syncFeedback();
+  showToast('Highlight saved! 💛');
+}
+
+function removeHighlight(id, idx) {
+  if (highlights[id]) {
+    highlights[id].splice(idx, 1);
+    if (!highlights[id].length) delete highlights[id];
+    localStorage.setItem('curator-highlights', JSON.stringify(highlights));
+    renderHighlights(id);
+    syncFeedback();
+  }
+}
+
+function renderHighlights(id) {
+  const container = document.getElementById('highlights-' + id);
+  if (!container) return;
+  const hls = highlights[id] || [];
+  container.innerHTML = hls.map((h, i) => 
+    '<div class="highlight-item">"' + h.text + '"<button class="remove-hl" onclick="removeHighlight(\'' + id + '\',' + i + ')">✕</button></div>'
+  ).join('');
+}
+
+// Render highlights on card render
+const _origRenderCards = renderCards;
+renderCards = function() {
+  _origRenderCards();
+  // Render highlights for visible items
+  Object.keys(highlights).forEach(id => renderHighlights(id));
+};
+
+// Include highlights in sync
+const _origSyncFb = syncFeedback;
+syncFeedback = async function() {
+  if (!syncBlobId) await initSync();
+  if (!syncBlobId) return;
+  try {
+    await fetch(SYNC_URL + '/' + syncBlobId, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({
+        feedback: feedback,
+        highlights: highlights,
+        lastSync: new Date().toISOString(),
+        ratedCount: Object.keys(feedback).filter(k => feedback[k]?.rating).length
+      })
+    });
+  } catch(e) {}
+};
+
+// Include highlights in export
+const _origExport = exportFeedback;
+exportFeedback = function() {
+  const allItems = Object.values(allData).flatMap(d => d.items||[]);
+  const data = allItems.map(i => ({
+    headline: i.headline, source: i.source, url: i.url, contentType: i.contentType,
+    rating: feedback[i.id]?.rating || 'unrated',
+    comment: feedback[i.id]?.comment || '',
+    highlights: (highlights[i.id] || []).map(h => h.text),
+    tags: i.tags
+  }));
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'feedback-' + new Date().toISOString().split('T')[0] + '.json';
+  a.click();
+  showToast('Exported! 📤');
+};
 
 initSync();
 loadData();
