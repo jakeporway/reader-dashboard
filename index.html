@@ -457,6 +457,7 @@
       <button onclick="setView('board')">📌 Board</button>
       <button onclick="setView('favorites')">⭐ Favorites</button>
       <button onclick="setView('draft')">✍️ Draft Builder</button>
+      <button onclick="setView('sources')">📡 Sources</button>
     </nav>
     <span id="sync-status" style="font-size:12px;color:#666;">☁️ Connecting...</span>
     <button class="export-btn" onclick="toggleAddLink()">➕ Add Link</button>
@@ -560,6 +561,7 @@ function renderCards() {
   const container = document.getElementById('cards-container');
   const filtered = getFilteredItems();
 
+  if (currentView === 'sources') { renderSources(container); return; }
   if (currentView === 'draft') {
     renderDraft(container, filtered);
     return;
@@ -717,6 +719,110 @@ function showToast(msg) {
   setTimeout(() => toast.classList.remove('show'), 2000);
 }
 
+
+
+// === SOURCES BROWSER ===
+const SOURCE_FEEDS = [
+  { name: 'Colossal', url: 'https://www.thisiscolossal.com/feed/', site: 'thisiscolossal.com' },
+  { name: 'Kottke', url: 'https://feeds.kottke.org/main', site: 'kottke.org' },
+  { name: 'Aeon', url: 'https://aeon.co/feed.rss', site: 'aeon.co' },
+  { name: 'The Marginalian', url: 'https://feeds.feedburner.com/brainpickings/rss', site: 'themarginalian.org' },
+  { name: 'Boing Boing', url: 'https://boingboing.net/feed', site: 'boingboing.net' },
+  { name: 'Atlas Obscura', url: 'https://www.atlasobscura.com/feeds/latest', site: 'atlasobscura.com' },
+  { name: 'It\'s Nice That', url: 'https://feeds.feedburner.com/itsnicethat/SlXC', site: 'itsnicethat.com' },
+  { name: 'Dense Discovery', url: 'https://www.densediscovery.com/feed/', site: 'densediscovery.com' },
+  { name: 'Austin Kleon', url: 'https://austinkleon.com/feed/', site: 'austinkleon.com' },
+  { name: 'Works in Progress', url: 'https://www.worksinprogress.co/feed/', site: 'worksinprogress.co' },
+  { name: 'SSIR', url: 'https://ssir.org/site/rss_feed', site: 'ssir.org' },
+  { name: 'Eye on Design', url: 'https://eyeondesign.aiga.org/feed/', site: 'eyeondesign.aiga.org' },
+  { name: 'Behavioral Scientist', url: 'https://behavioralscientist.org/feed/', site: 'behavioralscientist.org' },
+  { name: 'Nautilus', url: 'https://nautil.us/feed/', site: 'nautil.us' },
+  { name: 'Places Journal', url: 'https://placesjournal.org/feed/', site: 'placesjournal.org' },
+  { name: 'Farnam Street', url: 'https://fs.blog/feed/', site: 'fs.blog' },
+];
+
+let rssCache = {};
+let activeSource = null;
+
+function renderSources(container) {
+  container.className = '';
+  container.innerHTML = `
+    <div style="display:flex; gap:20px; min-height:60vh;">
+      <div style="min-width:200px; max-width:220px;">
+        <h3 style="font-size:14px; color:var(--text-muted); margin-bottom:12px; text-transform:uppercase; letter-spacing:0.5px;">Sources</h3>
+        ${SOURCE_FEEDS.map(s => `
+          <div class="source-item" onclick="loadFeed('${s.url}', '${s.name}')" 
+               style="padding:8px 12px; border-radius:8px; cursor:pointer; font-size:13px; margin-bottom:4px;
+                      background:${activeSource === s.name ? 'var(--accent-light)' : 'transparent'};
+                      color:${activeSource === s.name ? 'var(--accent)' : 'var(--text)'};
+                      border:1px solid ${activeSource === s.name ? 'var(--accent)' : 'transparent'};">
+            ${s.name}
+          </div>
+        `).join('')}
+      </div>
+      <div style="flex:1;" id="feed-content">
+        <div class="empty-state">
+          <div class="emoji">📡</div>
+          <p>Pick a source on the left to browse their recent posts.<br>Like something? Rate it or add it to your feed!</p>
+        </div>
+      </div>
+    </div>`;
+}
+
+async function loadFeed(feedUrl, name) {
+  activeSource = name;
+  const feedContent = document.getElementById('feed-content') || document.querySelector('#cards-container #feed-content');
+  
+  // Re-render sidebar to update active state
+  renderCards();
+  
+  const fc = document.getElementById('feed-content');
+  fc.innerHTML = '<div style="padding:40px; text-align:center; color:var(--text-muted);">Loading feed... ⏳</div>';
+  
+  try {
+    // Use a CORS proxy to fetch RSS
+    const proxyUrl = 'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(feedUrl);
+    const resp = await fetch(proxyUrl);
+    const data = await resp.json();
+    
+    if (data.status === 'ok' && data.items) {
+      fc.innerHTML = data.items.slice(0, 20).map(item => `
+        <div class="card" style="margin-bottom:12px;">
+          ${item.thumbnail ? '<img src="' + item.thumbnail + '" style="width:100%; max-height:200px; object-fit:cover; border-radius:8px; margin-bottom:12px;" onerror="this.style.display=\'none\'">' : ''}
+          <div class="card-source">${name} · ${new Date(item.pubDate).toLocaleDateString()}</div>
+          <div class="card-headline"><a href="${item.link}" target="_blank">${item.title}</a></div>
+          <div class="card-description" style="font-size:13px;">${(item.description || '').replace(/<[^>]*>/g, '').slice(0, 200)}...</div>
+          <button class="export-btn" style="margin-top:10px;" onclick="addFromFeed('${item.link.replace(/'/g, "\\'")}', '${item.title.replace(/'/g, "\\'")}', '${name}')">
+            ➕ Add to my feed
+          </button>
+        </div>
+      `).join('');
+    } else {
+      fc.innerHTML = '<div style="padding:40px; text-align:center; color:var(--text-muted);">Couldn\'t load this feed. Try visiting <a href="' + feedUrl.replace(/\/feed.*/, '') + '" target="_blank">the site directly</a>.</div>';
+    }
+  } catch(e) {
+    fc.innerHTML = '<div style="padding:40px; text-align:center; color:var(--text-muted);">Feed unavailable. Try visiting the site directly.</div>';
+  }
+}
+
+function addFromFeed(url, title, source) {
+  const newItem = {
+    id: 'feed-' + Date.now(),
+    headline: title,
+    source: source,
+    url: url,
+    description: 'Added from ' + source + ' feed',
+    tags: ['from-feed'],
+    alignment: null,
+    paywall: false,
+    custom: true
+  };
+  items.unshift(newItem);
+  const customs = JSON.parse(localStorage.getItem('curator-custom-items') || '[]');
+  customs.push(newItem);
+  localStorage.setItem('curator-custom-items', JSON.stringify(customs));
+  showToast('Added to your feed! ✨');
+}
 
 // === AUTO-SYNC ===
 const SYNC_URL = 'https://jsonblob.com/api/jsonBlob';
