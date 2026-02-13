@@ -519,59 +519,6 @@ initSync(); if(!syncBlobId)return; try{await fetch(SYNC_URL+'/'+syncBlobId,{meth
 
 
 // === HIGHLIGHTS ===
-let highlights = JSON.parse(localStorage.getItem('curator-highlights') || '{}');
-
-function toggleHighlight(id) {
-  document.getElementById('add-hl-' + id)?.classList.toggle('open');
-  const ta = document.getElementById('hl-textarea-' + id);
-  if (ta) ta.focus();
-}
-
-function saveHighlight(id) {
-  const ta = document.getElementById('hl-textarea-' + id);
-  const text = ta.value.trim();
-  if (!text) return;
-  if (!highlights[id]) highlights[id] = [];
-  highlights[id].push({ text: text, timestamp: new Date().toISOString() });
-  localStorage.setItem('curator-highlights', JSON.stringify(highlights));
-  ta.value = '';
-  toggleHighlight(id);
-  renderHighlights(id);
-  syncFeedback();
-  showToast('Highlight saved! 💛');
-}
-
-function removeHighlight(id, idx) {
-  if (highlights[id]) {
-    highlights[id].splice(idx, 1);
-    if (!highlights[id].length) delete highlights[id];
-    localStorage.setItem('curator-highlights', JSON.stringify(highlights));
-    renderHighlights(id);
-    syncFeedback();
-  }
-}
-
-function renderHighlights(id) {
-  const container = document.getElementById('highlights-' + id);
-  if (!container) return;
-  const hls = highlights[id] || [];
-  container.innerHTML = hls.map((h, i) => 
-    '<div class="highlight-item">"' + h.text + '"<button class="remove-hl" onclick="removeHighlight(\'' + id + '\',' + i + ')">✕</button></div>'
-  ).join('');
-}
-
-// Render highlights on card render
-const _origRenderCards = renderCards;
-renderCards = function() {
-  _origRenderCards();
-  // Render highlights for visible items
-  Object.keys(highlights).forEach(id => renderHighlights(id));
-};
-
-// Include highlights in sync
-const _origSyncFb = syncFeedback;
-syncFeedback = async function() {
-  if (!syncBlobId) await initSync();
   if (!syncBlobId) return;
   try {
     await fetch(SYNC_URL + '/' + syncBlobId, {
@@ -588,23 +535,6 @@ syncFeedback = async function() {
 };
 
 // Include highlights in export
-const _origExport = exportFeedback;
-exportFeedback = function() {
-  const allItems = Object.values(allData).flatMap(d => d.items||[]);
-  const data = allItems.map(i => ({
-    headline: i.headline, source: i.source, url: i.url, contentType: i.contentType,
-    rating: feedback[i.id]?.rating || 'unrated',
-    comment: feedback[i.id]?.comment || '',
-    highlights: (highlights[i.id] || []).map(h => h.text),
-    tags: i.tags
-  }));
-  const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'feedback-' + new Date().toISOString().split('T')[0] + '.json';
-  a.click();
-  showToast('Exported! 📤');
-};
 
 initSync();
 loadData();
