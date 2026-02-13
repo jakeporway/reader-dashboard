@@ -178,6 +178,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
+
 let currentView = 'board';
 let activeFilters = new Set();
 let allData = {};
@@ -185,18 +186,12 @@ let items = [];
 let currentDate = null;
 let availableDates = [];
 let feedback = JSON.parse(localStorage.getItem('curator-feedback-v2') || '{}');
+let highlights = JSON.parse(localStorage.getItem('curator-highlights') || '{}');
 
 const CONTENT_TYPES = [
-  { key:'article', label:'📝 Articles', icon:'📝' },
-  { key:'project', label:'🎨 Projects', icon:'🎨' },
-  { key:'visual-art', label:'🖼️ Visual Art', icon:'🖼️' },
-  { key:'interactive', label:'🎮 Interactive', icon:'🎮' },
-  { key:'video', label:'🎥 Video', icon:'🎥' },
-  { key:'audio', label:'🎧 Audio', icon:'🎧' },
-  { key:'podcast', label:'🎙️ Podcast', icon:'🎙️' },
-  { key:'framework', label:'🧰 Framework', icon:'🧰' },
-  { key:'toolkit', label:'🔧 Toolkit', icon:'🔧' },
-  { key:'immersive', label:'✨ Immersive', icon:'✨' },
+  {key:'article',label:'📝 Articles'},{key:'project',label:'🎨 Projects'},{key:'visual-art',label:'🖼️ Visual Art'},
+  {key:'interactive',label:'🎮 Interactive'},{key:'video',label:'🎥 Video'},{key:'audio',label:'🎧 Audio'},
+  {key:'podcast',label:'🎙️ Podcast'},{key:'framework',label:'🧰 Framework'},{key:'toolkit',label:'🔧 Toolkit'},{key:'immersive',label:'✨ Immersive'}
 ];
 
 async function loadData() {
@@ -209,7 +204,7 @@ async function loadData() {
       currentDate = availableDates[0];
       items = allData[currentDate]?.items || [];
     } else if (data.items) {
-      allData = { 'today': { pullDate: data.pullDate, items: data.items } };
+      allData = {'today':{pullDate:data.pullDate,items:data.items}};
       availableDates = ['today'];
       currentDate = 'today';
       items = data.items;
@@ -218,46 +213,34 @@ async function loadData() {
     renderFilters();
     renderCards();
     updateStats();
-    updateTitle();
   } catch(e) {
-    document.getElementById('pull-title').textContent = 'Waiting for first content pull...';
-    document.getElementById('cards-container').innerHTML = '<div class="empty-state"><div class="emoji">🔍</div><p>Content incoming! Check back soon.</p></div>';
+    document.getElementById('pull-title').textContent = 'Waiting for content...';
+    document.getElementById('cards-container').innerHTML = '<div class="empty-state"><div class="emoji">🔍</div><p>Content incoming!</p></div>';
   }
-}
-
-function updateTitle() {
-  const d = allData[currentDate];
-  document.getElementById('pull-title').textContent = d?.pullDate || currentDate;
 }
 
 function navigateDate(dir) {
   const idx = availableDates.indexOf(currentDate);
-  const newIdx = idx + dir;
-  if (newIdx >= 0 && newIdx < availableDates.length) {
-    currentDate = availableDates[newIdx];
+  const ni = idx + dir;
+  if (ni >= 0 && ni < availableDates.length) {
+    currentDate = availableDates[ni];
     items = allData[currentDate]?.items || [];
     loadCustomItems();
+    renderFilters();
     renderCards();
     updateStats();
-    updateTitle();
   }
 }
 
 function renderFilters() {
-  const container = document.getElementById('filters');
+  const c = document.getElementById('filters');
   const types = CONTENT_TYPES.filter(t => items.some(i => i.contentType === t.key));
-  container.innerHTML = `
-    <span class="filter-chip ${activeFilters.size===0?'active':''}" onclick="clearFilters()">All</span>
-    ${types.map(t => `<span class="filter-chip ${activeFilters.has(t.key)?'active':''}" onclick="toggleFilter('${t.key}')">${t.label}</span>`).join('')}
-    <div class="date-nav">
-      <button onclick="navigateDate(1)" title="Previous day">◀</button>
-      <span class="date-label" id="date-label">${allData[currentDate]?.pullDate || ''}</span>
-      <button onclick="navigateDate(-1)" title="Next day">▶</button>
-    </div>
-  `;
+  c.innerHTML = '<span class="filter-chip ' + (activeFilters.size===0?'active':'') + '" onclick="clearFilters()">All</span>' +
+    types.map(t => '<span class="filter-chip ' + (activeFilters.has(t.key)?'active':'') + '" onclick="toggleFilter(\'' + t.key + '\')">' + t.label + '</span>').join('') +
+    '<div class="date-nav"><button onclick="navigateDate(1)">◀</button><span class="date-label">' + (allData[currentDate]?.pullDate||'') + '</span><button onclick="navigateDate(-1)">▶</button></div>';
 }
 
-function toggleFilter(type) { if(activeFilters.has(type)) activeFilters.delete(type); else activeFilters.add(type); renderFilters(); renderCards(); updateStats(); }
+function toggleFilter(t) { if(activeFilters.has(t))activeFilters.delete(t);else activeFilters.add(t); renderFilters(); renderCards(); updateStats(); }
 function clearFilters() { activeFilters.clear(); renderFilters(); renderCards(); updateStats(); }
 
 function getFilteredItems() {
@@ -270,274 +253,148 @@ function getFilteredItems() {
 function renderCards() {
   const container = document.getElementById('cards-container');
   const filtered = getFilteredItems();
-
   if (currentView === 'sources') { renderSources(container); return; }
   if (currentView === 'draft') { renderDraft(container); return; }
-
   const isGrid = currentView === 'board';
   container.className = isGrid ? 'grid' : '';
-
   if (!filtered.length) {
-    container.innerHTML = `<div class="empty-state"><div class="emoji">${currentView==='favorites'?'⭐':'🔍'}</div><p>${currentView==='favorites'?'No favorites yet! Rate items to save them here.':'No items match this filter.'}</p></div>`;
+    container.innerHTML = '<div class="empty-state"><div class="emoji">' + (currentView==='favorites'?'⭐':'🔍') + '</div><p>' + (currentView==='favorites'?'No favorites yet!':'No items match.') + '</p></div>';
     return;
   }
-
-  container.innerHTML = filtered.map(item => {
-    const fb = feedback[item.id] || {};
-    const typeClass = 'type-' + (item.contentType || 'article');
-    const desc = (item.description || '').replace(/\"([^\"]{20,})\"/g, '<blockquote>"$1"</blockquote>');
-    return `
-    <div class="card">
-      ${item.image ? `<img class="card-image" src="${item.image}" onerror="this.style.display='none'" alt="">` : ''}
-      <div class="card-body">
-        <span class="card-type ${typeClass}">${item.contentType || 'article'}</span>
-        <span class="card-source">${item.source}${item.paywall ? ' · <span class="paywall-flag">🔒 Paywall</span>' : ''}</span>
-        <div class="card-headline"><a href="${item.url}" target="_blank">${item.headline}</a></div>
-        <div class="card-description">${desc}</div>
-        <div class="card-meta">
-          ${(item.tags||[]).map(t => `<span class="tag">${t}</span>`).join('')}
-          ${item.alignment ? `<span class="alignment alignment-${item.alignment}">Match: ${item.alignment}/5</span>` : ''}
-        </div>
-      </div>
-      <div class="highlights" id="highlights-${item.id}"></div>
-      <div class="add-highlight" id="add-hl-${item.id}">
-        <textarea placeholder="Paste a quote or snippet you loved..." id="hl-textarea-${item.id}"></textarea>
-        <div class="hl-actions">
-          <button class="save-hl" onclick="saveHighlight('${item.id}')">💛 Save Highlight</button>
-          <button class="cancel-hl" onclick="toggleHighlight('${item.id}')">Cancel</button>
-        </div>
-      </div>
-      <div class="card-actions">
-        <button class="rate-btn ${fb.rating==='fire'?'selected':''}" onclick="rate('${item.id}','fire')">🔥</button>
-        <button class="rate-btn ${fb.rating==='good'?'selected':''}" onclick="rate('${item.id}','good')">👍</button>
-        <button class="rate-btn ${fb.rating==='meh'?'selected':''}" onclick="rate('${item.id}','meh')">😐</button>
-        <button class="rate-btn ${fb.rating==='nope'?'selected':''}" onclick="rate('${item.id}','nope')">👎</button>
-        <button class="comment-toggle" onclick="toggleComment('${item.id}')">💬</button>
-        <button class="comment-toggle" onclick="toggleHighlight('${item.id}')" style="margin-left:0;">✏️ Highlight</button>
-      </div>
-      <div class="comment-box ${fb.comment?'open':''}" id="comment-${item.id}">
-        <textarea placeholder="What do you think? This helps me learn your taste..." id="textarea-${item.id}">${fb.comment||''}</textarea>
-        <button class="save-comment" onclick="saveComment('${item.id}')">Save</button>
-      </div>
-    </div>`;
+  container.innerHTML = filtered.map(function(item) {
+    var fb = feedback[item.id] || {};
+    var typeClass = 'type-' + (item.contentType || 'article');
+    var desc = (item.description || '');
+    var hls = highlights[item.id] || [];
+    var hlsHtml = hls.map(function(h, i) {
+      return '<div class="highlight-item">&ldquo;' + h.text.replace(/</g,'&lt;') + '&rdquo;<button class="remove-hl" onclick="removeHighlight(\'' + item.id + '\',' + i + ')">✕</button></div>';
+    }).join('');
+    return '<div class="card">' +
+      (item.image ? '<img class="card-image" src="' + item.image + '" onerror="this.style.display=\'none\'" alt="">' : '') +
+      '<div class="card-body">' +
+        '<span class="card-type ' + typeClass + '">' + (item.contentType||'article') + '</span>' +
+        '<span class="card-source">' + item.source + (item.paywall?' · <span class="paywall-flag">🔒 Paywall</span>':'') + '</span>' +
+        '<div class="card-headline"><a href="' + item.url + '" target="_blank">' + item.headline + '</a></div>' +
+        '<div class="card-description">' + desc + '</div>' +
+        '<div class="card-meta">' + (item.tags||[]).map(function(t){return '<span class="tag">'+t+'</span>';}).join('') +
+          (item.alignment ? '<span class="alignment alignment-' + item.alignment + '">Match: ' + item.alignment + '/5</span>' : '') +
+        '</div>' +
+      '</div>' +
+      (hlsHtml ? '<div class="highlights">' + hlsHtml + '</div>' : '') +
+      '<div class="add-highlight" id="add-hl-' + item.id + '">' +
+        '<textarea placeholder="Paste a quote you loved..." id="hl-textarea-' + item.id + '"></textarea>' +
+        '<div class="hl-actions"><button class="save-hl" onclick="saveHighlight(\'' + item.id + '\')">💛 Save</button><button class="cancel-hl" onclick="toggleHighlight(\'' + item.id + '\')">Cancel</button></div>' +
+      '</div>' +
+      '<div class="card-actions">' +
+        '<button class="rate-btn ' + (fb.rating==='fire'?'selected':'') + '" onclick="rate(\'' + item.id + '\',\'fire\')">🔥</button>' +
+        '<button class="rate-btn ' + (fb.rating==='good'?'selected':'') + '" onclick="rate(\'' + item.id + '\',\'good\')">👍</button>' +
+        '<button class="rate-btn ' + (fb.rating==='meh'?'selected':'') + '" onclick="rate(\'' + item.id + '\',\'meh\')">😐</button>' +
+        '<button class="rate-btn ' + (fb.rating==='nope'?'selected':'') + '" onclick="rate(\'' + item.id + '\',\'nope\')">👎</button>' +
+        '<button class="comment-toggle" onclick="toggleComment(\'' + item.id + '\')">💬</button>' +
+        '<button class="comment-toggle" onclick="toggleHighlight(\'' + item.id + '\')">✏️</button>' +
+      '</div>' +
+      '<div class="comment-box ' + (fb.comment?'open':'') + '" id="comment-' + item.id + '">' +
+        '<textarea placeholder="What do you think?" id="textarea-' + item.id + '">' + (fb.comment||'') + '</textarea>' +
+        '<button class="save-comment" onclick="saveComment(\'' + item.id + '\')">Save</button>' +
+      '</div>' +
+    '</div>';
   }).join('');
 }
 
 function renderDraft(container) {
-  const allItems = Object.values(allData).flatMap(d => d.items || []);
-  const favs = allItems.filter(i => feedback[i.id]?.rating === 'fire' || feedback[i.id]?.rating === 'good');
+  var allItems = [];
+  for (var k in allData) allItems = allItems.concat(allData[k].items || []);
+  var favs = allItems.filter(function(i){return feedback[i.id]?.rating==='fire'||feedback[i.id]?.rating==='good';});
   container.className = '';
-  container.innerHTML = `
-    <div class="draft-section">
-      <h3>✍️ Weekly Draft Builder</h3>
-      <p style="color:var(--text-muted);font-size:13px;margin-bottom:16px;">Your 🔥 and 👍 items compiled for Substack. ${favs.length} items ready.</p>
-      ${!favs.length ? '<div class="empty-state"><div class="emoji">✍️</div><p>Rate some items first!</p></div>'
-        : `<div class="draft-preview">${favs.map(i => `<h4><a class="draft-link" href="${i.url}" target="_blank">${i.headline}</a></h4><p class="draft-desc">${(i.description||'').replace(/<[^>]*>/g,'').slice(0,200)}...</p>`).join('')}</div>
-           <button class="copy-draft" onclick="copyDraft()">📋 Copy to Clipboard</button>`}
-    </div>`;
+  container.innerHTML = '<div class="draft-section"><h3>✍️ Weekly Draft</h3><p style="color:var(--text-muted);font-size:13px;margin-bottom:16px;">' + favs.length + ' favorites ready.</p>' +
+    (!favs.length ? '<div class="empty-state"><div class="emoji">✍️</div><p>Rate some items first!</p></div>' :
+    '<div class="draft-preview">' + favs.map(function(i){
+      var hls = (highlights[i.id]||[]).map(function(h){return '<blockquote style="border-left:3px solid #fdd835;padding-left:12px;font-style:italic;color:#666;margin:4px 0;">&ldquo;' + h.text + '&rdquo;</blockquote>';}).join('');
+      return '<h4><a class="draft-link" href="' + i.url + '" target="_blank">' + i.headline + '</a></h4>' + hls + '<p class="draft-desc">' + (i.description||'').replace(/<[^>]*>/g,'').slice(0,200) + '...</p>';
+    }).join('') + '</div><button class="copy-draft" onclick="copyDraft()">📋 Copy</button>') + '</div>';
 }
 
 // Sources
-const SOURCE_FEEDS = [
+var SOURCE_FEEDS = [
   {name:'Colossal',url:'https://www.thisiscolossal.com/feed/'},{name:'Kottke',url:'https://feeds.kottke.org/main'},
   {name:'Aeon',url:'https://aeon.co/feed.rss'},{name:'The Marginalian',url:'https://feeds.feedburner.com/brainpickings/rss'},
-  {name:'Boing Boing',url:'https://boingboing.net/feed'},{name:'Atlas Obscura',url:'https://www.atlasobscura.com/feeds/latest'},
-  {name:'It\'s Nice That',url:'https://feeds.feedburner.com/itsnicethat/SlXC'},{name:'Dense Discovery',url:'https://www.densediscovery.com/feed/'},
+  {name:'Atlas Obscura',url:'https://www.atlasobscura.com/feeds/latest'},
+  {name:'Dense Discovery',url:'https://www.densediscovery.com/feed/'},
   {name:'Austin Kleon',url:'https://austinkleon.com/feed/'},{name:'SSIR',url:'https://ssir.org/site/rss_feed'},
   {name:'Behavioral Scientist',url:'https://behavioralscientist.org/feed/'},{name:'Nautilus',url:'https://nautil.us/feed/'},
-  {name:'Places Journal',url:'https://placesjournal.org/feed/'},{name:'Farnam Street',url:'https://fs.blog/feed/'},
+  {name:'Farnam Street',url:'https://fs.blog/feed/'}
 ];
-let activeSource = null;
+var activeSource = null;
 
 function renderSources(container) {
   container.className = '';
-  container.innerHTML = `<div style="display:flex;gap:20px;min-height:60vh;">
-    <div style="min-width:180px;max-width:200px;">
-      <h3 style="font-size:13px;color:var(--text-muted);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.5px;">Sources</h3>
-      ${SOURCE_FEEDS.map(s => `<div style="padding:7px 10px;border-radius:8px;cursor:pointer;font-size:12px;margin-bottom:3px;background:${activeSource===s.name?'var(--accent-light)':'transparent'};color:${activeSource===s.name?'var(--accent)':'var(--text)'};border:1px solid ${activeSource===s.name?'var(--accent)':'transparent'}" onclick="loadFeed('${s.url}','${s.name}')">${s.name}</div>`).join('')}
-    </div>
-    <div style="flex:1;" id="feed-content">
-      <div class="empty-state"><div class="emoji">📡</div><p>Pick a source to browse recent posts.</p></div>
-    </div>
-  </div>`;
+  var sidebar = SOURCE_FEEDS.map(function(s){
+    return '<div style="padding:7px 10px;border-radius:8px;cursor:pointer;font-size:12px;margin-bottom:3px;background:' + (activeSource===s.name?'var(--accent-light)':'transparent') + ';color:' + (activeSource===s.name?'var(--accent)':'var(--text)') + '" onclick="loadFeed(\'' + s.url.replace(/'/g,"\\'") + '\',\'' + s.name.replace(/'/g,"\\'") + '\')">' + s.name + '</div>';
+  }).join('');
+  container.innerHTML = '<div style="display:flex;gap:20px;min-height:60vh;"><div style="min-width:180px"><h3 style="font-size:13px;color:var(--text-muted);margin-bottom:10px;">SOURCES</h3>' + sidebar + '</div><div style="flex:1" id="feed-content"><div class="empty-state"><div class="emoji">📡</div><p>Pick a source to browse.</p></div></div></div>';
 }
 
 async function loadFeed(url, name) {
   activeSource = name;
   renderCards();
-  const fc = document.getElementById('feed-content');
+  var fc = document.getElementById('feed-content');
   fc.innerHTML = '<div style="padding:40px;text-align:center;color:var(--text-muted);">Loading... ⏳</div>';
   try {
-    const resp = await fetch('https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(url));
-    const data = await resp.json();
+    var resp = await fetch('https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(url));
+    var data = await resp.json();
     if (data.status === 'ok' && data.items) {
-      fc.innerHTML = data.items.slice(0,20).map(item => `
-        <div class="card" style="margin-bottom:10px;">
-          ${item.thumbnail?`<img class="card-image" src="${item.thumbnail}" onerror="this.style.display='none'">`:''} 
-          <div class="card-body">
-            <div class="card-source">${name} · ${new Date(item.pubDate).toLocaleDateString()}</div>
-            <div class="card-headline"><a href="${item.link}" target="_blank">${item.title}</a></div>
-            <div class="card-description" style="font-size:13px;">${(item.description||'').replace(/<[^>]*>/g,'').slice(0,200)}...</div>
-            <button class="btn-sm" style="margin-top:8px;" onclick="addFromFeed('${item.link.replace(/'/g,"\\'")}','${item.title.replace(/'/g,"\\'")}','${name}')">➕ Add to my feed</button>
-          </div>
-        </div>`).join('');
-    } else { fc.innerHTML = '<div style="padding:40px;text-align:center;color:var(--text-muted);">Couldn\'t load feed.</div>'; }
-  } catch(e) { fc.innerHTML = '<div style="padding:40px;text-align:center;color:var(--text-muted);">Feed unavailable.</div>'; }
-}
-
-function addFromFeed(url,title,source) {
-  const n = {id:'feed-'+Date.now(),headline:title,source:source,url:url,description:'Added from '+source,tags:['from-feed'],contentType:'article',alignment:null,paywall:false,custom:true};
-  items.unshift(n);
-  const c = JSON.parse(localStorage.getItem('curator-custom-items')||'[]'); c.push(n); localStorage.setItem('curator-custom-items',JSON.stringify(c));
-  showToast('Added! ✨');
+      fc.innerHTML = data.items.slice(0,20).map(function(item){
+        return '<div class="card" style="margin-bottom:10px;">' +
+          (item.thumbnail?'<img class="card-image" src="'+item.thumbnail+'" onerror="this.style.display=\'none\'">':'') +
+          '<div class="card-body"><div class="card-source">'+name+' · '+new Date(item.pubDate).toLocaleDateString()+'</div>' +
+          '<div class="card-headline"><a href="'+item.link+'" target="_blank">'+item.title+'</a></div>' +
+          '<div class="card-description" style="font-size:13px;">'+(item.description||'').replace(/<[^>]*>/g,'').slice(0,200)+'...</div>' +
+          '</div></div>';
+      }).join('');
+    } else { fc.innerHTML = '<div style="padding:40px;text-align:center;">Could not load feed.</div>'; }
+  } catch(e) { fc.innerHTML = '<div style="padding:40px;text-align:center;">Feed unavailable.</div>'; }
 }
 
 // Actions
-function rate(id,rating) { if(!feedback[id])feedback[id]={}; feedback[id].rating=feedback[id].rating===rating?null:rating; feedback[id].timestamp=new Date().toISOString(); saveFeedback(); renderCards(); updateStats(); showToast(feedback[id].rating?`Rated ${({fire:'🔥',good:'👍',meh:'😐',nope:'👎'})[rating]}`:'Cleared'); }
-function toggleComment(id) { document.getElementById('comment-'+id)?.classList.toggle('open'); }
-function saveComment(id) { const t=document.getElementById('textarea-'+id); if(!feedback[id])feedback[id]={}; feedback[id].comment=t.value; feedback[id].timestamp=new Date().toISOString(); saveFeedback(); showToast('Saved! 💬'); }
+function rate(id, rating) { if(!feedback[id])feedback[id]={}; feedback[id].rating=feedback[id].rating===rating?null:rating; feedback[id].timestamp=new Date().toISOString(); saveFeedback(); renderCards(); updateStats(); showToast(feedback[id].rating?'Rated!':'Cleared'); }
+function toggleComment(id) { var el=document.getElementById('comment-'+id); if(el)el.classList.toggle('open'); }
+function saveComment(id) { var t=document.getElementById('textarea-'+id); if(!feedback[id])feedback[id]={}; feedback[id].comment=t.value; feedback[id].timestamp=new Date().toISOString(); saveFeedback(); showToast('Saved! 💬'); }
+function toggleHighlight(id) { var el=document.getElementById('add-hl-'+id); if(el)el.classList.toggle('open'); }
+function saveHighlight(id) { var ta=document.getElementById('hl-textarea-'+id); var text=ta.value.trim(); if(!text)return; if(!highlights[id])highlights[id]=[]; highlights[id].push({text:text,timestamp:new Date().toISOString()}); localStorage.setItem('curator-highlights',JSON.stringify(highlights)); ta.value=''; toggleHighlight(id); renderCards(); syncFeedback(); showToast('Highlight saved! 💛'); }
+function removeHighlight(id, idx) { if(highlights[id]){highlights[id].splice(idx,1);if(!highlights[id].length)delete highlights[id];localStorage.setItem('curator-highlights',JSON.stringify(highlights));renderCards();syncFeedback();} }
 function saveFeedback() { localStorage.setItem('curator-feedback-v2',JSON.stringify(feedback)); syncFeedback(); }
 function toggleAddLink() { document.getElementById('add-link-modal').classList.toggle('open'); }
-function addCustomLink() { const u=document.getElementById('custom-url').value.trim(),n=document.getElementById('custom-note').value.trim(); if(!u)return; const item={id:'custom-'+Date.now(),headline:n||u,source:'Custom',url:u,description:n||'Custom link',tags:['custom'],contentType:'article',alignment:null,paywall:false,custom:true}; items.unshift(item); const c=JSON.parse(localStorage.getItem('curator-custom-items')||'[]'); c.push(item); localStorage.setItem('curator-custom-items',JSON.stringify(c)); document.getElementById('custom-url').value=''; document.getElementById('custom-note').value=''; toggleAddLink(); renderCards(); updateStats(); showToast('Added! ✨'); }
-function loadCustomItems() { JSON.parse(localStorage.getItem('curator-custom-items')||'[]').forEach(c => { if(!items.find(i=>i.id===c.id)) items.unshift(c); }); }
-
-function exportFeedback() {
-  const data = Object.values(allData).flatMap(d => d.items||[]).map(i => ({headline:i.headline,source:i.source,url:i.url,contentType:i.contentType,rating:feedback[i.id]?.rating||'unrated',comment:feedback[i.id]?.comment||'',tags:i.tags}));
-  const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
-  const a = document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`feedback-${new Date().toISOString().split('T')[0]}.json`; a.click();
-  showToast('Exported! 📤');
-}
-
-function copyDraft() {
-  const allItems = Object.values(allData).flatMap(d => d.items||[]);
-  const favs = allItems.filter(i=>feedback[i.id]?.rating==='fire'||feedback[i.id]?.rating==='good');
-  navigator.clipboard.writeText(`This Week's Finds ✨\n\n`+favs.map(i=>`${i.headline}\n${i.url}\n${(i.description||'').replace(/<[^>]*>/g,'').slice(0,200)}\n`).join('\n'));
-  showToast('Copied! 📋');
-}
-
-function setView(v) { currentView=v; document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active')); document.querySelectorAll('.nav button').forEach(b=>{const t=b.textContent.toLowerCase(); if((v==='feed'&&t.includes('feed'))||(v==='board'&&t.includes('board'))||(v==='favorites'&&t.includes('fav'))||(v==='draft'&&t.includes('draft'))||(v==='sources'&&t.includes('source')))b.classList.add('active');}); renderCards(); updateStats(); }
-function updateStats() { const f=getFilteredItems(); document.getElementById('pull-stats').textContent=`${f.length} items · ${f.filter(i=>feedback[i.id]?.rating).length} rated`; }
-function showToast(m) { const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2000); }
+function addCustomLink() { var u=document.getElementById('custom-url').value.trim(),n=document.getElementById('custom-note').value.trim(); if(!u)return; var item={id:'custom-'+Date.now(),headline:n||u,source:'Custom',url:u,description:n||'Custom link',tags:['custom'],contentType:'article',alignment:null,paywall:false,custom:true}; items.unshift(item); var c=JSON.parse(localStorage.getItem('curator-custom-items')||'[]');c.push(item);localStorage.setItem('curator-custom-items',JSON.stringify(c)); document.getElementById('custom-url').value='';document.getElementById('custom-note').value='';toggleAddLink();renderCards();updateStats();showToast('Added! ✨'); }
+function loadCustomItems() { JSON.parse(localStorage.getItem('curator-custom-items')||'[]').forEach(function(c){if(!items.find(function(i){return i.id===c.id}))items.unshift(c);}); }
+function exportFeedback() { var allItems=[];for(var k in allData)allItems=allItems.concat(allData[k].items||[]);var data=allItems.map(function(i){return{headline:i.headline,source:i.source,url:i.url,contentType:i.contentType,rating:feedback[i.id]?.rating||'unrated',comment:feedback[i.id]?.comment||'',highlights:(highlights[i.id]||[]).map(function(h){return h.text}),tags:i.tags}});var blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='feedback-'+new Date().toISOString().split('T')[0]+'.json';a.click();showToast('Exported! 📤'); }
+function copyDraft() { var allItems=[];for(var k in allData)allItems=allItems.concat(allData[k].items||[]);var favs=allItems.filter(function(i){return feedback[i.id]?.rating==='fire'||feedback[i.id]?.rating==='good'});var text='This Weeks Finds\n\n'+favs.map(function(i){var hls=(highlights[i.id]||[]).map(function(h){return '"'+h.text+'"'}).join('\n');return i.headline+'\n'+i.url+'\n'+(hls?hls+'\n':'')+((i.description||'').replace(/<[^>]*>/g,'').slice(0,200))+'\n'}).join('\n');navigator.clipboard.writeText(text);showToast('Copied! 📋'); }
+function setView(v) { currentView=v; document.querySelectorAll('.nav button').forEach(function(b){b.classList.remove('active')}); document.querySelectorAll('.nav button').forEach(function(b){var t=b.textContent.toLowerCase();if((v==='feed'&&t.includes('list'))||(v==='board'&&t.includes('board'))||(v==='favorites'&&t.includes('fav'))||(v==='draft'&&t.includes('draft'))||(v==='sources'&&t.includes('source')))b.classList.add('active');}); renderCards();updateStats(); }
+function updateStats() { var f=getFilteredItems(); document.getElementById('pull-stats').textContent=f.length+' items · '+f.filter(function(i){return feedback[i.id]?.rating}).length+' rated'; }
+function showToast(m) { var t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},2000); }
 
 // Sync
-const SYNC_URL = 'https://jsonblob.com/api/jsonBlob';
-let syncBlobId = localStorage.getItem('curator-sync-id') || null;
+var SYNC_URL = 'https://jsonblob.com/api/jsonBlob';
+var syncBlobId = localStorage.getItem('curator-sync-id') || null;
 async function initSync() {
-  if (!syncBlobId) { try { const r=await fetch(SYNC_URL,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({feedback:{},lastSync:new Date().toISOString()})}); if(r.ok){const l=r.headers.get('Location')||'';syncBlobId=l.split('/').pop()||null;if(syncBlobId){localStorage.setItem('curator-sync-id',syncBlobId);}} }catch(e){} }
-  if(syncBlobId) document.getElementById('sync-status').textContent='☁️ Synced';
-}
-async function syncFeedback() { if(!syncBlobId)await 
-// === HIGHLIGHTS ===
-let highlights = JSON.parse(localStorage.getItem('curator-highlights') || '{}');
-
-function toggleHighlight(id) {
-  document.getElementById('add-hl-' + id)?.classList.toggle('open');
-  const ta = document.getElementById('hl-textarea-' + id);
-  if (ta) ta.focus();
-}
-
-function saveHighlight(id) {
-  const ta = document.getElementById('hl-textarea-' + id);
-  const text = ta.value.trim();
-  if (!text) return;
-  if (!highlights[id]) highlights[id] = [];
-  highlights[id].push({ text: text, timestamp: new Date().toISOString() });
-  localStorage.setItem('curator-highlights', JSON.stringify(highlights));
-  ta.value = '';
-  toggleHighlight(id);
-  renderHighlights(id);
-  syncFeedback();
-  showToast('Highlight saved! 💛');
-}
-
-function removeHighlight(id, idx) {
-  if (highlights[id]) {
-    highlights[id].splice(idx, 1);
-    if (!highlights[id].length) delete highlights[id];
-    localStorage.setItem('curator-highlights', JSON.stringify(highlights));
-    renderHighlights(id);
-    syncFeedback();
+  if (!syncBlobId) {
+    try {
+      var r = await fetch(SYNC_URL, {method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({feedback:{},lastSync:new Date().toISOString()})});
+      if (r.ok) { var l=r.headers.get('Location')||''; syncBlobId=l.split('/').pop()||null; if(syncBlobId)localStorage.setItem('curator-sync-id',syncBlobId); }
+    } catch(e) {}
   }
+  if (syncBlobId) document.getElementById('sync-status').textContent='☁️ Synced';
 }
-
-function renderHighlights(id) {
-  const container = document.getElementById('highlights-' + id);
-  if (!container) return;
-  const hls = highlights[id] || [];
-  container.innerHTML = hls.map((h, i) => 
-    '<div class="highlight-item">"' + h.text + '"<button class="remove-hl" onclick="removeHighlight(\'' + id + '\',' + i + ')">✕</button></div>'
-  ).join('');
-}
-
-// Render highlights on card render
-const _origRenderCards = renderCards;
-renderCards = function() {
-  _origRenderCards();
-  // Render highlights for visible items
-  Object.keys(highlights).forEach(id => renderHighlights(id));
-};
-
-// Include highlights in sync
-const _origSyncFb = syncFeedback;
-syncFeedback = async function() {
+async function syncFeedback() {
   if (!syncBlobId) await initSync();
   if (!syncBlobId) return;
   try {
-    await fetch(SYNC_URL + '/' + syncBlobId, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-      body: JSON.stringify({
-        feedback: feedback,
-        highlights: highlights,
-        lastSync: new Date().toISOString(),
-        ratedCount: Object.keys(feedback).filter(k => feedback[k]?.rating).length
-      })
-    });
+    await fetch(SYNC_URL+'/'+syncBlobId, {method:'PUT',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({feedback:feedback,highlights:highlights,lastSync:new Date().toISOString(),ratedCount:Object.keys(feedback).filter(function(k){return feedback[k]?.rating}).length})});
   } catch(e) {}
-};
-
-// Include highlights in export
-const _origExport = exportFeedback;
-exportFeedback = function() {
-  const allItems = Object.values(allData).flatMap(d => d.items||[]);
-  const data = allItems.map(i => ({
-    headline: i.headline, source: i.source, url: i.url, contentType: i.contentType,
-    rating: feedback[i.id]?.rating || 'unrated',
-    comment: feedback[i.id]?.comment || '',
-    highlights: (highlights[i.id] || []).map(h => h.text),
-    tags: i.tags
-  }));
-  const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'feedback-' + new Date().toISOString().split('T')[0] + '.json';
-  a.click();
-  showToast('Exported! 📤');
-};
-
-initSync(); if(!syncBlobId)return; try{await fetch(SYNC_URL+'/'+syncBlobId,{method:'PUT',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({feedback,lastSync:new Date().toISOString(),ratedCount:Object.keys(feedback).filter(k=>feedback[k]?.rating).length})});}catch(e){} }
-
-
-// === HIGHLIGHTS ===
-  if (!syncBlobId) return;
-  try {
-    await fetch(SYNC_URL + '/' + syncBlobId, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-      body: JSON.stringify({
-        feedback: feedback,
-        highlights: highlights,
-        lastSync: new Date().toISOString(),
-        ratedCount: Object.keys(feedback).filter(k => feedback[k]?.rating).length
-      })
-    });
-  } catch(e) {}
-};
-
-// Include highlights in export
+}
 
 initSync();
 loadData();
+
 </script>
 </body>
 </html>
