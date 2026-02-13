@@ -89,11 +89,12 @@
   .comment-box .save-comment { margin-top:6px; padding:4px 12px; background:var(--accent); color:white; border:none; border-radius:6px; font-size:11px; cursor:pointer; }
 
   /* Grid */
-  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:14px; }
-  .grid .card { margin-bottom:0; }
-  .grid .card-headline { font-size:14px; }
-  .grid .card-description { font-size:12px; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
-  .grid .card-image { height:140px; }
+  .grid { columns:2 320px; column-gap:14px; }
+  .grid .card { margin-bottom:14px; break-inside:avoid; display:inline-block; width:100%; }
+  .grid .card-headline { font-size:15px; }
+  .grid .card-description { font-size:12px; display:-webkit-box; -webkit-line-clamp:4; -webkit-box-orient:vertical; overflow:hidden; }
+  .grid .card-image { height:auto; max-height:240px; }
+  @media(max-width:700px) { .grid { columns:1; } }
 
   .empty-state { text-align:center; padding:60px 20px; color:var(--text-muted); }
   .empty-state .emoji { font-size:48px; margin-bottom:12px; }
@@ -125,8 +126,8 @@
   <h1>✨ Curation Lab</h1>
   <div class="header-actions">
     <nav class="nav">
-      <button class="active" onclick="setView('feed')">📰 Feed</button>
-      <button onclick="setView('board')">📌 Board</button>
+      <button onclick="setView('feed')">📰 List</button>
+      <button class="active" onclick="setView('board')">📌 Board</button>
       <button onclick="setView('favorites')">⭐ Favorites</button>
       <button onclick="setView('draft')">✍️ Draft</button>
       <button onclick="setView('sources')">📡 Sources</button>
@@ -162,7 +163,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
-let currentView = 'feed';
+let currentView = 'board';
 let activeFilters = new Set();
 let allData = {};
 let items = [];
