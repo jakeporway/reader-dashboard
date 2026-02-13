@@ -458,7 +458,9 @@
       <button onclick="setView('favorites')">⭐ Favorites</button>
       <button onclick="setView('draft')">✍️ Draft Builder</button>
     </nav>
-    <button class="export-btn" onclick="exportFeedback()">📤 Export Feedback</button>
+    <span id="sync-status" style="font-size:12px;color:#666;">☁️ Connecting...</span>
+    <button class="export-btn" onclick="toggleAddLink()">➕ Add Link</button>
+    <button class="export-btn" onclick="exportFeedback()">📤 Export</button>
   </div>
 </div>
 
@@ -715,9 +717,127 @@ function showToast(msg) {
   setTimeout(() => toast.classList.remove('show'), 2000);
 }
 
+
+// === AUTO-SYNC ===
+const SYNC_URL = 'https://jsonblob.com/api/jsonBlob';
+let syncBlobId = localStorage.getItem('curator-sync-id') || null;
+
+async function initSync() {
+  if (!syncBlobId) {
+    try {
+      const resp = await fetch(SYNC_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({ feedback: {}, lastSync: new Date().toISOString() })
+      });
+      if (resp.ok) {
+        const blobUrl = resp.headers.get('Location') || '';
+        syncBlobId = blobUrl.split('/').pop() || null;
+        if (syncBlobId) {
+          localStorage.setItem('curator-sync-id', syncBlobId);
+          document.getElementById('sync-status').textContent = '☁️ Connected';
+          console.log('Sync ID:', syncBlobId);
+        }
+      }
+    } catch(e) { console.error('Sync init failed:', e); }
+  } else {
+    document.getElementById('sync-status').textContent = '☁️ Connected';
+  }
+}
+
+async function syncFeedback() {
+  if (!syncBlobId) await initSync();
+  if (!syncBlobId) return;
+  try {
+    await fetch(SYNC_URL + '/' + syncBlobId, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({
+        feedback: feedback,
+        lastSync: new Date().toISOString(),
+        ratedCount: Object.keys(feedback).filter(k => feedback[k]?.rating).length
+      })
+    });
+  } catch(e) { console.error('Sync failed:', e); }
+}
+
+// Auto-sync on every save
+const _origSave = saveFeedback;
+saveFeedback = function() {
+  _origSave();
+  syncFeedback();
+};
+
+// === ADD YOUR OWN LINK ===
+function toggleAddLink() {
+  const modal = document.getElementById('add-link-modal');
+  modal.style.display = modal.style.display === 'block' ? 'none' : 'block';
+}
+
+function addCustomLink() {
+  const url = document.getElementById('custom-url').value.trim();
+  const note = document.getElementById('custom-note').value.trim();
+  if (!url) return;
+  
+  const newItem = {
+    id: 'custom-' + Date.now(),
+    headline: note || url,
+    source: 'Added by curator',
+    url: url,
+    description: note || 'Custom link added for review',
+    tags: ['custom'],
+    alignment: null,
+    paywall: false,
+    custom: true
+  };
+  
+  items.unshift(newItem);
+  
+  // Save custom items
+  const customs = JSON.parse(localStorage.getItem('curator-custom-items') || '[]');
+  customs.push(newItem);
+  localStorage.setItem('curator-custom-items', JSON.stringify(customs));
+  
+  document.getElementById('custom-url').value = '';
+  document.getElementById('custom-note').value = '';
+  toggleAddLink();
+  renderCards();
+  updateStats();
+  showToast('Link added! ✨');
+}
+
+// Load custom items on start
+function loadCustomItems() {
+  const customs = JSON.parse(localStorage.getItem('curator-custom-items') || '[]');
+  customs.forEach(c => items.unshift(c));
+}
+
+// Patch loadData to include customs
+const _origLoad = loadData;
+loadData = async function() {
+  await _origLoad();
+  loadCustomItems();
+  renderCards();
+  updateStats();
+};
+
+initSync();
+
 // Init
 loadData();
 </script>
+
+<div id="add-link-modal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.4); z-index:200; display:none;">
+  <div style="background:white; max-width:500px; margin:100px auto; border-radius:12px; padding:24px;">
+    <h3 style="margin-bottom:16px;">➕ Add Your Own Link</h3>
+    <input id="custom-url" type="url" placeholder="Paste URL here..." style="width:100%; padding:10px; border:1px solid #e8e6e3; border-radius:8px; font-size:14px; margin-bottom:10px; outline:none; box-sizing:border-box;">
+    <textarea id="custom-note" placeholder="Why is this interesting? (optional)" style="width:100%; padding:10px; border:1px solid #e8e6e3; border-radius:8px; font-size:13px; min-height:60px; font-family:inherit; resize:vertical; outline:none; box-sizing:border-box;"></textarea>
+    <div style="display:flex; gap:8px; margin-top:12px;">
+      <button onclick="addCustomLink()" style="padding:8px 16px; background:#e85d4a; color:white; border:none; border-radius:8px; cursor:pointer; font-size:13px;">Add Link</button>
+      <button onclick="toggleAddLink()" style="padding:8px 16px; background:white; border:1px solid #e8e6e3; border-radius:8px; cursor:pointer; font-size:13px; color:#666;">Cancel</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
 
