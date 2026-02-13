@@ -1,418 +1,1627 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>✨ Curation Lab</title>
-<style>
-  :root {
-    --bg: #faf9f7;
-    --card-bg: #ffffff;
-    --text: #1a1a1a;
-    --text-muted: #666;
-    --accent: #e85d4a;
-    --accent-light: #fff0ee;
-    --border: #e8e6e3;
-    --tag-bg: #f0eeeb;
-    --shadow: 0 1px 3px rgba(0,0,0,0.06);
-    --shadow-hover: 0 4px 12px rgba(0,0,0,0.1);
-    --radius: 12px;
-  }
-  * { margin:0; padding:0; box-sizing:border-box; }
-  body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif; background:var(--bg); color:var(--text); line-height:1.6; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Curation Lab v3</title>
+    <style>
+        /* CSS Variables */
+        :root {
+            --accent: #e85d4a;
+            --accent-light: #f08a7a;
+            --accent-dark: #d44335;
+            --bg-primary: #fefcf8;
+            --bg-secondary: #f9f5f0;
+            --bg-card: #ffffff;
+            --text-primary: #2c2c2c;
+            --text-secondary: #666666;
+            --text-light: #999999;
+            --border: #e6e3de;
+            --border-light: #f2f0ec;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.1);
+            --radius-sm: 6px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
-  .header { background:white; border-bottom:1px solid var(--border); padding:12px 24px; position:sticky; top:0; z-index:100; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
-  .header h1 { font-size:18px; font-weight:700; white-space:nowrap; }
-  .header-actions { display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
-  .nav { display:flex; gap:3px; background:var(--tag-bg); border-radius:8px; padding:3px; }
-  .nav button { padding:5px 10px; border:none; background:none; border-radius:6px; cursor:pointer; font-size:12px; font-weight:500; color:var(--text-muted); transition:all 0.2s; white-space:nowrap; }
-  .nav button.active { background:white; color:var(--text); box-shadow:var(--shadow); }
-  .btn-sm { padding:5px 10px; border:1px solid var(--border); border-radius:8px; background:white; cursor:pointer; font-size:12px; color:var(--text-muted); white-space:nowrap; }
-  .btn-sm:hover { border-color:var(--accent); color:var(--accent); }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-  /* Content Type Filters */
-  .filters { padding:10px 24px; display:flex; gap:6px; flex-wrap:wrap; border-bottom:1px solid var(--border); background:white; align-items:center; }
-  .filter-chip { padding:4px 10px; border:1px solid var(--border); border-radius:20px; font-size:11px; cursor:pointer; background:white; color:var(--text-muted); transition:all 0.2s; white-space:nowrap; }
-  .filter-chip:hover, .filter-chip.active { background:var(--accent-light); border-color:var(--accent); color:var(--accent); }
-  .date-nav { display:flex; align-items:center; gap:8px; margin-left:auto; }
-  .date-nav button { background:none; border:none; cursor:pointer; font-size:16px; padding:2px 6px; border-radius:4px; }
-  .date-nav button:hover { background:var(--tag-bg); }
-  .date-label { font-size:13px; font-weight:500; color:var(--text); min-width:140px; text-align:center; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
 
-  .main { max-width:900px; margin:0 auto; padding:20px 24px; }
-  .pull-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
-  .pull-header h2 { font-size:15px; color:var(--text-muted); font-weight:500; }
-  .pull-stats { font-size:12px; color:var(--text-muted); }
+        /* Header */
+        .header {
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
 
-  /* Cards */
-  .card { background:var(--card-bg); border:1px solid var(--border); border-radius:var(--radius); margin-bottom:12px; transition:all 0.2s; overflow:hidden; }
-  .card:hover { box-shadow:var(--shadow-hover); border-color:#d0cec9; }
-  .card-image { width:100%; height:180px; object-fit:cover; display:block; }
-  .card-body { padding:16px 20px; }
-  .card-type { display:inline-block; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; padding:2px 8px; border-radius:4px; margin-bottom:8px; }
-  .type-article { background:#e3f2fd; color:#1565c0; }
-  .type-video { background:#fce4ec; color:#c62828; }
-  .type-interactive { background:#e8f5e9; color:#2e7d32; }
-  .type-framework { background:#fff3e0; color:#e65100; }
-  .type-project { background:#f3e5f5; color:#6a1b9a; }
-  .type-toolkit { background:#fff8e1; color:#f57f17; }
-  .type-podcast { background:#fce4ec; color:#ad1457; }
-  .type-visual-art { background:#ede7f6; color:#4527a0; }
-  .type-audio { background:#e0f7fa; color:#00695c; }
-  .type-immersive { background:#e8eaf6; color:#283593; }
-  .card-source { font-size:11px; color:var(--accent); font-weight:600; display:inline; margin-left:8px; }
-  .card-headline { font-size:17px; font-weight:600; line-height:1.4; margin-bottom:10px; }
-  .card-headline a { color:var(--text); text-decoration:none; }
-  .card-headline a:hover { color:var(--accent); }
-  .card-description { font-size:14px; color:#444; line-height:1.7; margin-bottom:12px; }
-  .card-description blockquote { border-left:3px solid var(--accent); padding-left:12px; margin:8px 0; font-style:italic; color:var(--text-muted); }
-  .card-meta { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
-  .tag { font-size:10px; padding:2px 8px; background:var(--tag-bg); border-radius:4px; color:var(--text-muted); }
-  .alignment { font-size:11px; font-weight:600; padding:2px 8px; border-radius:4px; }
-  .alignment-5 { background:#e8f5e9; color:#2e7d32; }
-  .alignment-4 { background:#f1f8e9; color:#558b2f; }
-  .alignment-3 { background:#fff8e1; color:#f57f17; }
-  .alignment-2 { background:#fff3e0; color:#e65100; }
-  .alignment-1 { background:#fce4ec; color:#c62828; }
-  .paywall-flag { font-size:10px; color:#ff9800; font-weight:600; }
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 2rem;
+        }
 
-  .card-actions { display:flex; align-items:center; gap:5px; padding:12px 20px; border-top:1px solid var(--border); background:#fafaf9; }
-  .rate-btn { padding:5px 10px; border:1px solid var(--border); border-radius:8px; background:white; cursor:pointer; font-size:14px; transition:all 0.15s; }
-  .rate-btn:hover { transform:scale(1.1); box-shadow:var(--shadow); }
-  .rate-btn.selected { border-color:var(--accent); background:var(--accent-light); }
-  .rate-btn .label { font-size:10px; color:var(--text-muted); }
-  .comment-toggle { margin-left:auto; padding:5px 10px; border:1px solid var(--border); border-radius:8px; background:white; cursor:pointer; font-size:11px; color:var(--text-muted); }
-  .comment-box { padding:0 20px 16px; display:none; }
-  .comment-box.open { display:block; }
-  .comment-box textarea { width:100%; padding:10px; border:1px solid var(--border); border-radius:8px; font-family:inherit; font-size:13px; resize:vertical; min-height:50px; outline:none; }
-  .comment-box textarea:focus { border-color:var(--accent); }
-  .comment-box .save-comment { margin-top:6px; padding:4px 12px; background:var(--accent); color:white; border:none; border-radius:6px; font-size:11px; cursor:pointer; }
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent);
+            text-decoration: none;
+        }
 
-  /* Grid */
-  .grid { columns:2 320px; column-gap:14px; }
-  .grid .card { margin-bottom:14px; break-inside:avoid; display:inline-block; width:100%; }
-  .grid .card-headline { font-size:15px; }
-  .grid .card-description { font-size:12px; display:-webkit-box; -webkit-line-clamp:4; -webkit-box-orient:vertical; overflow:hidden; }
-  .grid .card-image { height:auto; max-height:240px; }
-  @media(max-width:700px) { .grid { columns:1; } }
+        .nav-tabs {
+            display: flex;
+            gap: 0.5rem;
+            background: var(--bg-secondary);
+            padding: 0.25rem;
+            border-radius: var(--radius-md);
+        }
 
-  .empty-state { text-align:center; padding:60px 20px; color:var(--text-muted); }
-  .empty-state .emoji { font-size:48px; margin-bottom:12px; }
+        .nav-tab {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            font-weight: 500;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
 
-  /* Draft */
-  .draft-section { background:white; border:1px solid var(--border); border-radius:var(--radius); padding:24px; }
-  .draft-preview { font-family:Georgia,serif; line-height:1.8; padding:20px; background:var(--bg); border-radius:8px; margin-top:12px; }
-  .draft-preview h4 { font-size:15px; margin-bottom:4px; }
-  .draft-preview .draft-link { color:var(--accent); text-decoration:none; }
-  .draft-preview .draft-desc { font-size:14px; color:var(--text-muted); margin-bottom:16px; }
-  .copy-draft { padding:8px 16px; background:var(--accent); color:white; border:none; border-radius:8px; cursor:pointer; font-size:13px; margin-top:12px; }
+        .nav-tab:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
 
-  /* Modal */
-  .modal-overlay { display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.4); z-index:200; }
-  .modal-overlay.open { display:flex; align-items:center; justify-content:center; }
-  .modal { background:white; max-width:500px; width:90%; border-radius:12px; padding:24px; }
-  .modal input, .modal textarea { width:100%; padding:10px; border:1px solid var(--border); border-radius:8px; font-size:14px; outline:none; box-sizing:border-box; font-family:inherit; }
-  .modal textarea { min-height:60px; resize:vertical; margin-top:8px; font-size:13px; }
+        .nav-tab.active {
+            background: var(--bg-card);
+            color: var(--text-primary);
+            box-shadow: var(--shadow-sm);
+        }
 
+        .nav-badge {
+            background: var(--accent);
+            color: white;
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            min-width: 20px;
+            text-align: center;
+            font-weight: 600;
+        }
 
-  .highlights { padding:0 20px 16px; }
-  .highlight-item { background:linear-gradient(120deg, #fff9c4 0%, #fff59d 100%); padding:8px 12px; border-radius:6px; font-size:13px; font-style:italic; line-height:1.5; margin-bottom:6px; position:relative; border-left:3px solid #fdd835; }
-  .highlight-item .remove-hl { position:absolute; top:4px; right:6px; background:none; border:none; cursor:pointer; font-size:10px; color:#999; opacity:0; transition:opacity 0.2s; }
-  .highlight-item:hover .remove-hl { opacity:1; }
-  .add-highlight { display:none; padding:0 20px 16px; }
-  .add-highlight.open { display:block; }
-  .add-highlight textarea { width:100%; padding:8px; border:1px solid var(--border); border-radius:6px; font-family:inherit; font-size:13px; resize:vertical; min-height:40px; outline:none; font-style:italic; }
-  .add-highlight textarea:focus { border-color:#fdd835; }
-  .add-highlight textarea::placeholder { color:#ccc; }
-  .hl-actions { display:flex; gap:6px; margin-top:6px; }
-  .hl-actions button { padding:4px 10px; border-radius:6px; font-size:11px; cursor:pointer; }
-  .save-hl { background:#fdd835; color:#333; border:none; }
-  .cancel-hl { background:white; border:1px solid var(--border); color:#666; }
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
 
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            min-height: 44px;
+            font-size: 0.9rem;
+        }
 
-  .audience-badge { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; padding:2px 6px; border-radius:3px; margin-left:6px; }
-  .audience-newsletter { background:#e3f2fd; color:#1565c0; }
-  .audience-friends { background:#fce4ec; color:#c62828; }
-  .audience-both { background:#e8f5e9; color:#2e7d32; }
-  .toast { position:fixed; bottom:24px; right:24px; background:var(--text); color:white; padding:10px 18px; border-radius:8px; font-size:13px; opacity:0; transform:translateY(10px); transition:all 0.3s; z-index:1000; }
-  .toast.show { opacity:1; transform:translateY(0); }
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
 
-  @media(max-width:640px) { .header{padding:10px 16px;} .main{padding:16px;} .nav button{padding:4px 8px;font-size:11px;} .grid{grid-template-columns:1fr;} }
-</style>
+        .btn-primary:hover {
+            background: var(--accent-dark);
+        }
+
+        .btn-secondary {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border);
+        }
+
+        /* Main Content */
+        .main {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+            min-height: calc(100vh - 100px);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Library Tab */
+        .library-header {
+            margin-bottom: 2rem;
+        }
+
+        .search-bar {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-md);
+            font-size: 1rem;
+            background: var(--bg-card);
+            margin-bottom: 1.5rem;
+            transition: var(--transition);
+        }
+
+        .search-bar:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .filter-chip {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+            border-radius: 20px;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: var(--transition);
+            min-height: 36px;
+            display: flex;
+            align-items: center;
+        }
+
+        .filter-chip:hover {
+            border-color: var(--accent);
+        }
+
+        .filter-chip.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .view-toggle {
+            margin-left: auto;
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .view-btn {
+            padding: 0.5rem;
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: var(--transition);
+            min-height: 36px;
+            min-width: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .view-btn.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        /* Content Grid */
+        .content-grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .content-grid.list-view {
+            grid-template-columns: 1fr;
+        }
+
+        .content-grid.board-view {
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        }
+
+        @media (max-width: 768px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+        }
+
+        /* Content Cards */
+        .content-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            transition: var(--transition);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .content-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .content-card.unread::before {
+            content: '';
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+            z-index: 10;
+        }
+
+        .card-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            background: var(--bg-secondary);
+        }
+
+        .card-content {
+            padding: 1.5rem;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .card-meta {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            margin-bottom: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .content-type {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .content-type.article { background: #e3f2fd; color: #1565c0; }
+        .content-type.video { background: #fce4ec; color: #c2185b; }
+        .content-type.interactive { background: #f3e5f5; color: #7b1fa2; }
+        .content-type.podcast { background: #fff3e0; color: #ef6c00; }
+
+        .source-name {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .paywall-icon {
+            color: var(--text-light);
+            font-size: 0.875rem;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            line-height: 1.4;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        .card-description {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-bottom: 1rem;
+        }
+
+        .card-description.truncated {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .show-more-btn {
+            color: var(--accent);
+            font-size: 0.875rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            margin-top: 0.5rem;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-light);
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            font-size: 1.1rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: var(--radius-sm);
+            transition: var(--transition);
+            min-height: 36px;
+            min-width: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .action-btn:hover {
+            background: var(--bg-secondary);
+        }
+
+        .action-btn.active {
+            color: var(--accent);
+        }
+
+        .star-btn.active {
+            color: #ffd700;
+        }
+
+        .rating-group {
+            display: flex;
+            gap: 0.25rem;
+            margin-left: auto;
+        }
+
+        .rating-btn {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0.25rem;
+            border-radius: var(--radius-sm);
+            transition: var(--transition);
+            opacity: 0.5;
+            min-height: 36px;
+            min-width: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .rating-btn:hover,
+        .rating-btn.active {
+            opacity: 1;
+        }
+
+        /* Toast Notifications */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--text-primary);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-lg);
+            z-index: 1000;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .modal-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .modal-body {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 1rem;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .form-textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 1rem;
+            resize: vertical;
+            min-height: 100px;
+            font-family: inherit;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+
+        /* Draft Builder */
+        .draft-items {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .draft-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            cursor: move;
+            transition: var(--transition);
+        }
+
+        .draft-item:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .draft-item.dragging {
+            opacity: 0.5;
+            transform: rotate(2deg);
+        }
+
+        .draft-item-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .draft-item-content {
+            flex: 1;
+        }
+
+        .draft-item-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .draft-item-source {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .draft-intro {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-family: inherit;
+            resize: vertical;
+            margin-bottom: 1rem;
+        }
+
+        .draft-highlights {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #fffbf0;
+            border: 1px solid #ffeaa7;
+            border-radius: var(--radius-sm);
+        }
+
+        .draft-highlights h4 {
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+
+        .highlight-item {
+            margin-bottom: 0.5rem;
+            font-style: italic;
+            color: var(--text-secondary);
+        }
+
+        /* Sources Tab */
+        .source-feeds {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .source-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            transition: var(--transition);
+        }
+
+        .source-card:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .source-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .source-desc {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .source-stats {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.875rem;
+            color: var(--text-light);
+        }
+
+        /* Loading State */
+        .loading {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-secondary);
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border);
+            border-top: 3px solid var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-state h3 {
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: stretch;
+            }
+
+            .nav-tabs {
+                justify-content: center;
+            }
+
+            .filters {
+                justify-content: center;
+            }
+
+            .view-toggle {
+                margin-left: 0;
+                justify-content: center;
+            }
+
+            .card-actions {
+                flex-wrap: wrap;
+            }
+
+            .rating-group {
+                margin-left: 0;
+            }
+        }
+    </style>
 </head>
 <body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <a href="#" class="logo">Curation Lab</a>
+            
+            <nav class="nav-tabs">
+                <button class="nav-tab active" data-tab="library">
+                    Library
+                    <span class="nav-badge" id="today-picks-badge" style="display: none;">0</span>
+                </button>
+                <button class="nav-tab" data-tab="draft-builder">Draft Builder</button>
+                <button class="nav-tab" data-tab="sources">Sources</button>
+            </nav>
+            
+            <div class="header-actions">
+                <button class="btn btn-primary" id="add-link-btn">+ Add Link</button>
+                <button class="btn btn-secondary" id="sync-btn">Sync</button>
+            </div>
+        </div>
+    </header>
 
-<div class="header">
-  <h1>✨ Curation Lab</h1>
-  <div class="header-actions">
-    <nav class="nav">
-      <button onclick="setView('feed')">📰 List</button>
-      <button class="active" onclick="setView('board')">📌 Board</button>
-      <button onclick="setView('favorites')">⭐ Favorites</button>
-      <button onclick="setView('draft')">✍️ Draft</button>
-      <button onclick="setView('sources')">📡 Sources</button>
-    </nav>
-    <button class="btn-sm" onclick="toggleAddLink()">➕ Add Link</button>
-    <button class="btn-sm" onclick="exportFeedback()">📤 Export</button>
-    <span id="sync-status" style="font-size:11px;color:#ccc;">☁️</span>
-  </div>
-</div>
+    <!-- Main Content -->
+    <main class="main">
+        <!-- Library Tab -->
+        <div class="tab-content active" id="library-tab">
+            <div class="library-header">
+                <input type="text" class="search-bar" placeholder="Search articles, sources, tags..." id="search-input">
+                
+                <div class="filters">
+                    <div class="filter-group">
+                        <div class="filter-chip active" data-type="all">All</div>
+                        <div class="filter-chip" data-type="article">Articles</div>
+                        <div class="filter-chip" data-type="video">Videos</div>
+                        <div class="filter-chip" data-type="interactive">Interactive</div>
+                        <div class="filter-chip" data-type="podcast">Podcasts</div>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <div class="filter-chip" id="favorites-filter" data-filter="favorites">⭐ Favorites</div>
+                        <div class="filter-chip" id="today-filter" data-filter="today">Today's Picks</div>
+                    </div>
+                    
+                    <div class="view-toggle">
+                        <button class="view-btn" data-view="list">☰</button>
+                        <button class="view-btn active" data-view="board">⊞</button>
+                    </div>
+                </div>
+                
+                <div class="filters">
+                    <button class="btn btn-secondary" id="mark-all-read-btn">Mark All as Read</button>
+                </div>
+            </div>
+            
+            <div class="content-grid board-view" id="content-grid">
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <p>Loading content...</p>
+                </div>
+            </div>
+        </div>
 
-<div class="filters" id="filters"></div>
+        <!-- Draft Builder Tab -->
+        <div class="tab-content" id="draft-builder-tab">
+            <div class="library-header">
+                <h2>Draft Builder</h2>
+                <p>Drag to reorder • Add personal commentary • Export when ready</p>
+                
+                <div class="filters">
+                    <button class="btn btn-primary" id="copy-markdown-btn">Copy as Markdown</button>
+                    <button class="btn btn-secondary" id="copy-text-btn">Copy as Plain Text</button>
+                </div>
+            </div>
+            
+            <div class="draft-items" id="draft-items">
+                <div class="empty-state">
+                    <h3>No favorites yet</h3>
+                    <p>Star some articles in your library to start building a draft</p>
+                </div>
+            </div>
+        </div>
 
-<div class="main">
-  <div class="pull-header">
-    <h2 id="pull-title">Loading...</h2>
-    <span class="pull-stats" id="pull-stats"></span>
-  </div>
-  <div id="cards-container"></div>
-</div>
+        <!-- Sources Tab -->
+        <div class="tab-content" id="sources-tab">
+            <div class="library-header">
+                <h2>Sources</h2>
+                <p>RSS feeds powering your daily content</p>
+            </div>
+            
+            <div class="source-feeds" id="source-feeds">
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <p>Loading sources...</p>
+                </div>
+            </div>
+        </div>
+    </main>
 
-<div class="modal-overlay" id="add-link-modal">
-  <div class="modal">
-    <h3 style="margin-bottom:12px;">➕ Add Your Own Link</h3>
-    <input id="custom-url" type="url" placeholder="Paste URL here...">
-    <textarea id="custom-note" placeholder="Why is this interesting? (optional)"></textarea>
-    <div style="display:flex;gap:8px;margin-top:12px;">
-      <button onclick="addCustomLink()" style="padding:8px 16px;background:var(--accent);color:white;border:none;border-radius:8px;cursor:pointer;font-size:13px;">Add Link</button>
-      <button onclick="toggleAddLink()" style="padding:8px 16px;background:white;border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:13px;color:#666;">Cancel</button>
+    <!-- Add Link Modal -->
+    <div class="modal" id="add-link-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Add Link</h2>
+                <p>Paste any URL to add it to your library</p>
+            </div>
+            
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label" for="link-url">URL</label>
+                    <input type="url" class="form-input" id="link-url" placeholder="https://...">
+                </div>
+            </div>
+            
+            <div class="modal-actions">
+                <button class="btn btn-secondary" id="cancel-add-link">Cancel</button>
+                <button class="btn btn-primary" id="submit-add-link">Add Link</button>
+            </div>
+        </div>
     </div>
-  </div>
-</div>
 
-<div class="toast" id="toast"></div>
+    <!-- Comment Modal -->
+    <div class="modal" id="comment-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Add Comment</h2>
+                <p>Feedback for AI training</p>
+            </div>
+            
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label" for="comment-text">Comment</label>
+                    <textarea class="form-textarea" id="comment-text" placeholder="e.g., 'too academic', 'love this angle', 'needs more context'..."></textarea>
+                </div>
+            </div>
+            
+            <div class="modal-actions">
+                <button class="btn btn-secondary" id="cancel-comment">Cancel</button>
+                <button class="btn btn-primary" id="submit-comment">Save Comment</button>
+            </div>
+        </div>
+    </div>
 
-<script>
+    <!-- Highlight Modal -->
+    <div class="modal" id="highlight-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Add Highlight</h2>
+                <p>Save a quote or snippet</p>
+            </div>
+            
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label" for="highlight-text">Highlight</label>
+                    <textarea class="form-textarea" id="highlight-text" placeholder="Paste or type the text you want to highlight..."></textarea>
+                </div>
+            </div>
+            
+            <div class="modal-actions">
+                <button class="btn btn-secondary" id="cancel-highlight">Cancel</button>
+                <button class="btn btn-primary" id="submit-highlight">Save Highlight</button>
+            </div>
+        </div>
+    </div>
 
-let currentView = 'board';
-let activeFilters = new Set();
-let allData = {};
-let items = [];
-let currentDate = null;
-let availableDates = [];
-let feedback = JSON.parse(localStorage.getItem('curator-feedback-v2') || '{}');
-let highlights = JSON.parse(localStorage.getItem('curator-highlights') || '{}');
+    <!-- Toast Container -->
+    <div class="toast" id="toast"></div>
 
-const CONTENT_TYPES = [
-  {key:'article',label:'📝 Articles'},{key:'project',label:'🎨 Projects'},{key:'visual-art',label:'🖼️ Visual Art'},
-  {key:'interactive',label:'🎮 Interactive'},{key:'video',label:'🎥 Video'},{key:'audio',label:'🎧 Audio'},
-  {key:'podcast',label:'🎙️ Podcast'},{key:'framework',label:'🧰 Framework'},{key:'toolkit',label:'🔧 Toolkit'},{key:'immersive',label:'✨ Immersive'}
-];
+    <script>
+        // Global State
+        let appData = {
+            items: [],
+            favorites: new Set(),
+            readItems: new Set(),
+            feedback: {},
+            highlights: {},
+            customItems: [],
+            currentTab: 'library',
+            currentView: 'board',
+            currentFilter: { type: 'all', favorites: false, today: false },
+            searchQuery: ''
+        };
 
-async function loadData() {
-  try {
-    const resp = await fetch('data.json?v=' + Date.now());
-    const data = await resp.json();
-    if (data.days) {
-      allData = data.days;
-      availableDates = Object.keys(allData).sort().reverse();
-      currentDate = availableDates[0];
-      items = allData[currentDate]?.items || [];
-    } else if (data.items) {
-      allData = {'today':{pullDate:data.pullDate,items:data.items}};
-      availableDates = ['today'];
-      currentDate = 'today';
-      items = data.items;
-    }
-    loadCustomItems();
-    renderFilters();
-    renderCards();
-    updateStats();
-  } catch(e) {
-    document.getElementById('pull-title').textContent = 'Waiting for content...';
-    document.getElementById('cards-container').innerHTML = '<div class="empty-state"><div class="emoji">🔍</div><p>Content incoming!</p></div>';
-  }
-}
+        // Constants
+        const SOURCE_FEEDS = [
+            { name: 'The New York Times', url: 'https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml' },
+            { name: 'The Guardian', url: 'https://www.theguardian.com/us/rss' },
+            { name: 'Wired', url: 'https://www.wired.com/feed/rss' },
+            { name: 'TechCrunch', url: 'https://techcrunch.com/feed/' },
+            { name: 'The Atlantic', url: 'https://feeds.feedburner.com/TheAtlantic' },
+            { name: 'Harvard Business Review', url: 'http://feeds.harvardbusiness.org/harvardbusiness' }
+        ];
 
-function navigateDate(dir) {
-  const idx = availableDates.indexOf(currentDate);
-  const ni = idx + dir;
-  if (ni >= 0 && ni < availableDates.length) {
-    currentDate = availableDates[ni];
-    items = allData[currentDate]?.items || [];
-    loadCustomItems();
-    renderFilters();
-    renderCards();
-    updateStats();
-  }
-}
+        const SYNC_URL_BASE = 'https://jsonblob.com/api/jsonBlob/';
 
-function renderFilters() {
-  const c = document.getElementById('filters');
-  const types = CONTENT_TYPES.filter(t => items.some(i => i.contentType === t.key));
-  var audienceFilters = '';
-  var audiences = [{key:'newsletter',label:'🏢 Newsletter'},{key:'friends',label:'🎉 Friends'},{key:'both',label:'🌐 Both'}];
-  var hasAudience = items.some(function(i){return i.audience;});
-  if (hasAudience) {
-    audienceFilters = '<span style="margin-left:8px;color:var(--text-muted);font-size:11px;">|</span>' +
-      audiences.map(function(a){return '<span class="filter-chip ' + (activeFilters.has('aud:'+a.key)?'active':'') + '" onclick="toggleFilter(\'aud:'+a.key+'\')">'+a.label+'</span>';}).join('');
-  }
-  c.innerHTML = audienceFilters + '<span class="filter-chip ' + (activeFilters.size===0?'active':'') + '" onclick="clearFilters()">All</span>' +
-    types.map(t => '<span class="filter-chip ' + (activeFilters.has(t.key)?'active':'') + '" onclick="toggleFilter(\'' + t.key + '\')">' + t.label + '</span>').join('') +
-    '<div class="date-nav"><button onclick="navigateDate(1)">◀</button><span class="date-label">' + (allData[currentDate]?.pullDate||'') + '</span><button onclick="navigateDate(-1)">▶</button></div>';
-}
+        // Utility Functions
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
 
-function toggleFilter(t) { if(activeFilters.has(t))activeFilters.delete(t);else activeFilters.add(t); renderFilters(); renderCards(); updateStats(); }
-function clearFilters() { activeFilters.clear(); renderFilters(); renderCards(); updateStats(); }
+        function showModal(modalId) {
+            document.getElementById(modalId).classList.add('show');
+        }
 
-function getFilteredItems() {
-  let f = items;
-  if (activeFilters.size > 0) {
-    var typeFilters = [];
-    var audFilters = [];
-    activeFilters.forEach(function(fi){ if(fi.startsWith('aud:'))audFilters.push(fi.replace('aud:','')); else typeFilters.push(fi); });
-    if (typeFilters.length) f = f.filter(function(i){return typeFilters.indexOf(i.contentType)>=0;});
-    if (audFilters.length) f = f.filter(function(i){return audFilters.indexOf(i.audience)>=0 || (!i.audience && audFilters.indexOf('both')>=0);});
-  }
-  if (currentView === 'favorites') f = f.filter(i => feedback[i.id]?.rating === 'fire' || feedback[i.id]?.rating === 'good');
-  return f;
-}
+        function hideModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+        }
 
-function renderCards() {
-  const container = document.getElementById('cards-container');
-  const filtered = getFilteredItems();
-  if (currentView === 'sources') { renderSources(container); return; }
-  if (currentView === 'draft') { renderDraft(container); return; }
-  const isGrid = currentView === 'board';
-  container.className = isGrid ? 'grid' : '';
-  if (!filtered.length) {
-    container.innerHTML = '<div class="empty-state"><div class="emoji">' + (currentView==='favorites'?'⭐':'🔍') + '</div><p>' + (currentView==='favorites'?'No favorites yet!':'No items match.') + '</p></div>';
-    return;
-  }
-  container.innerHTML = filtered.map(function(item) {
-    var fb = feedback[item.id] || {};
-    var typeClass = 'type-' + (item.contentType || 'article');
-    var desc = (item.description || '');
-    var hls = highlights[item.id] || [];
-    var hlsHtml = hls.map(function(h, i) {
-      return '<div class="highlight-item">&ldquo;' + h.text.replace(/</g,'&lt;') + '&rdquo;<button class="remove-hl" onclick="removeHighlight(\'' + item.id + '\',' + i + ')">✕</button></div>';
-    }).join('');
-    return '<div class="card">' +
-      (item.image ? '<img class="card-image" src="' + item.image + '" onerror="this.style.display=\'none\'" alt="">' : '') +
-      '<div class="card-body">' +
-        '<span class="card-type ' + typeClass + '">' + (item.contentType||'article') + '</span>' +
-        '<span class="card-source">' + item.source + (item.audience && item.audience !== 'both' ? '<span class="audience-badge audience-' + item.audience + '">' + (item.audience==='friends'?'🎉 friends':'🏢 newsletter') + '</span>' : '') + (item.paywall?' · <span class="paywall-flag">🔒 Paywall</span>':'') + '</span>' +
-        '<div class="card-headline"><a href="' + item.url + '" target="_blank">' + item.headline + '</a></div>' +
-        '<div class="card-description">' + desc + '</div>' + (item.originalSourceUrl ? '<div style="font-size:11px;color:var(--accent);padding:0 0 8px;">🔗 <a href="' + item.originalSourceUrl + '" target="_blank" style="color:var(--accent);">Original source</a></div>' : '') +
-        '<div class="card-meta">' + (item.tags||[]).map(function(t){return '<span class="tag">'+t+'</span>';}).join('') +
-          (item.alignment ? '<span class="alignment alignment-' + item.alignment + '">Match: ' + item.alignment + '/5</span>' : '') +
-        '</div>' +
-      '</div>' +
-      (hlsHtml ? '<div class="highlights">' + hlsHtml + '</div>' : '') +
-      '<div class="add-highlight" id="add-hl-' + item.id + '">' +
-        '<textarea placeholder="Paste a quote you loved..." id="hl-textarea-' + item.id + '"></textarea>' +
-        '<div class="hl-actions"><button class="save-hl" onclick="saveHighlight(\'' + item.id + '\')">💛 Save</button><button class="cancel-hl" onclick="toggleHighlight(\'' + item.id + '\')">Cancel</button></div>' +
-      '</div>' +
-      '<div class="card-actions">' +
-        '<button class="rate-btn ' + (fb.rating==='fire'?'selected':'') + '" onclick="rate(\'' + item.id + '\',\'fire\')">🔥</button>' +
-        '<button class="rate-btn ' + (fb.rating==='good'?'selected':'') + '" onclick="rate(\'' + item.id + '\',\'good\')">👍</button>' +
-        '<button class="rate-btn ' + (fb.rating==='meh'?'selected':'') + '" onclick="rate(\'' + item.id + '\',\'meh\')">😐</button>' +
-        '<button class="rate-btn ' + (fb.rating==='nope'?'selected':'') + '" onclick="rate(\'' + item.id + '\',\'nope\')">👎</button>' +
-        '<button class="comment-toggle" onclick="toggleComment(\'' + item.id + '\')">💬</button>' +
-        '<button class="comment-toggle" onclick="toggleHighlight(\'' + item.id + '\')">✏️</button>' +
-      '</div>' +
-      '<div class="comment-box ' + (fb.comment?'open':'') + '" id="comment-' + item.id + '">' +
-        '<textarea placeholder="What do you think?" id="textarea-' + item.id + '">' + (fb.comment||'') + '</textarea>' +
-        '<button class="save-comment" onclick="saveComment(\'' + item.id + '\')">Save</button>' +
-      '</div>' +
-    '</div>';
-  }).join('');
-}
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+        }
 
-function renderDraft(container) {
-  var allItems = [];
-  for (var k in allData) allItems = allItems.concat(allData[k].items || []);
-  var favs = allItems.filter(function(i){return feedback[i.id]?.rating==='fire'||feedback[i.id]?.rating==='good';});
-  container.className = '';
-  container.innerHTML = '<div class="draft-section"><h3>✍️ Weekly Draft</h3><p style="color:var(--text-muted);font-size:13px;margin-bottom:16px;">' + favs.length + ' favorites ready.</p>' +
-    (!favs.length ? '<div class="empty-state"><div class="emoji">✍️</div><p>Rate some items first!</p></div>' :
-    '<div class="draft-preview">' + favs.map(function(i){
-      var hls = (highlights[i.id]||[]).map(function(h){return '<blockquote style="border-left:3px solid #fdd835;padding-left:12px;font-style:italic;color:#666;margin:4px 0;">&ldquo;' + h.text + '&rdquo;</blockquote>';}).join('');
-      return '<h4><a class="draft-link" href="' + i.url + '" target="_blank">' + i.headline + '</a></h4>' + hls + '<p class="draft-desc">' + (i.description||'').replace(/<[^>]*>/g,'').slice(0,200) + '...</p>';
-    }).join('') + '</div><button class="copy-draft" onclick="copyDraft()">📋 Copy</button>') + '</div>';
-}
+        function getTodayString() {
+            return new Date().toISOString().split('T')[0];
+        }
 
-// Sources
-var SOURCE_FEEDS = [
-  {name:'Colossal',url:'https://www.thisiscolossal.com/feed/'},{name:'Kottke',url:'https://feeds.kottke.org/main'},
-  {name:'Aeon',url:'https://aeon.co/feed.rss'},{name:'The Marginalian',url:'https://feeds.feedburner.com/brainpickings/rss'},
-  {name:'Atlas Obscura',url:'https://www.atlasobscura.com/feeds/latest'},
-  {name:'Dense Discovery',url:'https://www.densediscovery.com/feed/'},
-  {name:'Austin Kleon',url:'https://austinkleon.com/feed/'},{name:'SSIR',url:'https://ssir.org/site/rss_feed'},
-  {name:'Behavioral Scientist',url:'https://behavioralscientist.org/feed/'},{name:'Nautilus',url:'https://nautil.us/feed/'},
-  {name:'Farnam Street',url:'https://fs.blog/feed/'}
-];
-var activeSource = null;
+        function isToday(dateStr) {
+            return dateStr === getTodayString();
+        }
 
-function renderSources(container) {
-  container.className = '';
-  var sidebar = SOURCE_FEEDS.map(function(s){
-    return '<div style="padding:7px 10px;border-radius:8px;cursor:pointer;font-size:12px;margin-bottom:3px;background:' + (activeSource===s.name?'var(--accent-light)':'transparent') + ';color:' + (activeSource===s.name?'var(--accent)':'var(--text)') + '" onclick="loadFeed(\'' + s.url.replace(/'/g,"\\'") + '\',\'' + s.name.replace(/'/g,"\\'") + '\')">' + s.name + '</div>';
-  }).join('');
-  container.innerHTML = '<div style="display:flex;gap:20px;min-height:60vh;"><div style="min-width:180px"><h3 style="font-size:13px;color:var(--text-muted);margin-bottom:10px;">SOURCES</h3>' + sidebar + '</div><div style="flex:1" id="feed-content"><div class="empty-state"><div class="emoji">📡</div><p>Pick a source to browse.</p></div></div></div>';
-}
+        // Local Storage Functions
+        function loadFromStorage() {
+            const feedback = localStorage.getItem('curator-feedback-v2');
+            const highlights = localStorage.getItem('curator-highlights');
+            const customItems = localStorage.getItem('curator-custom-items');
+            const favorites = localStorage.getItem('curator-favorites');
+            const readItems = localStorage.getItem('curator-read-items');
 
-async function loadFeed(url, name) {
-  activeSource = name;
-  renderCards();
-  var fc = document.getElementById('feed-content');
-  fc.innerHTML = '<div style="padding:40px;text-align:center;color:var(--text-muted);">Loading... ⏳</div>';
-  try {
-    var resp = await fetch('https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(url));
-    var data = await resp.json();
-    if (data.status === 'ok' && data.items) {
-      fc.innerHTML = data.items.slice(0,20).map(function(item){
-        return '<div class="card" style="margin-bottom:10px;">' +
-          (item.thumbnail?'<img class="card-image" src="'+item.thumbnail+'" onerror="this.style.display=\'none\'">':'') +
-          '<div class="card-body"><div class="card-source">'+name+' · '+new Date(item.pubDate).toLocaleDateString()+'</div>' +
-          '<div class="card-headline"><a href="'+item.link+'" target="_blank">'+item.title+'</a></div>' +
-          '<div class="card-description" style="font-size:13px;">'+(item.description||'').replace(/<[^>]*>/g,'').slice(0,200)+'...</div>' +
-          '</div></div>';
-      }).join('');
-    } else { fc.innerHTML = '<div style="padding:40px;text-align:center;">Could not load feed.</div>'; }
-  } catch(e) { fc.innerHTML = '<div style="padding:40px;text-align:center;">Feed unavailable.</div>'; }
-}
+            if (feedback) appData.feedback = JSON.parse(feedback);
+            if (highlights) appData.highlights = JSON.parse(highlights);
+            if (customItems) appData.customItems = JSON.parse(customItems);
+            if (favorites) appData.favorites = new Set(JSON.parse(favorites));
+            if (readItems) appData.readItems = new Set(JSON.parse(readItems));
+        }
 
-// Actions
-function rate(id, rating) { if(!feedback[id])feedback[id]={}; feedback[id].rating=feedback[id].rating===rating?null:rating; feedback[id].timestamp=new Date().toISOString(); saveFeedback(); renderCards(); updateStats(); showToast(feedback[id].rating?'Rated!':'Cleared'); }
-function toggleComment(id) { var el=document.getElementById('comment-'+id); if(el)el.classList.toggle('open'); }
-function saveComment(id) { var t=document.getElementById('textarea-'+id); if(!feedback[id])feedback[id]={}; feedback[id].comment=t.value; feedback[id].timestamp=new Date().toISOString(); saveFeedback(); showToast('Saved! 💬'); }
-function toggleHighlight(id) { var el=document.getElementById('add-hl-'+id); if(el)el.classList.toggle('open'); }
-function saveHighlight(id) { var ta=document.getElementById('hl-textarea-'+id); var text=ta.value.trim(); if(!text)return; if(!highlights[id])highlights[id]=[]; highlights[id].push({text:text,timestamp:new Date().toISOString()}); localStorage.setItem('curator-highlights',JSON.stringify(highlights)); ta.value=''; toggleHighlight(id); renderCards(); syncFeedback(); showToast('Highlight saved! 💛'); }
-function removeHighlight(id, idx) { if(highlights[id]){highlights[id].splice(idx,1);if(!highlights[id].length)delete highlights[id];localStorage.setItem('curator-highlights',JSON.stringify(highlights));renderCards();syncFeedback();} }
-function saveFeedback() { localStorage.setItem('curator-feedback-v2',JSON.stringify(feedback)); syncFeedback(); }
-function toggleAddLink() { document.getElementById('add-link-modal').classList.toggle('open'); }
-function addCustomLink() { var u=document.getElementById('custom-url').value.trim(),n=document.getElementById('custom-note').value.trim(); if(!u)return; var item={id:'custom-'+Date.now(),headline:n||u,source:'Custom',url:u,description:n||'Custom link',tags:['custom'],contentType:'article',alignment:null,paywall:false,custom:true}; items.unshift(item); var c=JSON.parse(localStorage.getItem('curator-custom-items')||'[]');c.push(item);localStorage.setItem('curator-custom-items',JSON.stringify(c)); document.getElementById('custom-url').value='';document.getElementById('custom-note').value='';toggleAddLink();renderCards();updateStats();showToast('Added! ✨'); }
-function loadCustomItems() { JSON.parse(localStorage.getItem('curator-custom-items')||'[]').forEach(function(c){if(!items.find(function(i){return i.id===c.id}))items.unshift(c);}); }
-function exportFeedback() { var allItems=[];for(var k in allData)allItems=allItems.concat(allData[k].items||[]);var data=allItems.map(function(i){return{headline:i.headline,source:i.source,url:i.url,contentType:i.contentType,rating:feedback[i.id]?.rating||'unrated',comment:feedback[i.id]?.comment||'',highlights:(highlights[i.id]||[]).map(function(h){return h.text}),tags:i.tags}});var blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='feedback-'+new Date().toISOString().split('T')[0]+'.json';a.click();showToast('Exported! 📤'); }
-function copyDraft() { var allItems=[];for(var k in allData)allItems=allItems.concat(allData[k].items||[]);var favs=allItems.filter(function(i){return feedback[i.id]?.rating==='fire'||feedback[i.id]?.rating==='good'});var text='This Weeks Finds\n\n'+favs.map(function(i){var hls=(highlights[i.id]||[]).map(function(h){return '"'+h.text+'"'}).join('\n');return i.headline+'\n'+i.url+'\n'+(hls?hls+'\n':'')+((i.description||'').replace(/<[^>]*>/g,'').slice(0,200))+'\n'}).join('\n');navigator.clipboard.writeText(text);showToast('Copied! 📋'); }
-function setView(v) { currentView=v; document.querySelectorAll('.nav button').forEach(function(b){b.classList.remove('active')}); document.querySelectorAll('.nav button').forEach(function(b){var t=b.textContent.toLowerCase();if((v==='feed'&&t.includes('list'))||(v==='board'&&t.includes('board'))||(v==='favorites'&&t.includes('fav'))||(v==='draft'&&t.includes('draft'))||(v==='sources'&&t.includes('source')))b.classList.add('active');}); renderCards();updateStats(); }
-function updateStats() { var f=getFilteredItems(); document.getElementById('pull-stats').textContent=f.length+' items · '+f.filter(function(i){return feedback[i.id]?.rating}).length+' rated'; }
-function showToast(m) { var t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},2000); }
+        function saveToStorage() {
+            localStorage.setItem('curator-feedback-v2', JSON.stringify(appData.feedback));
+            localStorage.setItem('curator-highlights', JSON.stringify(appData.highlights));
+            localStorage.setItem('curator-custom-items', JSON.stringify(appData.customItems));
+            localStorage.setItem('curator-favorites', JSON.stringify([...appData.favorites]));
+            localStorage.setItem('curator-read-items', JSON.stringify([...appData.readItems]));
+        }
 
-// Sync
-var SYNC_URL = 'https://jsonblob.com/api/jsonBlob';
-var syncBlobId = localStorage.getItem('curator-sync-id') || null;
-async function initSync() {
-  if (!syncBlobId) {
-    try {
-      var r = await fetch(SYNC_URL, {method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({feedback:{},lastSync:new Date().toISOString()})});
-      if (r.ok) { var l=r.headers.get('Location')||''; syncBlobId=l.split('/').pop()||null; if(syncBlobId)localStorage.setItem('curator-sync-id',syncBlobId); }
-    } catch(e) {}
-  }
-  if (syncBlobId) document.getElementById('sync-status').textContent='☁️ Synced';
-}
-async function syncFeedback() {
-  if (!syncBlobId) await initSync();
-  if (!syncBlobId) return;
-  try {
-    await fetch(SYNC_URL+'/'+syncBlobId, {method:'PUT',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({feedback:feedback,highlights:highlights,lastSync:new Date().toISOString(),ratedCount:Object.keys(feedback).filter(function(k){return feedback[k]?.rating}).length})});
-  } catch(e) {}
-}
+        // Data Loading
+        async function loadData() {
+            try {
+                const response = await fetch('./data.json');
+                const data = await response.json();
+                
+                // Convert days structure to flat items array
+                appData.items = [];
+                Object.entries(data.days).forEach(([date, dayData]) => {
+                    dayData.items.forEach(item => {
+                        appData.items.push({
+                            ...item,
+                            date: date,
+                            pullDate: dayData.pullDate
+                        });
+                    });
+                });
 
-initSync();
-loadData();
+                // Add custom items
+                appData.items = [...appData.items, ...appData.customItems];
+                
+                loadFromStorage();
+                renderCurrentTab();
+                updateTodayBadge();
+            } catch (error) {
+                console.error('Error loading data:', error);
+                showToast('Error loading data');
+            }
+        }
 
-</script>
+        // Filtering and Search
+        function filterItems(items) {
+            let filtered = items;
+
+            // Search filter
+            if (appData.searchQuery) {
+                const query = appData.searchQuery.toLowerCase();
+                filtered = filtered.filter(item => 
+                    item.headline.toLowerCase().includes(query) ||
+                    item.description.toLowerCase().includes(query) ||
+                    item.source.toLowerCase().includes(query) ||
+                    (item.tags && item.tags.some(tag => tag.toLowerCase().includes(query)))
+                );
+            }
+
+            // Content type filter
+            if (appData.currentFilter.type !== 'all') {
+                filtered = filtered.filter(item => 
+                    item.contentType.toLowerCase() === appData.currentFilter.type.toLowerCase()
+                );
+            }
+
+            // Favorites filter
+            if (appData.currentFilter.favorites) {
+                filtered = filtered.filter(item => appData.favorites.has(item.id));
+            }
+
+            // Today filter (unreviewed items from today)
+            if (appData.currentFilter.today) {
+                const today = getTodayString();
+                filtered = filtered.filter(item => 
+                    isToday(item.date) && 
+                    !appData.readItems.has(item.id) && 
+                    !appData.favorites.has(item.id) &&
+                    !appData.feedback[item.id]
+                );
+            }
+
+            return filtered;
+        }
+
+        // UI Rendering
+        function renderContentCard(item) {
+            const isUnread = !appData.readItems.has(item.id);
+            const isFavorited = appData.favorites.has(item.id);
+            const feedback = appData.feedback[item.id];
+            const highlights = appData.highlights[item.id] || [];
+
+            return `
+                <article class="content-card ${isUnread ? 'unread' : ''}" data-id="${item.id}">
+                    ${item.image ? `<img src="${item.image}" alt="" class="card-image" loading="lazy">` : ''}
+                    
+                    <div class="card-content">
+                        <div class="card-meta">
+                            <span class="content-type ${item.contentType.toLowerCase()}">${item.contentType}</span>
+                            <span class="source-name">${item.source}</span>
+                            ${item.paywall ? '<span class="paywall-icon">🔒</span>' : ''}
+                        </div>
+                        
+                        <h3 class="card-title" onclick="markAsRead('${item.id}')">${item.headline}</h3>
+                        
+                        <div class="card-description ${appData.currentView === 'board' ? 'truncated' : ''}" id="desc-${item.id}">
+                            ${item.description}
+                        </div>
+                        
+                        ${appData.currentView === 'board' ? `<button class="show-more-btn" onclick="toggleDescription('${item.id}')">Show more</button>` : ''}
+                        
+                        ${highlights.length > 0 ? `
+                            <div class="draft-highlights">
+                                <h4>Your highlights:</h4>
+                                ${highlights.map(h => `<div class="highlight-item">"${h.text}"</div>`).join('')}
+                            </div>
+                        ` : ''}
+                        
+                        <div class="card-actions">
+                            <button class="action-btn star-btn ${isFavorited ? 'active' : ''}" onclick="toggleFavorite('${item.id}')" title="Star as favorite">⭐</button>
+                            <button class="action-btn" onclick="openCommentModal('${item.id}')" title="Add comment">💬</button>
+                            <button class="action-btn" onclick="openHighlightModal('${item.id}')" title="Add highlight">✏️</button>
+                            <a href="${item.url}" target="_blank" class="action-btn" onclick="markAsRead('${item.id}')" title="Read article">🔗</a>
+                            
+                            <div class="rating-group">
+                                <button class="rating-btn ${feedback?.rating === 'up' ? 'active' : ''}" onclick="setRating('${item.id}', 'up')" title="Good">👍</button>
+                                <button class="rating-btn ${feedback?.rating === 'neutral' ? 'active' : ''}" onclick="setRating('${item.id}', 'neutral')" title="Neutral">🤷</button>
+                                <button class="rating-btn ${feedback?.rating === 'down' ? 'active' : ''}" onclick="setRating('${item.id}', 'down')" title="Not great">👎</button>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            `;
+        }
+
+        function renderLibrary() {
+            const grid = document.getElementById('content-grid');
+            const filtered = filterItems(appData.items);
+            
+            if (filtered.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <h3>No items found</h3>
+                        <p>Try adjusting your search or filters</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = filtered.map(renderContentCard).join('');
+        }
+
+        function renderDraftBuilder() {
+            const container = document.getElementById('draft-items');
+            const favorites = appData.items.filter(item => appData.favorites.has(item.id));
+            
+            if (favorites.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <h3>No favorites yet</h3>
+                        <p>Star some articles in your library to start building a draft</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = favorites.map(item => {
+                const highlights = appData.highlights[item.id] || [];
+                
+                return `
+                    <div class="draft-item" draggable="true" data-id="${item.id}">
+                        <div class="draft-item-header">
+                            <div class="draft-item-content">
+                                <h3 class="draft-item-title">${item.headline}</h3>
+                                <div class="draft-item-source">${item.source} • ${formatDate(item.date)}</div>
+                                
+                                <textarea class="draft-intro" placeholder="Add your personal commentary or intro for this item..." 
+                                    onchange="saveDraftIntro('${item.id}', this.value)">${item.draftIntro || ''}</textarea>
+                                
+                                ${highlights.length > 0 ? `
+                                    <div class="draft-highlights">
+                                        <h4>Your highlights:</h4>
+                                        ${highlights.map(h => `<div class="highlight-item">"${h.text}"</div>`).join('')}
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Set up drag and drop
+            setupDragAndDrop();
+        }
+
+        function renderSources() {
+            const container = document.getElementById('source-feeds');
+            
+            container.innerHTML = SOURCE_FEEDS.map(source => `
+                <div class="source-card">
+                    <h3 class="source-title">${source.name}</h3>
+                    <p class="source-desc">RSS feed providing daily content updates</p>
+                    <div class="source-stats">
+                        <span>📡 RSS</span>
+                        <span>🔄 Active</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderCurrentTab() {
+            switch (appData.currentTab) {
+                case 'library':
+                    renderLibrary();
+                    break;
+                case 'draft-builder':
+                    renderDraftBuilder();
+                    break;
+                case 'sources':
+                    renderSources();
+                    break;
+            }
+        }
+
+        function updateTodayBadge() {
+            const today = getTodayString();
+            const todayItems = appData.items.filter(item => 
+                isToday(item.date) && 
+                !appData.readItems.has(item.id) && 
+                !appData.favorites.has(item.id) &&
+                !appData.feedback[item.id]
+            );
+            
+            const badge = document.getElementById('today-picks-badge');
+            if (todayItems.length > 0) {
+                badge.textContent = todayItems.length;
+                badge.style.display = 'block';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+
+        // Action Functions
+        function markAsRead(itemId) {
+            appData.readItems.add(itemId);
+            saveToStorage();
+            
+            // Update the card visually
+            const card = document.querySelector(`[data-id="${itemId}"]`);
+            if (card) card.classList.remove('unread');
+            
+            updateTodayBadge();
+        }
+
+        function toggleFavorite(itemId) {
+            if (appData.favorites.has(itemId)) {
+                appData.favorites.delete(itemId);
+                // Remove draft intro when unfavorited
+                const item = appData.items.find(i => i.id === itemId);
+                if (item) delete item.draftIntro;
+            } else {
+                appData.favorites.add(itemId);
+                markAsRead(itemId);
+                // Auto-set positive feedback for starred items
+                setRating(itemId, 'up');
+            }
+            
+            saveToStorage();
+            renderCurrentTab();
+            updateTodayBadge();
+            showToast(appData.favorites.has(itemId) ? 'Added to favorites' : 'Removed from favorites');
+        }
+
+        function setRating(itemId, rating) {
+            if (!appData.feedback[itemId]) {
+                appData.feedback[itemId] = {};
+            }
+            
+            appData.feedback[itemId].rating = rating;
+            appData.feedback[itemId].timestamp = Date.now();
+            
+            saveToStorage();
+            markAsRead(itemId);
+            renderCurrentTab();
+            updateTodayBadge();
+        }
+
+        function openCommentModal(itemId) {
+            window.currentItemId = itemId;
+            const existing = appData.feedback[itemId]?.comment || '';
+            document.getElementById('comment-text').value = existing;
+            showModal('comment-modal');
+        }
+
+        function saveComment() {
+            const itemId = window.currentItemId;
+            const comment = document.getElementById('comment-text').value.trim();
+            
+            if (!comment) return;
+            
+            if (!appData.feedback[itemId]) {
+                appData.feedback[itemId] = {};
+            }
+            
+            appData.feedback[itemId].comment = comment;
+            appData.feedback[itemId].timestamp = Date.now();
+            
+            saveToStorage();
+            markAsRead(itemId);
+            hideModal('comment-modal');
+            showToast('Comment saved');
+            updateTodayBadge();
+        }
+
+        function openHighlightModal(itemId) {
+            window.currentItemId = itemId;
+            document.getElementById('highlight-text').value = '';
+            showModal('highlight-modal');
+        }
+
+        function saveHighlight() {
+            const itemId = window.currentItemId;
+            const text = document.getElementById('highlight-text').value.trim();
+            
+            if (!text) return;
+            
+            if (!appData.highlights[itemId]) {
+                appData.highlights[itemId] = [];
+            }
+            
+            appData.highlights[itemId].push({
+                text: text,
+                timestamp: Date.now()
+            });
+            
+            saveToStorage();
+            markAsRead(itemId);
+            hideModal('highlight-modal');
+            renderCurrentTab();
+            showToast('Highlight saved');
+            updateTodayBadge();
+        }
+
+        function toggleDescription(itemId) {
+            const desc = document.getElementById(`desc-${itemId}`);
+            const button = desc.nextElementSibling;
+            
+            if (desc.classList.contains('truncated')) {
+                desc.classList.remove('truncated');
+                button.textContent = 'Show less';
+            } else {
+                desc.classList.add('truncated');
+                button.textContent = 'Show more';
+            }
+        }
+
+        function saveDraftIntro(itemId, value) {
+            const item = appData.items.find(i => i.id === itemId);
+            if (item) {
+                item.draftIntro = value;
+                saveToStorage();
+            }
+        }
+
+        function markAllAsRead() {
+            const filtered = filterItems(appData.items);
+            filtered.forEach(item => appData.readItems.add(item.id));
+            saveToStorage();
+            renderCurrentTab();
+            updateTodayBadge();
+            showToast('Marked all as read');
+        }
+
+        // Add Link Functions
+        function addCustomLink() {
+            const url = document.getElementById('link-url').value.trim();
+            if (!url) return;
+
+            const newItem = {
+                id: `custom-${Date.now()}`,
+                headline: url,
+                description: 'Processing...',
+                source: 'Custom Link',
+                url: url,
+                contentType: 'Article',
+                image: '',
+                tags: [],
+                alignment: 3,
+                paywall: false,
+                date: getTodayString(),
+                pullDate: formatDate(getTodayString())
+            };
+
+            appData.customItems.push(newItem);
+            appData.items.push(newItem);
+            saveToStorage();
+            hideModal('add-link-modal');
+            document.getElementById('link-url').value = '';
+            renderCurrentTab();
+            showToast('Link added to library');
+        }
+
+        // Draft Export Functions
+        function exportAsMarkdown() {
+            const favorites = appData.items.filter(item => appData.favorites.has(item.id));
+            let markdown = '# Newsletter Draft\n\n';
+            
+            favorites.forEach(item => {
+                markdown += `## ${item.headline}\n\n`;
+                if (item.draftIntro) {
+                    markdown += `${item.draftIntro}\n\n`;
+                }
+                
+                const highlights = appData.highlights[item.id] || [];
+                if (highlights.length > 0) {
+                    highlights.forEach(h => {
+                        markdown += `> "${h.text}"\n\n`;
+                    });
+                }
+                
+                markdown += `[Read more](${item.url}) • ${item.source}\n\n---\n\n`;
+            });
+
+            navigator.clipboard.writeText(markdown).then(() => {
+                showToast('Copied as Markdown');
+            });
+        }
+
+        function exportAsText() {
+            const favorites = appData.items.filter(item => appData.favorites.has(item.id));
+            let text = 'Newsletter Draft\n\n';
+            
+            favorites.forEach((item, index) => {
+                text += `${index + 1}. ${item.headline}\n`;
+                if (item.draftIntro) {
+                    text += `${item.draftIntro}\n`;
+                }
+                
+                const highlights = appData.highlights[item.id] || [];
+                if (highlights.length > 0) {
+                    highlights.forEach(h => {
+                        text += `"${h.text}"\n`;
+                    });
+                }
+                
+                text += `${item.url}\n${item.source}\n\n`;
+            });
+
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('Copied as Plain Text');
+            });
+        }
+
+        // Drag and Drop
+        function setupDragAndDrop() {
+            const container = document.getElementById('draft-items');
+            let draggedElement = null;
+
+            container.addEventListener('dragstart', (e) => {
+                draggedElement = e.target.closest('.draft-item');
+                if (draggedElement) {
+                    draggedElement.classList.add('dragging');
+                    e.dataTransfer.effectAllowed = 'move';
+                    e.dataTransfer.setData('text/html', draggedElement.outerHTML);
+                }
+            });
+
+            container.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+
+                const afterElement = getDragAfterElement(container, e.clientY);
+                if (afterElement == null) {
+                    container.appendChild(draggedElement);
+                } else {
+                    container.insertBefore(draggedElement, afterElement);
+                }
+            });
+
+            container.addEventListener('dragend', (e) => {
+                if (draggedElement) {
+                    draggedElement.classList.remove('dragging');
+                    draggedElement = null;
+                }
+            });
+        }
+
+        function getDragAfterElement(container, y) {
+            const draggableElements = [...container.querySelectorAll('.draft-item:not(.dragging)')];
+
+            return draggableElements.reduce((closest, child) => {
+                const box = child.getBoundingClientRect();
+                const offset = y - box.top - box.height / 2;
+
+                if (offset < 0 && offset > closest.offset) {
+                    return { offset: offset, element: child };
+                } else {
+                    return closest;
+                }
+            }, { offset: Number.NEGATIVE_INFINITY }).element;
+        }
+
+        // Sync Functions
+        async function syncData() {
+            const syncId = localStorage.getItem('curator-sync-id');
+            if (!syncId) {
+                showToast('No sync ID found');
+                return;
+            }
+
+            const syncData = {
+                feedback: appData.feedback,
+                highlights: appData.highlights,
+                readItems: [...appData.readItems],
+                favorites: [...appData.favorites],
+                customItems: appData.customItems,
+                lastSync: Date.now()
+            };
+
+            try {
+                const response = await fetch(SYNC_URL_BASE + syncId, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(syncData)
+                });
+
+                if (response.ok) {
+                    showToast('Synced successfully');
+                } else {
+                    showToast('Sync failed');
+                }
+            } catch (error) {
+                showToast('Sync error');
+                console.error('Sync error:', error);
+            }
+        }
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            loadData();
+
+            // Tab navigation
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabId = tab.dataset.tab;
+                    
+                    // Update active tab
+                    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    
+                    // Update active content
+                    document.querySelectorAll('.tab-content').forEach(content => {
+                        content.classList.remove('active');
+                    });
+                    document.getElementById(tabId + '-tab').classList.add('active');
+                    
+                    appData.currentTab = tabId;
+                    renderCurrentTab();
+                });
+            });
+
+            // Search
+            document.getElementById('search-input').addEventListener('input', (e) => {
+                appData.searchQuery = e.target.value;
+                renderCurrentTab();
+            });
+
+            // Content type filters
+            document.querySelectorAll('.filter-chip[data-type]').forEach(chip => {
+                chip.addEventListener('click', () => {
+                    document.querySelectorAll('.filter-chip[data-type]').forEach(c => c.classList.remove('active'));
+                    chip.classList.add('active');
+                    appData.currentFilter.type = chip.dataset.type;
+                    renderCurrentTab();
+                });
+            });
+
+            // Special filters
+            document.getElementById('favorites-filter').addEventListener('click', () => {
+                const chip = document.getElementById('favorites-filter');
+                appData.currentFilter.favorites = !appData.currentFilter.favorites;
+                chip.classList.toggle('active', appData.currentFilter.favorites);
+                renderCurrentTab();
+            });
+
+            document.getElementById('today-filter').addEventListener('click', () => {
+                const chip = document.getElementById('today-filter');
+                appData.currentFilter.today = !appData.currentFilter.today;
+                chip.classList.toggle('active', appData.currentFilter.today);
+                renderCurrentTab();
+            });
+
+            // View toggle
+            document.querySelectorAll('.view-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    appData.currentView = btn.dataset.view;
+                    
+                    const grid = document.getElementById('content-grid');
+                    grid.className = `content-grid ${appData.currentView}-view`;
+                    renderCurrentTab();
+                });
+            });
+
+            // Mark all as read
+            document.getElementById('mark-all-read-btn').addEventListener('click', markAllAsRead);
+
+            // Add link modal
+            document.getElementById('add-link-btn').addEventListener('click', () => showModal('add-link-modal'));
+            document.getElementById('cancel-add-link').addEventListener('click', () => hideModal('add-link-modal'));
+            document.getElementById('submit-add-link').addEventListener('click', addCustomLink);
+
+            // Comment modal
+            document.getElementById('cancel-comment').addEventListener('click', () => hideModal('comment-modal'));
+            document.getElementById('submit-comment').addEventListener('click', saveComment);
+
+            // Highlight modal
+            document.getElementById('cancel-highlight').addEventListener('click', () => hideModal('highlight-modal'));
+            document.getElementById('submit-highlight').addEventListener('click', saveHighlight);
+
+            // Draft builder actions
+            document.getElementById('copy-markdown-btn').addEventListener('click', exportAsMarkdown);
+            document.getElementById('copy-text-btn').addEventListener('click', exportAsText);
+
+            // Sync
+            document.getElementById('sync-btn').addEventListener('click', syncData);
+
+            // Modal backdrop clicks
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        modal.classList.remove('show');
+                    }
+                });
+            });
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    document.querySelectorAll('.modal.show').forEach(modal => {
+                        modal.classList.remove('show');
+                    });
+                }
+            });
+        });
+
+        // Global functions for onclick handlers
+        window.markAsRead = markAsRead;
+        window.toggleFavorite = toggleFavorite;
+        window.setRating = setRating;
+        window.openCommentModal = openCommentModal;
+        window.openHighlightModal = openHighlightModal;
+        window.toggleDescription = toggleDescription;
+        window.saveDraftIntro = saveDraftIntro;
+    </script>
 </body>
 </html>
