@@ -1,0 +1,575 @@
+{
+  "pullDate": "February 13, 2026 \u2014 First Pull \ud83c\udf89",
+  "items": [
+    {
+      "headline": "What If the World's Mood Had a Soundtrack? This Device Composes One Every Day.",
+      "source": "Creative Applications",
+      "url": "https://www.creativeapplications.net/member/current_state-worlds-mood-each-day-as-generated-music/",
+      "description": "current_state analyzes daily news sentiment from major global regions, then generates music representing the world's collective mood. It's a physical product blending AI, news APIs, and generative audio \u2014 a poetic data sonification that makes the abstract tangible.",
+      "tags": [
+        "art+tech",
+        "AI",
+        "data sonification",
+        "interactive"
+      ],
+      "paywall": false,
+      "id": "pull001-000",
+      "alignment": 5
+    },
+    {
+      "headline": "A Light That Can See Radio Waves",
+      "source": "Creative Applications",
+      "url": "https://www.creativeapplications.net/member/spectrum-slit-a-light-that-can-see-radiowaves/",
+      "description": "Spectrum Slit transforms invisible radio wave traffic into physical bursts of light and sound using LED filaments. It exposes the constant, invasive density of our wireless world \u2014 making you feel the electromagnetic pollution you're swimming in every day.",
+      "tags": [
+        "art+science",
+        "installation",
+        "invisible infrastructure",
+        "creative tech"
+      ],
+      "paywall": false,
+      "id": "pull001-001",
+      "alignment": 5
+    },
+    {
+      "headline": "What Does a Speculative Prayer Device Sound Like?",
+      "source": "Creative Applications",
+      "url": "https://www.creativeapplications.net/member/aurora-speculative-device-for-future-prayer/",
+      "description": "Aurora is a speculative device that explores the act of prayer through proximity-based hand gestures generating evolving, dreamlike soundscapes. It sits beautifully at the intersection of spirituality, interaction design, and speculative futures.",
+      "tags": [
+        "speculative design",
+        "spirituality",
+        "interaction design",
+        "sound"
+      ],
+      "paywall": false,
+      "id": "pull001-002",
+      "alignment": 5
+    },
+    {
+      "headline": "Simone de Beauvoir's One Rule for Keeping Life From Becoming a Parody",
+      "source": "The Marginalian",
+      "url": "https://www.themarginalian.org/2026/02/13/simone-de-beauvoir-coming-of-age/",
+      "description": "Maria Popova excavates de Beauvoir's 1970 meditation on aging \u2014 not as a project to ace, but a fact to meet. The only antidote to life becoming its own parody: passions strong enough to keep you from turning inward. Timeless wisdom for anyone designing a life, not just a career.",
+      "tags": [
+        "philosophy",
+        "aging",
+        "creativity",
+        "life design"
+      ],
+      "paywall": false,
+      "id": "pull001-003",
+      "alignment": 4
+    },
+    {
+      "headline": "Nick Cave's Advice to a 13-Year-Old on Living a Full Creative Life",
+      "source": "The Marginalian",
+      "url": "https://www.themarginalian.org/2026/02/13/nick-cave-advice/",
+      "description": "A teenager asks Nick Cave how to live fully in a world of hate and disconnect. Cave's response \u2014 read voraciously, look at art, listen to music, be kind \u2014 is a masterclass in creative mentorship. Pairs beautifully with themes of human-centered living.",
+      "tags": [
+        "creativity",
+        "mentorship",
+        "culture",
+        "inspiration"
+      ],
+      "paywall": false,
+      "id": "pull001-004",
+      "alignment": 4
+    },
+    {
+      "headline": "Do Bumblebees Dream? (Yes, and We Can Imagine What About)",
+      "source": "Nautilus",
+      "url": "https://nautil.us/the-dreams-of-a-bumblebee-in-autumn-1266834/",
+      "description": "Brandon Keim explores emerging research showing bees actually dream \u2014 and what that means for our understanding of consciousness across species. A gorgeous piece that challenges the boundary between 'simple' creatures and rich inner lives.",
+      "tags": [
+        "science",
+        "consciousness",
+        "nature",
+        "wonder"
+      ],
+      "paywall": true,
+      "id": "pull001-005",
+      "alignment": 4
+    },
+    {
+      "headline": "To Unleash Your Imagination, Step Out of the Light",
+      "source": "Nautilus",
+      "url": "https://nautil.us/let-there-be-dark-1265475/",
+      "description": "An exploration of how darkness \u2014 literal darkness \u2014 unlocks creativity and imagination. In a world obsessed with illumination and visibility, this makes a case for the generative power of not seeing. Relevant to anyone designing experiences or environments.",
+      "tags": [
+        "creativity",
+        "environment",
+        "design thinking",
+        "science"
+      ],
+      "paywall": true,
+      "id": "pull001-006",
+      "alignment": 5
+    },
+    {
+      "headline": "The Confabulations of Oliver Sacks: A Neurologist Reckons with Revelations",
+      "source": "Nautilus",
+      "url": "https://nautil.us/the-confabulations-of-oliver-sacks-1262447/",
+      "description": "Following revelations about the celebrated author-neurologist's fabrications, a fellow neurologist wrestles with what it means when our heroes of empathy turn out to be unreliable narrators. A fascinating meditation on storytelling, science, and trust.",
+      "tags": [
+        "science",
+        "ethics",
+        "storytelling",
+        "neuroscience"
+      ],
+      "paywall": true,
+      "id": "pull001-007",
+      "alignment": 4
+    },
+    {
+      "headline": "Want to Be More Creative? Immigrate.",
+      "source": "Nautilus",
+      "url": "https://nautil.us/to-be-more-creative-immigrate-1246613/",
+      "description": "Research shows creativity flourishes when people cross borders \u2014 and that the depth of cross-cultural connection matters more than superficial exposure. A powerful argument for diversity as creative fuel, not just moral imperative.",
+      "tags": [
+        "creativity",
+        "behavioral science",
+        "immigration",
+        "innovation"
+      ],
+      "paywall": true,
+      "id": "pull001-008",
+      "alignment": 5
+    },
+    {
+      "headline": "Compost Modernity! The Vision of Solarpunk Cities",
+      "source": "Aeon",
+      "url": "https://aeon.co/essays/in-solarpunk-cities-of-the-future-tech-follows-natures-lead",
+      "description": "Solarpunk imagines joining nature with technology in vibrantly inclusive ways to create a world that truly blooms. This essay explores a design philosophy where tech follows nature's lead \u2014 directly relevant to regenerative design and HCD futures.",
+      "tags": [
+        "design futures",
+        "sustainability",
+        "urbanism",
+        "solarpunk"
+      ],
+      "paywall": false,
+      "id": "pull001-009",
+      "alignment": 5
+    },
+    {
+      "headline": "In Japanese Philosophy, You Are Not a Self \u2014 You Are 'Ningen'",
+      "source": "Aeon",
+      "url": "https://aeon.co/essays/the-japanese-ethics-of-ningen-dethrones-the-western-self",
+      "description": "Unlike the atomized Western self, Japanese philosophy sees us as 'ningen' (\u4eba\u9593) \u2014 each enmeshed with other humans and nature. A provocative reframe for anyone working in human-centered design: what if the 'human' at the center isn't an individual?",
+      "tags": [
+        "philosophy",
+        "HCD",
+        "systems thinking",
+        "culture"
+      ],
+      "paywall": false,
+      "id": "pull001-010",
+      "alignment": 5
+    },
+    {
+      "headline": "Can AI Really Surprise Us? (A Case for Human Creativity's Uniqueness)",
+      "source": "Aeon",
+      "url": "https://aeon.co/essays/sure-ai-can-do-writing-but-memoir-not-so-much",
+      "description": "As AI's endless clich\u00e9s encroach on human art, the true uniqueness of our creativity becomes clearer. Richard Beard argues that surprise \u2014 real, meaningful surprise \u2014 remains a fundamentally human capacity. Essential reading for the AI-anxious creative.",
+      "tags": [
+        "AI",
+        "creativity",
+        "writing",
+        "innovation"
+      ],
+      "paywall": false,
+      "id": "pull001-011",
+      "alignment": 5
+    },
+    {
+      "headline": "How Selfish Are We, Really? New Science on the Tightrope of Cooperation",
+      "source": "Aeon",
+      "url": "https://aeon.co/essays/we-cooperate-to-survive-but-if-no-ones-looking-we-compete",
+      "description": "New findings energize the age-old debate about human nature \u2014 we cooperate to survive, but when no one's looking, we compete. Fascinating implications for designing systems, organizations, and social interventions.",
+      "tags": [
+        "behavioral science",
+        "human nature",
+        "social design",
+        "cooperation"
+      ],
+      "paywall": false,
+      "id": "pull001-012",
+      "alignment": 5
+    },
+    {
+      "headline": "Can You Actually Rewire Your Brain? (Not the Way You Think)",
+      "source": "Aeon",
+      "url": "https://aeon.co/essays/what-the-metaphor-of-rewiring-gets-wrong-about-neuroplasticity",
+      "description": "The 'rewiring' metaphor offers an ideal of engineered precision, but the brain is more like a forest than a circuit board. A corrective to oversimplified self-help neuroscience that has real implications for learning design and behavior change.",
+      "tags": [
+        "neuroscience",
+        "behavioral science",
+        "metaphor",
+        "learning"
+      ],
+      "paywall": false,
+      "id": "pull001-013",
+      "alignment": 4
+    },
+    {
+      "headline": "Ethereal Kites That Transform Into Wearable Sculptures",
+      "source": "Colossal",
+      "url": "https://www.thisiscolossal.com/2026/02/hai-wen-lin-kite-garment-textiles-sculptures/",
+      "description": "Hai-Wen Lin creates kites that double as elegant garments and sculptures \u2014 objects that exist between sky and body, flight and fashion. A stunning example of craft that refuses to stay in one category.",
+      "tags": [
+        "art",
+        "craft",
+        "wearable design",
+        "sculpture"
+      ],
+      "paywall": false,
+      "id": "pull001-014",
+      "alignment": 4
+    },
+    {
+      "headline": "A Hand-Painted Stop-Motion Film Eulogizes a Lost Childhood Home",
+      "source": "Colossal",
+      "url": "https://www.thisiscolossal.com/2026/02/jason-mitcham-ever-behind-the-sunset-film/",
+      "description": "Jason Mitcham's stop-motion film is painted entirely by hand \u2014 each frame a small act of remembering. It's a meditation on home, memory, and loss that collapses the distance between fine art and filmmaking.",
+      "tags": [
+        "animation",
+        "art",
+        "memory",
+        "storytelling"
+      ],
+      "paywall": false,
+      "id": "pull001-015",
+      "alignment": 4
+    },
+    {
+      "headline": "Indigenous Artisans + Recycled Plastic = Beautiful Lighting Design",
+      "source": "Colossal",
+      "url": "https://www.thisiscolossal.com/2026/02/pet-lamp-global-artisans-lighting-design/",
+      "description": "PET Lamp collaborates with indigenous artisans worldwide to weave recycled plastic bottles into stunning light fixtures. Each lamp carries traditional weaving techniques from its origin community \u2014 a masterclass in sustainable design that honors cultural heritage.",
+      "tags": [
+        "sustainability",
+        "design",
+        "indigenous craft",
+        "social impact"
+      ],
+      "paywall": false,
+      "id": "pull001-016",
+      "alignment": 5
+    },
+    {
+      "headline": "Where Art, Ecology, and the Mississippi River Converge",
+      "source": "Colossal",
+      "url": "https://www.thisiscolossal.com/2026/02/minnesota-marina-art-museum-water-craft-exhibition/",
+      "description": "The Water | Craft exhibition brings together art, culture, and ecology along the Mississippi River. It's a confluence \u2014 literally and figuratively \u2014 of environmental awareness and creative practice, exploring our relationship with water systems.",
+      "tags": [
+        "art",
+        "ecology",
+        "exhibition",
+        "place-based design"
+      ],
+      "paywall": false,
+      "id": "pull001-017",
+      "alignment": 4
+    },
+    {
+      "headline": "An Interactive Film That Immerses You in the Physics of Light",
+      "source": "Emergence Magazine",
+      "url": "https://emergencemagazine.org/feature/five-studies-on-light/",
+      "description": "Five Studies on Light is an interactive film that sets you in motion around five dynamic spatial installations exploring light \u2014 the most essential element of the seasons. From Emergence's stunning new 'Seasons' issue, it's the kind of immersive digital experience that redefines what online storytelling can be.",
+      "tags": [
+        "interactive",
+        "art+science",
+        "immersive storytelling",
+        "nature"
+      ],
+      "paywall": false,
+      "id": "pull001-018",
+      "alignment": 5
+    },
+    {
+      "headline": "A Poet-Ornithologist's Reverent Exchange with Migrating Birds",
+      "source": "Emergence Magazine",
+      "url": "https://emergencemagazine.org/film/a-mystical-ornithology/",
+      "description": "J. Drew Lanham \u2014 poet and ornithologist \u2014 engages in reverent exchanges with birds stopping over at his rural South Carolina home during seasonal migrations. A beautiful film about attention, kinship with other species, and what it means to truly notice.",
+      "tags": [
+        "nature",
+        "film",
+        "ecology",
+        "attention"
+      ],
+      "paywall": false,
+      "id": "pull001-019",
+      "alignment": 4
+    },
+    {
+      "headline": "A Solidarity Ecosystem for AI: Cooperatives, Not Corporations",
+      "source": "Stanford Social Innovation Review",
+      "url": "https://ssir.org/articles/entry/artificial-intelligence-solidarity-ecosystem",
+      "description": "How cooperatives, public institutions, and social movements can come together to build a practical, community-owned alternative to extractive AI systems. A blueprint for the AI future that centers collective ownership over corporate extraction.",
+      "tags": [
+        "AI",
+        "social impact",
+        "cooperatives",
+        "innovation"
+      ],
+      "paywall": true,
+      "id": "pull001-020",
+      "alignment": 5
+    },
+    {
+      "headline": "The Nonprofit Sector Has a Randomized Controlled Trial Problem",
+      "source": "Stanford Social Innovation Review",
+      "url": "https://ssir.org/articles/entry/the-problem-with-randomized-controlled-trials",
+      "description": "RCTs are touted as the gold standard for evaluating social programs, but this article argues the social sector should focus on an improvement orientation instead. A provocative challenge to the evidence-based orthodoxy with real implications for how we measure impact.",
+      "tags": [
+        "social impact",
+        "measurement",
+        "innovation",
+        "nonprofits"
+      ],
+      "paywall": true,
+      "id": "pull001-021",
+      "alignment": 4
+    },
+    {
+      "headline": "When USAID Shut Down, 60 Years of Lessons Nearly Vanished. AI Helped Recover Them.",
+      "source": "Stanford Social Innovation Review",
+      "url": "https://ssir.org/articles/entry/ai-recovers-usaid-lessons",
+      "description": "A final sweep of 60 years of development evidence, rescued by AI before institutional knowledge was lost forever. A remarkable story about knowledge preservation, institutional memory, and unexpected uses of AI for the public good.",
+      "tags": [
+        "AI",
+        "social impact",
+        "knowledge management",
+        "government"
+      ],
+      "paywall": true,
+      "id": "pull001-022",
+      "alignment": 5
+    },
+    {
+      "headline": "The Human Side of Medicaid Work Requirements",
+      "source": "Civilla",
+      "url": "https://civilla.org/stories/work-requirements",
+      "description": "Four priorities for leaders to meet federal rules without losing sight of actual residents. Civilla's human-centered approach to policy implementation shows how design thinking can make bureaucracy more compassionate \u2014 without sacrificing compliance.",
+      "tags": [
+        "HCD",
+        "social impact",
+        "policy design",
+        "government"
+      ],
+      "paywall": false,
+      "id": "pull001-023",
+      "alignment": 5
+    },
+    {
+      "headline": "Designing for Beauty in Public Services (Yes, Really)",
+      "source": "Civilla",
+      "url": "https://civilla.org/stories/designing-beauty",
+      "description": "What happens when you bring thoughtful, beautiful design into government services? Civilla argues that aesthetics aren't a luxury in public services \u2014 they're a signal of respect. A radical proposition for anyone who's suffered through a DMV form.",
+      "tags": [
+        "HCD",
+        "design",
+        "government",
+        "social impact"
+      ],
+      "paywall": false,
+      "id": "pull001-024",
+      "alignment": 5
+    },
+    {
+      "headline": "Were Classical Statues Actually Painted Horribly?",
+      "source": "Works in Progress",
+      "url": "https://worksinprogress.co/issue/were-classical-statues-painted-horribly/",
+      "description": "We're told that modern viewers dislike painted reconstructions because our taste differs from the ancients. This essay proposes an alternative: maybe the reconstructions are just bad. A delightful deep-dive into aesthetics, archaeology, and the politics of taste.",
+      "tags": [
+        "art history",
+        "design",
+        "culture",
+        "wonder"
+      ],
+      "paywall": false,
+      "id": "pull001-025",
+      "alignment": 3
+    },
+    {
+      "headline": "South Korea's Demographic Collapse: A Warning for the World",
+      "source": "Works in Progress",
+      "url": "https://worksinprogress.co/issue/two-is-already-too-many/",
+      "description": "Every 100 South Koreans today will have only 6 great-grandchildren between them. This piece traces the social, economic, and cultural factors behind the most extreme demographic collapse in human history \u2014 and what the rest of the world can learn before it's too late.",
+      "tags": [
+        "demographics",
+        "social change",
+        "innovation",
+        "policy"
+      ],
+      "paywall": false,
+      "id": "pull001-026",
+      "alignment": 3
+    },
+    {
+      "headline": "Systems Thinking Is Magical Thinking (And Here's Why)",
+      "source": "Works in Progress",
+      "url": "https://worksinprogress.co/issue/magical-systems-thinking/",
+      "description": "Systems thinking promises a toolkit to design complex systems from the ground up. It fails because it ignores an important fact: systems fight back. A bracing, contrarian take that anyone in design, strategy, or social innovation should wrestle with.",
+      "tags": [
+        "systems thinking",
+        "design",
+        "innovation",
+        "critique"
+      ],
+      "paywall": false,
+      "id": "pull001-027",
+      "alignment": 5
+    },
+    {
+      "headline": "The Decision-Making Theory We All Rely On Falls Short of Real Life",
+      "source": "Behavioral Scientist",
+      "url": "https://behavioralscientist.org/a-day-in-the-life/",
+      "description": "The theory underpinning much of decision-making science doesn't capture how we actually make decisions \u2014 or how decisions should be made. A provocative rethink of rational choice theory through the lens of a single ordinary day.",
+      "tags": [
+        "behavioral science",
+        "decision-making",
+        "psychology",
+        "HCD"
+      ],
+      "paywall": false,
+      "id": "pull001-028",
+      "alignment": 5
+    },
+    {
+      "headline": "Why Don't People Return Their Shopping Carts? A (Somewhat) Scientific Investigation",
+      "source": "Behavioral Scientist",
+      "url": "https://behavioralscientist.org/why-dont-people-return-their-shopping-carts-a-somewhat-scientific-investigation/",
+      "description": "The shopping cart is the ultimate litmus test of whether a person will do the right thing without being forced to. This delightfully nerdy investigation applies behavioral science to one of life's small moral tests \u2014 with broader implications for nudge design.",
+      "tags": [
+        "behavioral science",
+        "nudge design",
+        "social norms",
+        "humor"
+      ],
+      "paywall": false,
+      "id": "pull001-029",
+      "alignment": 5
+    },
+    {
+      "headline": "What Hiring Tells You About an Organization's Soul",
+      "source": "Behavioral Scientist",
+      "url": "https://behavioralscientist.org/the-trust-equation-its-not-just-who-you-hire-its-how-you-hire/",
+      "description": "What if organizations treated their entire hiring process as a competitive advantage rather than a chore? This piece reframes recruitment through the lens of trust-building \u2014 relevant to anyone building teams or designing organizational systems.",
+      "tags": [
+        "behavioral science",
+        "organizational design",
+        "trust",
+        "entrepreneurship"
+      ],
+      "paywall": false,
+      "id": "pull001-030",
+      "alignment": 4
+    },
+    {
+      "headline": "How to Find Your InnS\u00e6i: An Icelandic Guide to Reconnecting with Intuition",
+      "source": "Psyche",
+      "url": "https://psyche.co/guides/how-to-find-your-innsaei-and-reconnect-with-your-intuition",
+      "description": "In uncertain times, the Icelandic concept of InnS\u00e6i can help you reconnect with your inner compass. A practical guide grounded in a beautiful cultural concept \u2014 perfect for creatives navigating ambiguity.",
+      "tags": [
+        "psychology",
+        "creativity",
+        "intuition",
+        "culture"
+      ],
+      "paywall": false,
+      "id": "pull001-031",
+      "alignment": 4
+    },
+    {
+      "headline": "Why We Should Embrace 'Nepantla' \u2014 The In-Betweenness of Life",
+      "source": "Psyche",
+      "url": "https://psyche.co/ideas/why-we-should-embrace-nepantla-the-in-betweenness-of-life",
+      "description": "The Nahuatl concept of nepantla \u2014 being in between \u2014 reframes uncertainty and transition as generative states rather than problems to solve. Deeply relevant to anyone in creative or entrepreneurial liminal spaces.",
+      "tags": [
+        "philosophy",
+        "creativity",
+        "liminality",
+        "culture"
+      ],
+      "paywall": false,
+      "id": "pull001-032",
+      "alignment": 4
+    },
+    {
+      "headline": "No, Willpower Isn't a Muscle \u2014 Here's a Better Way to Think About It",
+      "source": "Psyche",
+      "url": "https://psyche.co/ideas/no-willpower-isnt-a-muscle-heres-a-better-way-to-think-of-it",
+      "description": "The ego-depletion theory of willpower hasn't survived scrutiny. This piece offers a more nuanced alternative that reframes self-control \u2014 essential reading for anyone designing behavior change interventions or just trying to understand their own habits.",
+      "tags": [
+        "behavioral science",
+        "psychology",
+        "self-improvement",
+        "design"
+      ],
+      "paywall": false,
+      "id": "pull001-033",
+      "alignment": 4
+    },
+    {
+      "headline": "A 14-Year-Old's Origami Shape Can Hold 10,000 Times Its Own Weight",
+      "source": "Kottke.org",
+      "url": "https://www.smithsonianmag.com/innovation/this-14-year-old-is-using-origami-to-design-emergency-shelters-that-are-sturdy-cost-efficient-and-easy-to-deploy-180988179/",
+      "description": "Miles Wu won a junior innovators competition with an origami structure that could be used for deployable emergency shelters. It's sturdy, cost-efficient, and easy to deploy \u2014 biomimicry meets humanitarian design, invented by a teenager.",
+      "tags": [
+        "innovation",
+        "design",
+        "humanitarian",
+        "biomimicry"
+      ],
+      "paywall": false,
+      "id": "pull001-034",
+      "alignment": 5
+    },
+    {
+      "headline": "The Surprising Reason Writing Still Matters in an AI World",
+      "source": "Farnam Street",
+      "url": "https://fs.blog/why-write/",
+      "description": "Why write when AI can do it for you? Because writing isn't about output \u2014 it's about thinking. This piece makes the case that writing remains the essential tool for clear thought, even (especially) when machines can generate text on demand.",
+      "tags": [
+        "AI",
+        "creativity",
+        "thinking",
+        "productivity"
+      ],
+      "paywall": false,
+      "id": "pull001-035",
+      "alignment": 4
+    },
+    {
+      "headline": "Kinetic Sculptures Reveal the Spirits Hiding in Everyday Objects",
+      "source": "Creative Applications",
+      "url": "https://www.creativeapplications.net/member/synthetic-spirits-kinetic-sculptures-reveal-a-hidden-world/",
+      "description": "Neil Mendoza's kinetic installation explores tsukumogami \u2014 the Japanese belief that everyday objects acquire spirits. A sake bottle and sandal glide past screens as generative AI reveals yokai spirits, contrasting ancient folklore with throwaway consumer culture.",
+      "tags": [
+        "art+tech",
+        "folklore",
+        "AI",
+        "kinetic art"
+      ],
+      "paywall": false,
+      "id": "pull001-036",
+      "alignment": 5
+    },
+    {
+      "headline": "Beyond Crisis: Finding Beauty and Purpose in the Climate Future",
+      "source": "Deem Journal",
+      "url": "https://deemjournal.com/beyond-crisis-finding-beauty-and-purpose-in-the-climate-future-1",
+      "description": "Dr. Ayana Elizabeth Johnson in conversation with Mark Chambers on how to find beauty and purpose even as we face climate realities. From Deem's latest issue on Climate Realities and Responses \u2014 design as social practice at its most urgent.",
+      "tags": [
+        "climate",
+        "design",
+        "social impact",
+        "beauty"
+      ],
+      "paywall": false,
+      "id": "pull001-037",
+      "alignment": 5
+    }
+  ]
+}

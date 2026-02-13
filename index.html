@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lindsay's Curation Dashboard</title>
+<style>
+  :root {
+    --bg: #faf9f7;
+    --card-bg: #ffffff;
+    --text: #1a1a1a;
+    --text-muted: #666;
+    --accent: #e85d4a;
+    --accent-light: #fff0ee;
+    --border: #e8e6e3;
+    --tag-bg: #f0eeeb;
+    --green: #4caf50;
+    --yellow: #ff9800;
+    --blue: #2196f3;
+    --purple: #9c27b0;
+    --shadow: 0 1px 3px rgba(0,0,0,0.06);
+    --shadow-hover: 0 4px 12px rgba(0,0,0,0.1);
+    --radius: 12px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  /* Header */
+  .header {
+    background: white;
+    border-bottom: 1px solid var(--border);
+    padding: 16px 24px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .header h1 {
+    font-size: 20px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .header-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  /* Navigation */
+  .nav {
+    display: flex;
+    gap: 4px;
+    background: var(--tag-bg);
+    border-radius: 8px;
+    padding: 3px;
+  }
+
+  .nav button {
+    padding: 6px 14px;
+    border: none;
+    background: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-muted);
+    transition: all 0.2s;
+  }
+
+  .nav button.active {
+    background: white;
+    color: var(--text);
+    box-shadow: var(--shadow);
+  }
+
+  /* Filters */
+  .filters {
+    padding: 12px 24px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    border-bottom: 1px solid var(--border);
+    background: white;
+  }
+
+  .filter-chip {
+    padding: 5px 12px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    font-size: 12px;
+    cursor: pointer;
+    background: white;
+    color: var(--text-muted);
+    transition: all 0.2s;
+  }
+
+  .filter-chip:hover, .filter-chip.active {
+    background: var(--accent-light);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* Main Content */
+  .main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 24px;
+  }
+
+  .pull-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .pull-header h2 {
+    font-size: 16px;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+
+  .pull-stats {
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+
+  /* Cards - List View */
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 12px;
+    transition: all 0.2s;
+    position: relative;
+  }
+
+  .card:hover {
+    box-shadow: var(--shadow-hover);
+    border-color: #d0cec9;
+  }
+
+  .card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .card-source {
+    font-size: 12px;
+    color: var(--accent);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+  }
+
+  .card-headline {
+    font-size: 17px;
+    font-weight: 600;
+    line-height: 1.4;
+    margin-bottom: 8px;
+  }
+
+  .card-headline a {
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  .card-headline a:hover {
+    color: var(--accent);
+  }
+
+  .card-description {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.6;
+    margin-bottom: 12px;
+  }
+
+  .card-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .tag {
+    font-size: 11px;
+    padding: 3px 8px;
+    background: var(--tag-bg);
+    border-radius: 4px;
+    color: var(--text-muted);
+  }
+
+  .alignment {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+
+  .alignment-5 { background: #e8f5e9; color: #2e7d32; }
+  .alignment-4 { background: #f1f8e9; color: #558b2f; }
+  .alignment-3 { background: #fff8e1; color: #f57f17; }
+  .alignment-2 { background: #fff3e0; color: #e65100; }
+  .alignment-1 { background: #fce4ec; color: #c62828; }
+
+  .paywall-flag {
+    font-size: 11px;
+    color: var(--yellow);
+    font-weight: 600;
+  }
+
+  /* Rating System */
+  .card-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+  }
+
+  .rate-btn {
+    padding: 6px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: white;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .rate-btn:hover {
+    transform: scale(1.1);
+    box-shadow: var(--shadow);
+  }
+
+  .rate-btn.selected {
+    border-color: var(--accent);
+    background: var(--accent-light);
+  }
+
+  .rate-btn .label {
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  .comment-toggle {
+    margin-left: auto;
+    padding: 6px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: white;
+    cursor: pointer;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  .comment-toggle:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .comment-box {
+    margin-top: 10px;
+    display: none;
+  }
+
+  .comment-box.open {
+    display: block;
+  }
+
+  .comment-box textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 13px;
+    resize: vertical;
+    min-height: 60px;
+    outline: none;
+  }
+
+  .comment-box textarea:focus {
+    border-color: var(--accent);
+  }
+
+  .comment-box .save-comment {
+    margin-top: 6px;
+    padding: 5px 12px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+  }
+
+  /* Board/Grid View */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+  }
+
+  .grid .card {
+    margin-bottom: 0;
+  }
+
+  .grid .card-headline {
+    font-size: 15px;
+  }
+
+  .grid .card-description {
+    font-size: 13px;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Favorites View */
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-muted);
+  }
+
+  .empty-state .emoji {
+    font-size: 48px;
+    margin-bottom: 16px;
+  }
+
+  /* Draft Builder */
+  .draft-section {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+  }
+
+  .draft-section h3 {
+    margin-bottom: 16px;
+  }
+
+  .draft-preview {
+    font-family: Georgia, serif;
+    line-height: 1.8;
+    padding: 20px;
+    background: var(--bg);
+    border-radius: 8px;
+    margin-top: 12px;
+  }
+
+  .draft-preview h4 {
+    font-size: 15px;
+    margin-bottom: 4px;
+  }
+
+  .draft-preview .draft-link {
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  .draft-preview .draft-desc {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+  }
+
+  .copy-draft {
+    padding: 8px 16px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    margin-top: 12px;
+  }
+
+  /* Export */
+  .export-btn {
+    padding: 6px 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: white;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+
+  .export-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* Responsive */
+  @media (max-width: 640px) {
+    .header { padding: 12px 16px; }
+    .main { padding: 16px; }
+    .filters { padding: 10px 16px; }
+    .nav button { padding: 5px 10px; font-size: 12px; }
+    .grid { grid-template-columns: 1fr; }
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--text);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 13px;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s;
+    z-index: 1000;
+  }
+
+  .toast.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>✨ Lindsay's Curation Lab</h1>
+  <div class="header-actions">
+    <nav class="nav">
+      <button class="active" onclick="setView('feed')">📰 Daily Feed</button>
+      <button onclick="setView('board')">📌 Board</button>
+      <button onclick="setView('favorites')">⭐ Favorites</button>
+      <button onclick="setView('draft')">✍️ Draft Builder</button>
+    </nav>
+    <button class="export-btn" onclick="exportFeedback()">📤 Export Feedback</button>
+  </div>
+</div>
+
+<div class="filters" id="filters"></div>
+
+<div class="main" id="main-content">
+  <div class="pull-header">
+    <h2 id="pull-title">Loading...</h2>
+    <span class="pull-stats" id="pull-stats"></span>
+  </div>
+  <div id="cards-container"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// State
+let currentView = 'feed';
+let activeFilters = new Set();
+let items = [];
+let feedback = JSON.parse(localStorage.getItem('lindsay-feedback') || '{}');
+
+// Load data
+async function loadData() {
+  try {
+    const resp = await fetch('data.json');
+    const data = await resp.json();
+    items = data.items || data;
+    document.getElementById('pull-title').textContent = data.pullDate || 'First Pull';
+    renderFilters();
+    renderCards();
+    updateStats();
+  } catch(e) {
+    document.getElementById('pull-title').textContent = 'Waiting for first content pull...';
+    document.getElementById('cards-container').innerHTML = `
+      <div class="empty-state">
+        <div class="emoji">🔍</div>
+        <p>JawnBot is scanning your sources for the first batch of content.<br>Check back soon!</p>
+      </div>`;
+  }
+}
+
+// Get all unique topics
+function getAllTopics() {
+  const topics = new Set();
+  items.forEach(item => {
+    (item.tags || []).forEach(t => topics.add(t));
+  });
+  return [...topics].sort();
+}
+
+// Render filter chips
+function renderFilters() {
+  const topics = getAllTopics();
+  const container = document.getElementById('filters');
+  container.innerHTML = `
+    <span class="filter-chip ${activeFilters.size === 0 ? 'active' : ''}" onclick="clearFilters()">All</span>
+    ${topics.map(t => `
+      <span class="filter-chip ${activeFilters.has(t) ? 'active' : ''}" onclick="toggleFilter('${t}')">${t}</span>
+    `).join('')}
+  `;
+}
+
+function toggleFilter(topic) {
+  if (activeFilters.has(topic)) activeFilters.delete(topic);
+  else activeFilters.add(topic);
+  renderFilters();
+  renderCards();
+  updateStats();
+}
+
+function clearFilters() {
+  activeFilters.clear();
+  renderFilters();
+  renderCards();
+  updateStats();
+}
+
+// Filter items
+function getFilteredItems() {
+  let filtered = items;
+  if (activeFilters.size > 0) {
+    filtered = items.filter(item =>
+      (item.tags || []).some(t => activeFilters.has(t))
+    );
+  }
+  if (currentView === 'favorites') {
+    filtered = filtered.filter(item =>
+      feedback[item.id]?.rating === 'fire' || feedback[item.id]?.rating === 'good'
+    );
+  }
+  return filtered;
+}
+
+// Render cards
+function renderCards() {
+  const container = document.getElementById('cards-container');
+  const filtered = getFilteredItems();
+
+  if (currentView === 'draft') {
+    renderDraft(container, filtered);
+    return;
+  }
+
+  const isGrid = currentView === 'board';
+  container.className = isGrid ? 'grid' : '';
+
+  if (filtered.length === 0) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <div class="emoji">${currentView === 'favorites' ? '⭐' : '🔍'}</div>
+        <p>${currentView === 'favorites'
+          ? 'No favorites yet! Rate items with 🔥 or 👍 to save them here.'
+          : 'No items match this filter.'}</p>
+      </div>`;
+    return;
+  }
+
+  container.innerHTML = filtered.map(item => {
+    const fb = feedback[item.id] || {};
+    return `
+    <div class="card" data-id="${item.id}">
+      <div class="card-top">
+        <div style="flex:1">
+          <div class="card-source">${item.source || ''}${item.paywall ? ' <span class="paywall-flag">🔒 Paywall</span>' : ''}</div>
+          <div class="card-headline"><a href="${item.url}" target="_blank">${item.headline}</a></div>
+          <div class="card-description">${item.description}</div>
+          <div class="card-meta">
+            ${(item.tags || []).map(t => `<span class="tag">${t}</span>`).join('')}
+            ${item.alignment ? `<span class="alignment alignment-${item.alignment}">Match: ${item.alignment}/5</span>` : ''}
+          </div>
+        </div>
+      </div>
+      <div class="card-actions">
+        <button class="rate-btn ${fb.rating === 'fire' ? 'selected' : ''}" onclick="rate('${item.id}','fire')">🔥 <span class="label">Perfect</span></button>
+        <button class="rate-btn ${fb.rating === 'good' ? 'selected' : ''}" onclick="rate('${item.id}','good')">👍 <span class="label">Good</span></button>
+        <button class="rate-btn ${fb.rating === 'meh' ? 'selected' : ''}" onclick="rate('${item.id}','meh')">😐 <span class="label">Meh</span></button>
+        <button class="rate-btn ${fb.rating === 'nope' ? 'selected' : ''}" onclick="rate('${item.id}','nope')">👎 <span class="label">Not this</span></button>
+        <button class="comment-toggle" onclick="toggleComment('${item.id}')">💬 Comment</button>
+      </div>
+      <div class="comment-box ${fb.showComment ? 'open' : ''}" id="comment-${item.id}">
+        <textarea placeholder="What do you like or dislike about this? This helps me refine..." id="textarea-${item.id}">${fb.comment || ''}</textarea>
+        <button class="save-comment" onclick="saveComment('${item.id}')">Save</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// Draft builder
+function renderDraft(container, filtered) {
+  const favorites = items.filter(item =>
+    feedback[item.id]?.rating === 'fire' || feedback[item.id]?.rating === 'good'
+  );
+
+  container.className = '';
+  container.innerHTML = `
+    <div class="draft-section">
+      <h3>✍️ Weekly Draft Builder</h3>
+      <p style="color:var(--text-muted); font-size:14px; margin-bottom:16px;">
+        Your 🔥 and 👍 rated items compiled into a shareable format. Copy and paste into Substack!
+      </p>
+      ${favorites.length === 0
+        ? '<div class="empty-state"><div class="emoji">✍️</div><p>Rate some items first, then come back here to build your weekly draft!</p></div>'
+        : `<div class="draft-preview">
+            <h2 style="font-size:22px; margin-bottom:20px;">This Week's Finds ✨</h2>
+            ${favorites.map(item => `
+              <h4><a class="draft-link" href="${item.url}" target="_blank">${item.headline}</a></h4>
+              <p class="draft-desc">${item.description}</p>
+            `).join('')}
+          </div>
+          <button class="copy-draft" onclick="copyDraft()">📋 Copy Draft to Clipboard</button>`
+      }
+    </div>`;
+}
+
+// Actions
+function rate(id, rating) {
+  if (!feedback[id]) feedback[id] = {};
+  feedback[id].rating = feedback[id].rating === rating ? null : rating;
+  feedback[id].timestamp = new Date().toISOString();
+  saveFeedback();
+  renderCards();
+  updateStats();
+  showToast(feedback[id].rating ? `Rated ${rating === 'fire' ? '🔥' : rating === 'good' ? '👍' : rating === 'meh' ? '😐' : '👎'}` : 'Rating cleared');
+}
+
+function toggleComment(id) {
+  const box = document.getElementById(`comment-${id}`);
+  box.classList.toggle('open');
+}
+
+function saveComment(id) {
+  const textarea = document.getElementById(`textarea-${id}`);
+  if (!feedback[id]) feedback[id] = {};
+  feedback[id].comment = textarea.value;
+  feedback[id].timestamp = new Date().toISOString();
+  saveFeedback();
+  showToast('Comment saved! 💬');
+}
+
+function saveFeedback() {
+  localStorage.setItem('lindsay-feedback', JSON.stringify(feedback));
+}
+
+function exportFeedback() {
+  const data = items.map(item => ({
+    headline: item.headline,
+    source: item.source,
+    url: item.url,
+    rating: feedback[item.id]?.rating || 'unrated',
+    comment: feedback[item.id]?.comment || '',
+    tags: item.tags
+  }));
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `lindsay-feedback-${new Date().toISOString().split('T')[0]}.json`;
+  a.click();
+  showToast('Feedback exported! 📤');
+}
+
+function copyDraft() {
+  const favorites = items.filter(item =>
+    feedback[item.id]?.rating === 'fire' || feedback[item.id]?.rating === 'good'
+  );
+  const text = `This Week's Finds ✨\n\n` +
+    favorites.map(item => `${item.headline}\n${item.url}\n${item.description}\n`).join('\n');
+  navigator.clipboard.writeText(text);
+  showToast('Draft copied! 📋');
+}
+
+function setView(view) {
+  currentView = view;
+  document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.nav button').forEach(b => {
+    if (b.textContent.toLowerCase().includes(view === 'feed' ? 'daily' : view)) b.classList.add('active');
+  });
+  renderCards();
+  updateStats();
+}
+
+function updateStats() {
+  const filtered = getFilteredItems();
+  const rated = filtered.filter(i => feedback[i.id]?.rating).length;
+  document.getElementById('pull-stats').textContent =
+    `${filtered.length} items · ${rated} rated`;
+}
+
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2000);
+}
+
+// Init
+loadData();
+</script>
+</body>
+</html>
