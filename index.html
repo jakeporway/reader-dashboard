@@ -843,6 +843,15 @@ async function initSync() {
           localStorage.setItem('curator-sync-id', syncBlobId);
           document.getElementById('sync-status').textContent = '☁️ Connected';
           console.log('Sync ID:', syncBlobId);
+          // Show sync ID subtly in footer for discovery
+          let sid = document.getElementById('sync-id-display');
+          if (!sid) {
+            sid = document.createElement('div');
+            sid.id = 'sync-id-display';
+            sid.style.cssText = 'position:fixed;bottom:4px;left:8px;font-size:10px;color:#ccc;';
+            document.body.appendChild(sid);
+          }
+          sid.textContent = 'sync:' + syncBlobId;
         }
       }
     } catch(e) { console.error('Sync init failed:', e); }
