@@ -4,7 +4,7 @@
 A personal curation dashboard that helps the curator discover, evaluate, and share inspiring content from across the internet. The goal is to cut through the noise and surface genuinely interesting, underreported stories at the intersection of creativity, innovation, human-centered design, art & science, behavioral economics, social impact, and what it means to be human today.
 
 ## The Human
-**the curator** — Works in innovation, consulting, HCD, design, research, strategy, decision-making, and entrepreneurship. She's art-forward, socially conscious, and deeply curious. She wants to feel inspired and share that inspiration with friends and colleagues.
+**the curator** — Works in innovation, consulting, HCD, design, research, strategy, decision-making, and entrepreneurship. Is art-forward, socially conscious, and deeply curious. Wants to feel inspired and share that inspiration with friends and colleagues.
 
 ## The Problem
 It's really hard to find valuable, interesting content online. There's too much noise, too many surfaces, and the truly fascinating stuff gets buried. the curator wants a curated feed of the good stuff — the things that make you stop and think, that connect unexpected dots, that inspire creativity and hope.
@@ -20,7 +20,7 @@ A two-part system:
   - Topic category tags
   - Alignment score (1-5) based on the curator's interests
   - Paywall flag
-- **Learning loop**: the curator rates content (🔥👍😐👎) and leaves comments. Over time, JawnBot refines its curation algorithm based on her feedback patterns — tone, depth, medium, topic gravity, novelty threshold.
+- **Learning loop**: the curator rates content (🔥👍😐👎) and leaves comments. Over time, JawnBot refines its curation algorithm based on the curator's feedback patterns — tone, depth, medium, topic gravity, novelty threshold.
 - **Ongoing source discovery**: JawnBot proactively finds new sources based on what the curator gravitates toward.
 
 ### Part 2: The Dashboard (Web App)
