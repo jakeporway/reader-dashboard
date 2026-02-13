@@ -129,6 +129,11 @@
   .save-hl { background:#fdd835; color:#333; border:none; }
   .cancel-hl { background:white; border:1px solid var(--border); color:#666; }
 
+
+  .audience-badge { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; padding:2px 6px; border-radius:3px; margin-left:6px; }
+  .audience-newsletter { background:#e3f2fd; color:#1565c0; }
+  .audience-friends { background:#fce4ec; color:#c62828; }
+  .audience-both { background:#e8f5e9; color:#2e7d32; }
   .toast { position:fixed; bottom:24px; right:24px; background:var(--text); color:white; padding:10px 18px; border-radius:8px; font-size:13px; opacity:0; transform:translateY(10px); transition:all 0.3s; z-index:1000; }
   .toast.show { opacity:1; transform:translateY(0); }
 
@@ -235,7 +240,14 @@ function navigateDate(dir) {
 function renderFilters() {
   const c = document.getElementById('filters');
   const types = CONTENT_TYPES.filter(t => items.some(i => i.contentType === t.key));
-  c.innerHTML = '<span class="filter-chip ' + (activeFilters.size===0?'active':'') + '" onclick="clearFilters()">All</span>' +
+  var audienceFilters = '';
+  var audiences = [{key:'newsletter',label:'🏢 Newsletter'},{key:'friends',label:'🎉 Friends'},{key:'both',label:'🌐 Both'}];
+  var hasAudience = items.some(function(i){return i.audience;});
+  if (hasAudience) {
+    audienceFilters = '<span style="margin-left:8px;color:var(--text-muted);font-size:11px;">|</span>' +
+      audiences.map(function(a){return '<span class="filter-chip ' + (activeFilters.has('aud:'+a.key)?'active':'') + '" onclick="toggleFilter(\'aud:'+a.key+'\')">'+a.label+'</span>';}).join('');
+  }
+  c.innerHTML = audienceFilters + '<span class="filter-chip ' + (activeFilters.size===0?'active':'') + '" onclick="clearFilters()">All</span>' +
     types.map(t => '<span class="filter-chip ' + (activeFilters.has(t.key)?'active':'') + '" onclick="toggleFilter(\'' + t.key + '\')">' + t.label + '</span>').join('') +
     '<div class="date-nav"><button onclick="navigateDate(1)">◀</button><span class="date-label">' + (allData[currentDate]?.pullDate||'') + '</span><button onclick="navigateDate(-1)">▶</button></div>';
 }
@@ -245,7 +257,13 @@ function clearFilters() { activeFilters.clear(); renderFilters(); renderCards();
 
 function getFilteredItems() {
   let f = items;
-  if (activeFilters.size > 0) f = f.filter(i => activeFilters.has(i.contentType));
+  if (activeFilters.size > 0) {
+    var typeFilters = [];
+    var audFilters = [];
+    activeFilters.forEach(function(fi){ if(fi.startsWith('aud:'))audFilters.push(fi.replace('aud:','')); else typeFilters.push(fi); });
+    if (typeFilters.length) f = f.filter(function(i){return typeFilters.indexOf(i.contentType)>=0;});
+    if (audFilters.length) f = f.filter(function(i){return audFilters.indexOf(i.audience)>=0 || (!i.audience && audFilters.indexOf('both')>=0);});
+  }
   if (currentView === 'favorites') f = f.filter(i => feedback[i.id]?.rating === 'fire' || feedback[i.id]?.rating === 'good');
   return f;
 }
@@ -273,9 +291,9 @@ function renderCards() {
       (item.image ? '<img class="card-image" src="' + item.image + '" onerror="this.style.display=\'none\'" alt="">' : '') +
       '<div class="card-body">' +
         '<span class="card-type ' + typeClass + '">' + (item.contentType||'article') + '</span>' +
-        '<span class="card-source">' + item.source + (item.paywall?' · <span class="paywall-flag">🔒 Paywall</span>':'') + '</span>' +
+        '<span class="card-source">' + item.source + (item.audience && item.audience !== 'both' ? '<span class="audience-badge audience-' + item.audience + '">' + (item.audience==='friends'?'🎉 friends':'🏢 newsletter') + '</span>' : '') + (item.paywall?' · <span class="paywall-flag">🔒 Paywall</span>':'') + '</span>' +
         '<div class="card-headline"><a href="' + item.url + '" target="_blank">' + item.headline + '</a></div>' +
-        '<div class="card-description">' + desc + '</div>' +
+        '<div class="card-description">' + desc + '</div>' + (item.originalSourceUrl ? '<div style="font-size:11px;color:var(--accent);padding:0 0 8px;">🔗 <a href="' + item.originalSourceUrl + '" target="_blank" style="color:var(--accent);">Original source</a></div>' : '') +
         '<div class="card-meta">' + (item.tags||[]).map(function(t){return '<span class="tag">'+t+'</span>';}).join('') +
           (item.alignment ? '<span class="alignment alignment-' + item.alignment + '">Match: ' + item.alignment + '/5</span>' : '') +
         '</div>' +
