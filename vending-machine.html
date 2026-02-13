@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>✨ The Curiosity Vending Machine ✨</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&family=Caveat:wght@700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Space Grotesk',sans-serif;background:#0a0a1a;color:#e0e0e0;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden}
+.machine{position:relative;width:380px;max-width:90vw;background:linear-gradient(145deg,#1a1a3e,#12122a);border-radius:24px;padding:30px;box-shadow:0 0 60px rgba(120,80,255,0.15),inset 0 1px 0 rgba(255,255,255,0.05);border:1px solid rgba(120,80,255,0.2)}
+.title{font-family:'Caveat',cursive;font-size:32px;text-align:center;background:linear-gradient(90deg,#ff6b9d,#c084fc,#60a5fa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:6px}
+.subtitle{text-align:center;font-size:11px;color:rgba(255,255,255,0.3);letter-spacing:2px;text-transform:uppercase;margin-bottom:20px}
+.display{background:#0d0d20;border-radius:16px;padding:24px;min-height:220px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;border:1px solid rgba(120,80,255,0.1);position:relative;overflow:hidden}
+.display::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(120,80,255,0.3),transparent)}
+.category{font-size:11px;text-transform:uppercase;letter-spacing:3px;color:#c084fc;margin-bottom:14px;opacity:0.8;min-height:1.4em}
+.nugget{font-size:15px;line-height:1.7;color:#e8e8f0;transition:opacity 0.3s}
+.connection{font-size:13px;color:#60a5fa;margin-top:18px;font-style:italic;opacity:0.7;min-height:1.4em}
+.lever-zone{display:flex;justify-content:center;margin-top:24px}
+.lever{background:linear-gradient(135deg,#c084fc,#7c3aed);border:none;color:white;font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;padding:14px 44px;border-radius:50px;cursor:pointer;transition:all 0.15s;box-shadow:0 4px 20px rgba(120,80,255,0.3);letter-spacing:1px;user-select:none}
+.lever:hover{transform:translateY(-2px);box-shadow:0 6px 30px rgba(120,80,255,0.5)}
+.lever:active{transform:translateY(1px)}
+.lever.spinning{animation:shake 0.08s infinite}
+.coins{text-align:center;margin-top:16px;font-size:12px;color:rgba(255,255,255,0.25)}
+.sparkle{position:absolute;pointer-events:none;font-size:20px;animation:float 1s ease-out forwards}
+.credit{margin-top:24px;font-size:10px;color:rgba(255,255,255,0.15);text-align:center;letter-spacing:1px}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
+@keyframes float{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-60px) scale(0.5)}}
+</style>
+</head>
+<body>
+<div class="machine">
+  <div class="title">The Curiosity Vending Machine</div>
+  <div class="subtitle">Where unlikely things collide</div>
+  <div class="display" id="display">
+    <div class="category" id="cat">INSERT WONDER</div>
+    <div class="nugget" id="nugget">Every great idea lives at the intersection of two things that don't belong together.<br><br>Pull the lever. 🎰</div>
+    <div class="connection" id="conn"></div>
+  </div>
+  <div class="lever-zone">
+    <button class="lever" id="lever" onclick="pull()">⚡ PULL</button>
+  </div>
+  <div class="coins" id="coins">∞ wonders remaining</div>
+</div>
+<div class="credit">built with ⚡ by JawnBot</div>
+
+<script>
+const items=[
+{cat:'🧠 Behavioral Science × Street Art',nugget:'Banksy\'s shredded painting sold for 25x MORE after it self-destructed. Behavioral economists call this the "IKEA effect" meets scarcity bias — we value what feels rare or broken. The art world literally monetized loss aversion.',conn:'What if newsletters self-destructed after 24 hours?'},
+{cat:'🎨 Design × Octopuses',nugget:'Octopuses have no blind spot — their eyes evolved independently from ours and got the wiring RIGHT (photoreceptors face forward). Human-centered design often means designing around our biological bugs, not features.',conn:'The best designs compensate for human flaws we don\'t even notice.'},
+{cat:'🎵 Music × Fungi',nugget:'Scientists hooked electrodes to mushroom mycelium and found electrical signals with patterns eerily similar to human speech — up to 50 distinct "words." A composer turned these into a symphony. The mushrooms got a standing ovation.',conn:'What counts as language when everything is communicating?'},
+{cat:'🏙️ Urban Planning × Desire',nugget:'Some universities don\'t pave walkways for new buildings — they wait a year, see where students actually walk through the grass, then pave THOSE paths. They\'re called "desire lines." The best design is observation.',conn:'Where are the desire lines in your audience\'s behavior?'},
+{cat:'🧪 Chemistry × Loneliness',nugget:'Loneliness triggers the same brain region as physical pain (dorsal anterior cingulate cortex). Social neuroscientists found that Tylenol — yes, the painkiller — actually reduces feelings of social rejection.',conn:'The body doesn\'t distinguish between a broken bone and a broken heart.'},
+{cat:'📚 Libraries × Rebellion',nugget:'During WWII, the Nazis burned books. So librarians in Vilnius smuggled 3,000+ books under their clothes, in potato sacks, and in coffins. They called themselves the "Paper Brigade." Every book they saved was an act of war.',conn:'Curation has always been resistance.'},
+{cat:'🌊 Oceanography × Memory',nugget:'The ocean has a "memory" — sea surface temperatures from one winter can predict drought conditions TWO YEARS later on the other side of the planet. Scientists call it "re-emergence." The ocean literally remembers.',conn:'What patterns from 2 years ago are shaping your life right now?'},
+{cat:'🎭 Improv × Emergency Rooms',nugget:'Medical schools now teach improv comedy to doctors. Why? "Yes, and…" thinking reduces diagnostic errors by 30%. When a doctor says "but" to a patient\'s symptoms, they miss things. Acceptance is literally medicine.',conn:'The funniest skill in comedy is the most life-saving in medicine.'},
+{cat:'🐝 Bees × Democracy',nugget:'When bees choose a new hive, scout bees do waggle dances for their preferred sites. Other bees visit and "vote" by dancing too. The decision is made when 80% converge — no queen decides. It\'s the oldest democracy on Earth.',conn:'The best group decisions happen when everyone does their own research first.'},
+{cat:'🎮 Game Design × Grief',nugget:'A dad whose son passed away found his wife\'s Wii avatar still driving a ghost car in an old Mario Kart time trial. She\'d died years earlier. He never finished the race — just drives beside her. Game designers never planned for digital ghosts, but they made one.',conn:'The most profound features are the ones nobody designed.'},
+{cat:'🧬 Genetics × Cooking',nugget:'Cilantro tastes like soap to ~14% of people — it\'s genetic (OR6A2 gene). But here\'s the twist: if you crush cilantro leaves, it breaks down the aldehydes that trigger the soap taste. Cooking is chemistry that hacks your DNA.',conn:'Sometimes the solution isn\'t avoiding what\'s broken — it\'s processing it differently.'},
+{cat:'🏛️ Architecture × Intimacy',nugget:'The ideal hallway width for two people to comfortably pass is 48 inches. But research shows that at 36 inches, people make MORE eye contact, smile more, and report feeling more connected. Discomfort creates intimacy.',conn:'The best spaces aren\'t always the most comfortable ones.'},
+{cat:'🦠 Microbiology × Art',nugget:'The biggest threat to the Mona Lisa isn\'t thieves — it\'s bacteria. The painting lives in a sealed, climate-controlled case because human breath alone could destroy it. Every visitor is a biological threat. We are literally too alive for art.',conn:'Sometimes love is dangerous to the thing you love.'},
+{cat:'🌱 Botany × Strategy',nugget:'When a tobacco plant gets eaten by caterpillars, it releases a chemical that attracts the caterpillar\'s predators. It literally calls in an airstrike. Plants can\'t run, so they evolved to be strategic geniuses.',conn:'Constraints don\'t limit strategy — they sharpen it.'},
+{cat:'🎪 Circus × Physics',nugget:'A trapeze artist at the peak of their swing experiences zero gravity — the same weightlessness astronauts feel. For 0.8 seconds, a circus tent and outer space are the same place.',conn:'Wonder doesn\'t require a rocket. Just the right moment.'},
+{cat:'🗺️ Cartography × Power',nugget:'The Mercator map makes Africa look the same size as Greenland. In reality, Africa is 14x larger. Every "neutral" visualization is a political choice. The map is not the territory — it\'s the mapmaker\'s agenda.',conn:'What invisible distortions live in your default dashboards?'},
+{cat:'🧊 Glaciology × Sound',nugget:'Glaciers sing. As ice melts and refreezes, trapped air bubbles vibrate at frequencies that create harmonic tones. Scientists recorded an Antarctic glacier "singing" a song that changes with the weather. The planet has a soundtrack.',conn:'If you listen to anything closely enough, it\'s music.'},
+{cat:'🎯 Behavioral Econ × Supermarkets',nugget:'Grocery stores put milk at the back so you walk past everything else. But here\'s the deeper trick: they make aisles slightly too narrow for two carts. The awkward "excuse me" dance forces social interaction, which triggers oxytocin, which makes you buy 12% more.',conn:'Every environment you enter was designed to make you do something.'},
+{cat:'🔬 Neuroscience × Stories',nugget:'When someone tells you a story, your brain waves literally synchronize with the storyteller\'s — a phenomenon called "neural coupling." The better the story, the more your brains become one. Stories are the original mind meld.',conn:'A great newsletter doesn\'t inform readers. It synchronizes with them.'},
+{cat:'🌌 Astronomy × Indigenous Knowledge',nugget:'Aboriginal Australians mapped the sky using "dark constellations" — shapes formed by the dark dust lanes in the Milky Way, not the stars. Western astronomy looked at what shines. Indigenous astronomy looked at what\'s hidden. Both are maps of the same sky.',conn:'What are you not seeing because you\'re only looking at what\'s bright?'}
+];
+let spinning=false,lastIdx=-1;
+function pull(){
+  if(spinning)return;
+  spinning=true;
+  const btn=document.getElementById('lever'),nug=document.getElementById('nugget'),cat=document.getElementById('cat'),con=document.getElementById('conn');
+  btn.classList.add('spinning');btn.textContent='🎰 ...';nug.style.opacity='0.3';con.style.opacity='0';
+  let flicks=0,maxFlicks=14;
+  const iv=setInterval(()=>{
+    cat.textContent=items[Math.floor(Math.random()*items.length)].cat;
+    flicks++;
+    if(flicks>=maxFlicks){
+      clearInterval(iv);
+      let idx;do{idx=Math.floor(Math.random()*items.length)}while(idx===lastIdx);lastIdx=idx;
+      const c=items[idx];
+      cat.textContent=c.cat;nug.innerHTML=c.nugget;con.textContent='💭 '+c.conn;
+      nug.style.opacity='1';con.style.opacity='0.7';
+      btn.classList.remove('spinning');btn.textContent='⚡ PULL';spinning=false;sparkle();
+    }
+  },90);
+}
+function sparkle(){
+  const d=document.getElementById('display');
+  ['✨','💫','⚡','🌟','💜','🔮'].forEach((e,i)=>{
+    const s=document.createElement('span');s.className='sparkle';s.textContent=e;
+    s.style.left=Math.random()*80+10+'%';s.style.top=Math.random()*80+10+'%';
+    d.appendChild(s);setTimeout(()=>s.remove(),1000);
+  });
+}
+</script>
+</body>
+</html>
