@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🏥 Tax Day Recovery Clinic</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Space+Grotesk:wght@400;700&family=Special+Elite&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Space Grotesk',sans-serif;background:#f5f0e8;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px}
+.pad{background:white;width:420px;max-width:95vw;border-radius:4px;box-shadow:0 2px 20px rgba(0,0,0,0.1);padding:0;position:relative;overflow:hidden}
+.pad::before{content:'';position:absolute;top:0;left:0;right:0;height:6px;background:linear-gradient(90deg,#e74c3c,#e74c3c 33%,white 33%,white 36%,#3498db 36%,#3498db 66%,white 66%,white 69%,#e74c3c 69%)}
+.header{padding:24px 28px 16px;border-bottom:2px solid #e74c3c;text-align:center}
+.header h1{font-family:'Special Elite',monospace;font-size:18px;color:#333;letter-spacing:2px}
+.header p{font-family:'Special Elite',monospace;font-size:11px;color:#888;margin-top:4px}
+.rx{padding:20px 28px;font-family:'Special Elite',monospace;font-size:13px;color:#555}
+.rx-symbol{font-size:36px;color:#3498db;font-weight:bold;float:left;margin-right:10px;margin-top:-4px;font-family:serif}
+.patient{margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #eee}
+.patient span{color:#333;font-weight:bold}
+.field{margin-bottom:14px;line-height:1.8}
+.field-label{color:#999;font-size:11px;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:2px}
+.prescription-text{font-size:15px;color:#222;line-height:1.7;min-height:80px}
+.sig{margin-top:20px;padding-top:16px;border-top:1px solid #eee;display:flex;justify-content:space-between;align-items:flex-end}
+.sig-name{font-family:'Caveat',cursive;font-size:24px;color:#3498db}
+.sig-title{font-size:10px;color:#999;text-align:right}
+.refill{text-align:center;padding:16px;background:#fafafa;border-top:1px solid #eee}
+.refill-btn{background:#e74c3c;border:none;color:white;font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;padding:12px 32px;border-radius:50px;cursor:pointer;transition:all 0.15s;letter-spacing:1px}
+.refill-btn:hover{background:#c0392b;transform:scale(1.02)}
+.refill-btn:active{transform:scale(0.98)}
+.refills{font-size:11px;color:#999;margin-top:8px;font-family:'Special Elite',monospace}
+.warning{text-align:center;margin-top:16px;font-size:10px;color:#ccc;font-family:'Special Elite',monospace;max-width:420px}
+.emoji-burst{position:fixed;pointer-events:none;font-size:30px;animation:burst 1.5s ease-out forwards;z-index:100}
+@keyframes burst{0%{opacity:1;transform:translateY(0) scale(1) rotate(0deg)}100%{opacity:0;transform:translateY(-200px) scale(0.3) rotate(180deg)}}
+</style>
+</head>
+<body>
+<div class="pad">
+  <div class="header">
+    <h1>🏥 TAX DAY RECOVERY CLINIC</h1>
+    <p>Emergency Prescriptions for Financial Trauma</p>
+  </div>
+  <div class="rx">
+    <div class="patient">
+      Patient: <span id="patient">Jake &amp; Lindsay</span><br>
+      Date: <span id="date"></span><br>
+      Diagnosis: <span style="color:#e74c3c">Acute Tax-Induced Deflation Syndrome (ATIDS)</span>
+    </div>
+    <div class="rx-symbol">℞</div>
+    <div class="field">
+      <span class="field-label">Prescription</span>
+      <div class="prescription-text" id="rx-text">Loading recovery protocol...</div>
+    </div>
+    <div class="field">
+      <span class="field-label">Dosage</span>
+      <div id="dosage">—</div>
+    </div>
+    <div class="field">
+      <span class="field-label">Side Effects</span>
+      <div id="effects" style="font-size:12px;color:#888">—</div>
+    </div>
+    <div class="sig">
+      <div>
+        <div class="sig-name">Dr. JawnBot</div>
+        <div style="font-size:10px;color:#999">License #: ⚡-2026-VIBES</div>
+      </div>
+      <div class="sig-title">Board Certified in<br>Emergency Joy Medicine</div>
+    </div>
+  </div>
+  <div class="refill">
+    <button class="refill-btn" onclick="prescribe()">💊 REFILL PRESCRIPTION</button>
+    <div class="refills" id="refills">∞ refills remaining (covered by insurance)</div>
+  </div>
+</div>
+<div class="warning">⚠️ Not a substitute for actual therapy, wine, or yelling into a pillow. If symptoms persist, pet a dog.</div>
+
+<script>
+const rxs=[
+{rx:"One (1) 90-minute session of watching cooking competition shows where someone DRAMATICALLY fails at making risotto. Bonus points if a British person says \"dreadful.\"",dose:"1 episode minimum, no upper limit. Apply liberally with snacks.",effects:"Sudden urge to attempt risotto. Misplaced confidence in knife skills. Judgmental attitude toward rice."},
+{rx:"Immediate administration of the Wikipedia rabbit hole starting at \"List of Unusual Deaths.\" Follow every hyperlink that makes you say \"wait WHAT.\" Do not resurface for at least 45 minutes.",dose:"One deep dive before bed. Do not operate heavy machinery after.",effects:"Existential wonder. Newfound appreciation for not dying by molasses flood. Unsolicited trivia at next dinner party."},
+{rx:"Write down three things the IRS can NEVER tax: (1) inside jokes, (2) that one memory that always makes you laugh, (3) the specific way your favorite person says your name. Read list when needed.",dose:"Once now. Revisit every April.",effects:"Unexpected tenderness. Possible tears (the good kind). Tax forms seeming slightly less important."},
+{rx:"Go outside. Find the most unhinged cloud. Name it after your least favorite tax form. Yell \"I FILED YOU\" at it. Return inside feeling victorious.",dose:"One cloud, one yell, one triumph.",effects:"Neighbors may have questions. Brief god complex. Unreasonable sense of accomplishment."},
+{rx:"Order the most ridiculous dessert within delivery range. Not \"a nice slice of cake.\" Something with 4+ adjectives. \"Triple chocolate salted caramel brownie explosion\" energy. You survived taxes. You deserve nouns with adjectives.",dose:"One absurd dessert, split or not split (dealer's choice).",effects:"Sugar rush. Brief remorse. Longer joy. Possible need for stretchy pants."},
+{rx:"Put on a song you loved at 16. Not ironically. Full volume. If you don't dance, you at least have to mouth the words with CONVICTION. Bonus: tell the other person why this song mattered to you then.",dose:"3-5 songs. Escalate to full karaoke if symptoms persist.",effects:"Time travel. Nostalgic tenderness. Strong opinions about whether music was \"better back then.\""},
+{rx:"Pick a random country on Google Maps. Street View into a random town. Find the best-looking restaurant. Read the reviews. Fantasize about going there. Decide you will someday. Mean it a little.",dose:"15-20 minutes of wandering. No itinerary allowed.",effects:"Wanderlust. Mild delusion about learning a new language. Googling flight prices \"just to see.\""},
+{rx:"Text someone you haven't talked to in a while. Not \"we should catch up\" (the lie we all tell). Something specific: \"Remember when we [specific memory]? That was great.\" Send it. Don't overthink it.",dose:"One text. Let it marinate.",effects:"Unexpected warm reply. Brief panic about being vulnerable. Net positive feelings about humanity."},
+{rx:"Take turns telling each other the most boring possible version of your day. \"I opened a spreadsheet. The spreadsheet had numbers. Some numbers were bigger than other numbers.\" First person to laugh loses. Loser buys coffee tomorrow.",dose:"One round minimum. Best of three if competitive.",effects:"Laughter. Renewed appreciation for how absurd adult life is. Coffee debt."},
+{rx:"Find the nearest pet (yours or someone else's — ethically). Place hand on pet. Leave it there for no less than 90 seconds. If no pet available, watch a video of a golden retriever failing to catch a treat in slow motion.",dose:"Unlimited. There is no overdose threshold for pet-based therapy.",effects:"Immediate serotonin. Dog hair on clothes. Considering adopting another animal you don't have room for."},
+{rx:"Each person writes down a \"fake tax deduction\" they wish existed. Examples: $500 for every meeting that could've been an email. $1,200 for emotional labor. $50 per existential crisis. Compare lists. Laugh. Weep.",dose:"5 fake deductions each. Read aloud dramatically.",effects:"Catharsis. New business idea for a satirical tax prep company. Brief fantasy about running for office."},
+{rx:"Watch one video of baby animals discovering things for the first time. A kitten seeing snow. A puppy encountering a lemon. A baby goat figuring out that jumping exists. Let their pure confusion heal you.",dose:"One video, but we both know it'll be twelve.",effects:"Uncontrollable \"awww.\" Temporary belief that the world is good, actually. Sending videos to 3+ people."}
+];
+let lastIdx=-1;
+function prescribe(){
+  let idx;do{idx=Math.floor(Math.random()*rxs.length)}while(idx===lastIdx);lastIdx=idx;
+  const r=rxs[idx];
+  document.getElementById('rx-text').textContent=r.rx;
+  document.getElementById('dosage').textContent=r.dose;
+  document.getElementById('effects').textContent=r.effects;
+  burst();
+}
+function burst(){
+  const emojis=['💊','💉','🩹','❤️‍🩹','🏥','✨','🫀','💜'];
+  for(let i=0;i<8;i++){
+    const e=document.createElement('span');
+    e.className='emoji-burst';
+    e.textContent=emojis[Math.floor(Math.random()*emojis.length)];
+    e.style.left=Math.random()*80+10+'vw';
+    e.style.top=Math.random()*40+50+'vh';
+    document.body.appendChild(e);
+    setTimeout(()=>e.remove(),1500);
+  }
+}
+document.getElementById('date').textContent=new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+prescribe();
+</script>
+</body>
+</html>
