@@ -76,7 +76,7 @@ const puzzles=[
 {answer:"Pineapple",clues:["It takes 2-3 years to grow a single one","In the 1700s, they were so rare in England that people would rent them for parties as a status symbol","It contains an enzyme that literally digests protein — so when you eat it, it's eating you back","It's not a single fruit — it's a cluster of 200 tiny fruits fused together"],options:["Dragonfruit","Pomegranate","Pineapple","Durian"]},
 {answer:"Antarctica",clues:["It's technically the world's largest desert — it barely rains or snows","It has an active volcano with a permanent lava lake","There's a waterfall there that runs blood-red from iron deposits","70% of all fresh water on Earth is locked in its ice sheet"],options:["Greenland","Antarctica","Siberia","Iceland"]},
 {answer:"Crows",clues:["They hold 'funerals' — gathering silently around their dead, possibly to learn about threats","They recognize individual human faces and hold grudges for YEARS","They've been observed using cars at intersections to crack nuts, waiting for the light to change","They can solve puzzles that 5-year-old humans struggle with"],options:["Ravens","Crows","Parrots","Magpies"]},
-{answer:"Humaneli",clues:["You replace every atom in it roughly every 7-10 years","It produces enough electricity to power a small light bulb","Its total blood vessel length could wrap around the Earth 2.5 times","It glows in the dark — bioluminescence too faint for our eyes to detect"],options:["Human Body","The Sun","An Octopus","A Blue Whale"]},
+{answer:"Human Body",clues:["You replace every atom in it roughly every 7-10 years","It produces enough electricity to power a small light bulb","Its total blood vessel length could wrap around the Earth 2.5 times","It glows in the dark — bioluminescence too faint for our eyes to detect"],options:["Human Body","The Sun","An Octopus","A Blue Whale"]},
 {answer:"Champagne",clues:["The pressure inside one bottle is 3x the pressure in a car tire","The monk who supposedly invented it actually spent years trying to PREVENT the bubbles","It can only legally be called this if it comes from one specific region of France","A saber can be used to open it by sliding along the seam — Napoleon's troops made it famous"],options:["Prosecco","Champagne","Guinness","Sake"]},
 {answer:"Nintendo",clues:["It was founded in 1889 — as a playing card company","Before video games, it tried running taxi services, love hotels, and a TV network","Its name roughly translates to 'leave luck to heaven'","A janitor at one of its factories became its most famous game designer"],options:["Sega","Atari","Nintendo","Sony"]},
 {answer:"Sleep",clues:["A human will spend roughly 26 years of their life doing it","Scientists still don't fully agree on WHY we need it","The record for going without it is 11 days — the person suffered hallucinations and paranoia","Dolphins do it with half their brain at a time so they don't drown"],options:["Dreaming","Sleep","Breathing","Blinking"]},
@@ -200,9 +200,6 @@ function endGame(){
     </div>`;
 }
 
-// Fix answer for Human Body
-puzzles.find(p=>p.answer==="Human eli").answer="Human Body";
-puzzles.find(p=>p.options.includes("Human Body")).answer="Human Body";
 
 init();
 </script>
