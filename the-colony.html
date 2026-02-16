@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🐜 The Colony — You Are The Swarm</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Caveat:wght@700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Space Grotesk',sans-serif;background:#0a0f0a;color:#d4e0d4;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:12px;overflow-x:hidden}
+.game{width:520px;max-width:95vw}
+.title{font-family:'Caveat',cursive;font-size:30px;text-align:center;background:linear-gradient(90deg,#4ade80,#22c55e,#16a34a);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.sub{text-align:center;font-size:11px;color:rgba(255,255,255,0.25);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px}
+.stats{display:flex;justify-content:center;gap:12px;margin-bottom:10px;flex-wrap:wrap}
+.stat{background:rgba(74,222,128,0.06);padding:5px 12px;border-radius:10px;text-align:center;border:1px solid rgba(74,222,128,0.1);min-width:70px}
+.stat .label{font-size:9px;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:1px}
+.stat .val{font-size:16px;font-weight:700;color:#4ade80}
+.card{background:linear-gradient(145deg,#0f1f0f,#0a150a);border-radius:16px;padding:20px;box-shadow:0 0 40px rgba(74,222,128,0.06);border:1px solid rgba(74,222,128,0.12);margin-bottom:12px}
+.week{font-size:10px;color:rgba(255,255,255,0.25);text-transform:uppercase;letter-spacing:2px;margin-bottom:8px;text-align:center}
+.scene{font-size:14px;line-height:1.7;color:#c8dcc8;margin-bottom:14px}
+.scene em{color:#4ade80;font-style:normal;font-weight:600}
+.fact{font-size:11px;color:rgba(74,222,128,0.5);padding:8px 12px;background:rgba(74,222,128,0.04);border-radius:8px;border-left:2px solid rgba(74,222,128,0.2);margin-bottom:14px;line-height:1.5}
+.choices{display:flex;flex-direction:column;gap:8px}
+.choice{background:rgba(74,222,128,0.04);border:1px solid rgba(74,222,128,0.12);border-radius:10px;padding:12px 14px;cursor:pointer;transition:all 0.15s;text-align:left;font-family:'Space Grotesk',sans-serif;font-size:13px;color:#c8dcc8;line-height:1.5}
+.choice:hover{background:rgba(74,222,128,0.1);border-color:rgba(74,222,128,0.3);transform:translateX(4px)}
+.choice .tag{font-size:10px;color:#4ade80;text-transform:uppercase;letter-spacing:1px;margin-bottom:2px;display:block}
+.outcome{font-size:13px;line-height:1.7;padding:14px;background:rgba(74,222,128,0.04);border-radius:10px;border:1px solid rgba(74,222,128,0.1);margin-bottom:12px}
+.outcome .change{color:#4ade80;font-weight:600}
+.outcome .loss{color:#ef4444;font-weight:600}
+.next-btn{display:none;background:linear-gradient(135deg,#4ade80,#16a34a);border:none;color:#0a0f0a;font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;padding:10px 28px;border-radius:50px;cursor:pointer;margin:0 auto;transition:all 0.15s;letter-spacing:1px}
+.next-btn.show{display:block}
+.next-btn:hover{transform:translateY(-2px);box-shadow:0 4px 20px rgba(74,222,128,0.3)}
+.ants-bg{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:-1;overflow:hidden}
+.ant-particle{position:absolute;font-size:10px;opacity:0.15;animation:crawl linear infinite}
+@keyframes crawl{0%{transform:translateY(110vh)}100%{transform:translateY(-10vh)}}
+.final{text-align:center;padding:20px}
+.final-title{font-family:'Caveat',cursive;font-size:36px;color:#4ade80}
+.final-msg{font-size:14px;color:rgba(255,255,255,0.5);line-height:1.7;margin:12px 0}
+.final-stats{display:flex;justify-content:center;gap:16px;margin:16px 0;flex-wrap:wrap}
+.final-stat{text-align:center}
+.final-stat .big{font-size:28px;font-weight:700;color:#4ade80}
+.final-stat .sm{font-size:10px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px}
+.play-again{background:linear-gradient(135deg,#4ade80,#16a34a);border:none;color:#0a0f0a;font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;padding:12px 32px;border-radius:50px;cursor:pointer;margin-top:12px;letter-spacing:1px}
+.insight{font-size:12px;color:rgba(255,255,255,0.4);padding:10px 14px;background:rgba(255,255,255,0.03);border-radius:8px;margin-top:10px;line-height:1.6;text-align:left}
+.insight strong{color:#4ade80}
+</style>
+</head>
+<body>
+<div class="ants-bg" id="antsBg"></div>
+<div class="game">
+  <div class="title">🐜 The Colony</div>
+  <div class="sub">You are the swarm intelligence</div>
+  <div class="stats" id="stats">
+    <div class="stat"><div class="label">Ants</div><div class="val" id="s-pop">100</div></div>
+    <div class="stat"><div class="label">Food</div><div class="val" id="s-food">50</div></div>
+    <div class="stat"><div class="label">Territory</div><div class="val" id="s-terr">1</div></div>
+    <div class="stat"><div class="label">Week</div><div class="val" id="s-week">1</div></div>
+    <div class="stat"><div class="label">Morale</div><div class="val" id="s-mor">🟢</div></div>
+  </div>
+  <div class="card" id="card"></div>
+</div>
+<script>
+const S={pop:100,food:50,terr:1,week:0,morale:3,decisions:[],alive:true};
+const scenarios=[
+{week:1,
+scene:`Your colony is young — <em>100 workers</em>, a single queen, and a patch of dirt beneath an old oak tree. Scout ants return with news: there's a <em>massive sugar source</em> 30 meters away (a dropped popsicle), but the path crosses another colony's territory.`,
+fact:`🐜 Real ant fact: Ants make up roughly 15-20% of terrestrial animal biomass. There are approximately 20 quadrillion ants on Earth — about 2.5 million for every human.`,
+choices:[
+{tag:'🗺️ Diplomacy',text:'Send pheromone scouts to map a detour around the other colony\'s territory. Slower but safer.',pop:5,food:15,terr:0,morale:1,result:'Your scouts find a winding but safe path through a crack in the sidewalk. It takes 3x longer, but the sugar flows steadily. <em>The colony learns: patience compounds.</em>'},
+{tag:'⚔️ Direct Route',text:'March straight through. Claim the resource by force of numbers.',pop:-20,food:30,terr:1,morale:-1,result:'A brutal skirmish. You lose workers, but your boldness pays off — the sugar is yours AND you\'ve expanded territory. <em>But the enemy colony remembers.</em>'},
+{tag:'🧪 Innovation',text:'Task a team to find alternative food sources nearby instead. Why fight over one popsicle?',pop:0,food:20,terr:0,morale:2,result:'Your foragers discover aphids on a nearby rosebush — a <em>renewable</em> honeydew farm! Less dramatic, more sustainable. <em>Design thinking: reframe the problem.</em>'}
+]},
+{week:2,
+scene:`Rain. Torrential, apocalyptic rain. Your tunnels are <em>flooding fast</em>. Workers are carrying larvae to higher chambers, but there's not enough room. The queen is calm (she\'s seen this before), but you have minutes to decide.`,
+fact:`🐜 Real ant fact: Fire ants survive floods by linking their bodies into living rafts that can float for weeks. They rotate who's on the bottom so no one drowns. It's pure emergent cooperation — no leader directs it.`,
+choices:[
+{tag:'🏗️ Rebuild Higher',text:'Evacuate everything upward. Sacrifice the lower chambers and food stores to save lives.',pop:5,food:-20,terr:0,morale:1,result:'You lose nearly half your food reserves, but every ant survives. Workers immediately begin reinforcing upper tunnels. <em>The colony learns: infrastructure is investment.</em>'},
+{tag:'🤝 Living Architecture',text:'Form living walls with worker bodies to redirect water flow, like fire ants do.',pop:-15,food:-5,terr:0,morale:2,result:'It works — mostly. Some workers on the front lines don\'t make it, but the colony structure holds. Morale surges. <em>Sacrifice creates meaning.</em>'},
+{tag:'🚪 Abandon & Relocate',text:'This nest site was flawed. Evacuate entirely and find higher ground.',pop:-5,food:-15,terr:1,morale:0,result:'A risky migration in the rain, but you find a <em>perfect spot</em> under a concrete slab — elevated, protected, with more room to grow. Sometimes the best design is starting over.'}
+]},
+{week:3,
+scene:`A <em>dead bird</em> has fallen near your colony. It's an enormous protein source — enough to feed the colony for weeks. But it's also attracting flies, beetles, and a rival colony of <em>army ants</em> that vastly outnumber you.`,
+fact:`🐜 Real ant fact: Leafcutter ants don't eat the leaves they carry. They use them to farm fungus underground — they're agriculture pioneers who've been farming for 50 million years, beating humans by roughly 49.99 million years.`,
+choices:[
+{tag:'🌙 Night Raid',text:'Wait until dark. Army ants navigate by sight more than scent. Hit the bird at night and carry what you can.',pop:0,food:25,terr:0,morale:1,result:'Under cover of darkness, your workers dismantle the bird with surgical precision. You secure massive protein reserves while the army ants sleep. <em>Timing is a design choice.</em>'},
+{tag:'🍄 Farm Instead',text:'Ignore the bird. Use this moment to establish a fungus garden with decomposing leaf matter nearby.',pop:10,food:15,terr:0,morale:2,result:'While everyone fights over the bird, you quietly build a <em>sustainable food system</em>. The fungus garden will produce food long after the bird is gone. <em>Renewable beats windfall.</em>'},
+{tag:'🤯 Recruit the Beetles',text:'Some beetle species have symbiotic relationships with ants. Try to recruit the beetles as allies to overwhelm the army ants.',pop:5,food:20,terr:1,morale:1,result:'Bold move. The beetles aren\'t exactly allies, but they create chaos that distracts the army ants while you harvest. <em>Ecosystems are networks, not hierarchies.</em>'}
+]},
+{week:4,
+scene:`Something strange: a group of your workers has <em>stopped working</em>. They're alive, healthy, but just... standing there. Not foraging, not building, not responding to pheromone signals. Other workers are getting agitated.`,
+fact:`🐜 Real ant fact: About 25-30% of ants in any colony appear to do "nothing" at any given time. Scientists discovered these "lazy ants" are actually reserves — when active workers tire out, the idle ones seamlessly take over, ensuring the colony never stops.`,
+choices:[
+{tag:'📋 Enforce Work',text:'Release alarm pheromones to jolt the idle workers back into action. Every ant must contribute.',pop:0,food:10,terr:0,morale:-1,result:'The idle ants resume work, but something feels off. When a tunnel collapses next week, there are no fresh reserves to help. <em>Efficiency without slack is fragile.</em>'},
+{tag:'🧘 Trust the System',text:'Leave them alone. Maybe the colony knows something you don\'t.',pop:5,food:5,terr:0,morale:2,result:'Three days later, a foraging team gets exhausted. The "lazy" ants seamlessly step in — fresh, rested, ready. Your colony never missed a beat. <em>Redundancy isn\'t waste. It\'s resilience.</em>'},
+{tag:'🔬 Investigate',text:'Send scouts to observe the idle ants closely. What are they actually doing?',pop:0,food:5,terr:0,morale:1,result:'You discover they\'re subtly maintaining tunnel walls, grooming larvae, managing humidity — <em>invisible labor</em> that keeps everything running. You just couldn\'t see it before. <em>Not all work looks like work.</em>'}
+]},
+{week:5,
+scene:`A <em>parasitic fungus</em> has infected three workers. You know this one — <em>Ophiocordyceps</em>, the zombie ant fungus. It hijacks their brains, makes them climb to a high point, then explodes spores everywhere. The infected ants are already acting strange, climbing the grass blades above your nest.`,
+fact:`🐜 Real ant fact: Ants evolved a response to zombie fungus millions of years ago. Healthy ants can detect infected nestmates and will carry them far from the colony. Some species have dedicated "sick wards." They invented quarantine 50 million years before humans.`,
+choices:[
+{tag:'🚑 Quarantine',text:'Immediately isolate the infected workers. Carry them far from the colony. It\'s brutal but necessary.',pop:-3,food:-5,terr:0,morale:1,result:'The three infected workers are gently carried 10 meters away. They won\'t return. It\'s heartbreaking, but the spores never reach the colony. <em>Compassionate boundaries save communities.</em>'},
+{tag:'🧬 Antimicrobial Defense',text:'Coat the infected ants in antimicrobial secretions. Some ant species produce natural antifungals.',pop:-1,food:-10,terr:0,morale:2,result:'Your workers produce metapleural gland secretions — a natural antibiotic. Two of the three infected ants recover. The colony develops stronger resistance. <em>Invest in immune systems, not just walls.</em>'},
+{tag:'🔥 Scorched Earth',text:'Seal off the entire tunnel section near the infected ants. Collapse it. Nothing gets through.',pop:-10,food:-5,terr:0,morale:-1,result:'Effective but devastating. The infection is contained, but you lost workers and infrastructure. The colony feels the fear. <em>Overreaction has costs too.</em>'}
+]},
+{week:6,
+scene:`Your colony has grown strong. Now a <em>new queen</em> has matured — your colony\'s daughter. She\'s ready to fly, mate, and start her own colony. But resources are tight, and sending her off means investing food and workers you could use here.`,
+fact:`🐜 Real ant fact: During nuptial flights, virgin queens mate with males mid-air, then land, break off their own wings, and dig a chamber alone. They survive for weeks on nutrients from their now-useless wing muscles. A queen's first act of leadership is self-sacrifice.`,
+choices:[
+{tag:'🕊️ Let Her Fly',text:'Give her a full escort, extra food, and your blessing. The future of your genetic line depends on spreading.',pop:-10,food:-15,terr:0,morale:2,result:'She takes flight on a warm evening. Most new queens don\'t survive, but she carries your colony\'s DNA into the future. If she makes it, your legacy doubles. <em>Growth means letting go.</em>'},
+{tag:'👑 Keep Her',text:'A second queen means more egg production. Keep her in the colony to boost population.',pop:20,food:-10,terr:0,morale:0,result:'Two queens, double the eggs. Population booms. But tension builds — ant colonies with multiple queens can fracture into factions. <em>More isn\'t always better. Alignment matters.</em>'},
+{tag:'🤝 Alliance',text:'Send her to establish a satellite colony nearby. Connected to yours, but independent.',pop:-5,food:-10,terr:2,morale:1,result:'She establishes a sister colony 5 meters away. You now have a <em>network</em> — shared resources, coordinated defense, distributed risk. <em>Franchising: ants did it first.</em>'}
+]},
+{week:7,
+scene:`A <em>human child</em> has discovered your colony. They're poking a stick into your entrance, pouring water in, and — oh no — they have a <em>magnifying glass</em>. This is an existential threat on a scale your colony has never faced.`,
+fact:`🐜 Real ant fact: Argentine ants have formed a global "supercolony" spanning 6,000 km across Europe. Ants from Portugal and Italy recognize each other as family. They've essentially created a civilization that spans a continent — without language, laws, or leaders.`,
+choices:[
+{tag:'🏃 Emergency Evacuation',text:'Activate the full colony evacuation protocol. Every ant carries a larva and runs.',pop:-5,food:-20,terr:-1,morale:1,result:'Chaos, but organized chaos. The colony streams out the back exits the child doesn\'t know about. You lose your home but save your people. You\'ve rebuilt before. <em>Survival is the first design requirement.</em>'},
+{tag:'🐜 Swarm Defense',text:'Send waves of soldier ants at the stick. Bite the hand. Make this child REGRET their choices.',pop:-15,food:0,terr:0,morale:2,result:'Hundreds of ants pour over the child\'s hand. The screaming is immediate. The child runs. The colony cheers (chemically). Your home is damaged but standing. <em>Sometimes the best defense is "absolutely not."</em>'},
+{tag:'🕳️ Go Deep',text:'Retreat to the deepest chambers and seal the upper tunnels. Wait it out. Children have short attention spans.',pop:0,food:-5,terr:0,morale:0,result:'The child gets bored after 10 minutes (predictable). Your upper tunnels are trashed, but the queen, larvae, and food stores are safe in the deep chambers. <em>Depth is a form of defense.</em>'}
+]},
+{week:8,
+scene:`Autumn arrives. Temperature is dropping. Your colony faces a <em>strategic winter planning</em> decision. You have enough food for survival, but not enough for comfort. Scout ants report a heated building foundation 20 meters away.`,
+fact:`🐜 Real ant fact: Honeypot ants have specialized workers called "repletes" who gorge themselves until their abdomens swell to the size of grapes, becoming living food storage containers. They hang from the ceiling and feed the colony all winter by regurgitating on demand.`,
+choices:[
+{tag:'🏠 Stay & Store',text:'Invest everything in deepening chambers and stockpiling food. Hunker down for winter in place.',pop:0,food:10,terr:0,morale:1,result:'Your workers dig deeper than ever, finding warmer soil. Food stores are tight but sufficient. It\'ll be a lean winter, but a safe one. <em>Sometimes boring is the right strategy.</em>'},
+{tag:'🗺️ Migrate to Warmth',text:'Move the colony to the heated building foundation. Risky journey, but warm all winter.',pop:-10,food:5,terr:1,morale:1,result:'The migration is brutal — you lose workers to a garden spider along the way. But the heated foundation is paradise. Your colony stays active all winter while others hibernate. <em>High risk, high reward — but only if you survive the journey.</em>'},
+{tag:'🍯 Living Pantry',text:'Designate workers as living food storage — honeypot style. They sacrifice mobility to become reserves.',pop:0,food:20,terr:0,morale:1,result:'Thirty workers volunteer to become living pantries, swelling with stored food. They\'ll hang motionless in a chamber all winter, feeding others drop by drop. <em>The most radical service is becoming what your community needs.</em>'}
+]}
+];
+
+function updateStats(){
+  document.getElementById('s-pop').textContent=S.pop;
+  document.getElementById('s-food').textContent=S.food;
+  document.getElementById('s-terr').textContent=S.terr;
+  document.getElementById('s-week').textContent=S.week;
+  const m=S.morale>=4?'🟢':S.morale>=2?'🟡':'🔴';
+  document.getElementById('s-mor').textContent=m;
+}
+
+function showScenario(){
+  if(S.week>=scenarios.length){endGame();return;}
+  if(S.pop<=0||S.food<=0){endGame(true);return;}
+  const sc=scenarios[S.week];
+  const card=document.getElementById('card');
+  card.innerHTML=`
+    <div class="week">Week ${sc.week} — ${['Early Spring','The Flood','The Windfall','The Lazy Ants','The Infection','The Daughter Queen','The Giant','Winter Planning'][S.week]}</div>
+    <div class="scene">${sc.scene}</div>
+    <div class="fact">${sc.fact}</div>
+    <div class="choices" id="choices">
+      ${sc.choices.map((c,i)=>`<button class="choice" onclick="choose(${i})"><span class="tag">${c.tag}</span>${c.text}</button>`).join('')}
+    </div>
+    <div id="outcome"></div>
+    <button class="next-btn" id="nextBtn" onclick="advance()">NEXT WEEK →</button>
+  `;
+  updateStats();
+}
+
+function choose(idx){
+  const sc=scenarios[S.week];
+  const c=sc.choices[idx];
+  S.pop=Math.max(0,S.pop+c.pop);
+  S.food=Math.max(0,S.food+c.food);
+  S.terr=Math.max(1,S.terr+c.terr);
+  S.morale=Math.max(0,Math.min(5,S.morale+c.morale));
+  S.decisions.push({week:S.week,choice:c.tag});
+  
+  document.querySelectorAll('.choice').forEach(el=>el.style.pointerEvents='none');
+  document.querySelectorAll('.choice').forEach((el,i)=>{
+    if(i===idx){el.style.borderColor='rgba(74,222,128,0.5)';el.style.background='rgba(74,222,128,0.1)';}
+    else{el.style.opacity='0.3';}
+  });
+  
+  const changes=[];
+  if(c.pop>0)changes.push(`<span class="change">+${c.pop} ants</span>`);
+  if(c.pop<0)changes.push(`<span class="loss">${c.pop} ants</span>`);
+  if(c.food>0)changes.push(`<span class="change">+${c.food} food</span>`);
+  if(c.food<0)changes.push(`<span class="loss">${c.food} food</span>`);
+  if(c.terr>0)changes.push(`<span class="change">+${c.terr} territory</span>`);
+  if(c.terr<0)changes.push(`<span class="loss">${c.terr} territory</span>`);
+  
+  document.getElementById('outcome').innerHTML=`<div class="outcome">${c.result}<br><br>${changes.join(' · ')}</div>`;
+  document.getElementById('nextBtn').className='next-btn show';
+  updateStats();
+}
+
+function advance(){S.week++;showScenario();}
+
+function endGame(dead){
+  const card=document.getElementById('card');
+  const style=S.pop>=100?'thriving':S.pop>=50?'surviving':'struggling';
+  const insights=S.decisions.map(d=>{
+    const tags={'🗺️ Diplomacy':'cautious pathfinder','⚔️ Direct Route':'bold risk-taker','🧪 Innovation':'creative reframer',
+    '🏗️ Rebuild Higher':'infrastructure investor','🤝 Living Architecture':'sacrifice-driven leader','🚪 Abandon & Relocate':'fresh-start thinker',
+    '🌙 Night Raid':'tactical opportunist','🍄 Farm Instead':'systems thinker','🤯 Recruit the Beetles':'network builder',
+    '📋 Enforce Work':'efficiency optimizer','🧘 Trust the System':'emergence believer','🔬 Investigate':'curious observer',
+    '🚑 Quarantine':'compassionate pragmatist','🧬 Antimicrobial Defense':'invest-in-resilience type','🔥 Scorched Earth':'overwhelming force fan',
+    '🕊️ Let Her Fly':'legacy builder','👑 Keep Her':'growth maximizer','🤝 Alliance':'franchise thinker',
+    '🏃 Emergency Evacuation':'survival-first strategist','🐜 Swarm Defense':'stand-your-ground type','🕳️ Go Deep':'patience player',
+    '🏠 Stay & Store':'conservative planner','🗺️ Migrate to Warmth':'bold migrator','🍯 Living Pantry':'radical service believer'};
+    return tags[d.choice]||'wildcard';
+  });
+  const unique=[...new Set(insights)];
+  const personality=unique.slice(0,3).join(', ');
+  
+  card.innerHTML=`<div class="final">
+    <div class="final-title">${dead?'The Colony Falls 💀':'Winter Arrives'}</div>
+    <div class="final-msg">${dead?'Your colony didn\'t make it. But in nature, most colonies don\'t — what matters is what you learned.':'Your colony made it to winter. Whatever comes next, you built something real.'}</div>
+    <div class="final-stats">
+      <div class="final-stat"><div class="big">${S.pop}</div><div class="sm">Ants</div></div>
+      <div class="final-stat"><div class="big">${S.food}</div><div class="sm">Food</div></div>
+      <div class="final-stat"><div class="big">${S.terr}</div><div class="sm">Territory</div></div>
+      <div class="final-stat"><div class="big">${S.decisions.length}</div><div class="sm">Decisions</div></div>
+    </div>
+    <div class="insight">
+      <strong>Your leadership style:</strong> ${personality}.<br><br>
+      Every choice you made mirrors a real principle from ant biology — and from human design. Ants don't have managers, strategic plans, or Slack channels. They have <strong>simple rules, local information, and trust in the collective</strong>. And they've been running successful organizations for 140 million years.<br><br>
+      The question isn't whether ants can teach us about design. It's whether we're humble enough to learn.
+    </div>
+    <button class="play-again" onclick="location.reload()">🐜 PLAY AGAIN</button>
+  </div>`;
+}
+
+// Background ants
+function spawnAnts(){
+  const bg=document.getElementById('antsBg');
+  for(let i=0;i<15;i++){
+    const a=document.createElement('span');
+    a.className='ant-particle';a.textContent='🐜';
+    a.style.left=Math.random()*100+'%';
+    a.style.animationDuration=(15+Math.random()*20)+'s';
+    a.style.animationDelay=(-Math.random()*20)+'s';
+    bg.appendChild(a);
+  }
+}
+spawnAnts();
+showScenario();
+</script>
+</body>
+</html>
