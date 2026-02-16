@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🔮 WikiWhodunit</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Caveat:wght@700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Space Grotesk',sans-serif;background:#0a0a1a;color:#e0e0e0;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:20px;overflow-x:hidden}
+.game{width:520px;max-width:95vw}
+.title{font-family:'Caveat',cursive;font-size:38px;text-align:center;background:linear-gradient(90deg,#fbbf24,#f59e0b,#fbbf24);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px}
+.sub{text-align:center;font-size:12px;color:rgba(255,255,255,0.3);letter-spacing:2px;text-transform:uppercase;margin-bottom:24px}
+.scores{display:flex;justify-content:center;gap:24px;margin-bottom:20px;font-size:14px}
+.score-box{background:rgba(255,255,255,0.05);padding:8px 16px;border-radius:12px;text-align:center}
+.score-box .label{font-size:10px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:1px}
+.score-box .val{font-size:22px;font-weight:700;color:#fbbf24}
+.card{background:linear-gradient(145deg,#1a1a3e,#12122a);border-radius:20px;padding:28px;box-shadow:0 0 40px rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.15);margin-bottom:16px}
+.round-label{font-size:11px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:2px;margin-bottom:16px;text-align:center}
+.clue-area{min-height:120px;margin-bottom:20px}
+.clue{font-size:15px;line-height:1.8;color:#e8e8f0;margin-bottom:8px;padding:8px 12px;background:rgba(255,255,255,0.03);border-radius:8px;border-left:3px solid rgba(251,191,36,0.3);opacity:0;transform:translateX(-10px);transition:all 0.4s ease}
+.clue.show{opacity:1;transform:translateX(0)}
+.clue .num{color:#fbbf24;font-weight:700;margin-right:8px}
+.options{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+.opt{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:14px;text-align:center;cursor:pointer;font-family:'Space Grotesk',sans-serif;font-size:14px;color:#e0e0e0;transition:all 0.15s}
+.opt:hover{background:rgba(251,191,36,0.1);border-color:rgba(251,191,36,0.3);transform:translateY(-1px)}
+.opt.correct{background:rgba(34,197,94,0.2)!important;border-color:#22c55e!important;color:#22c55e!important}
+.opt.wrong{background:rgba(239,68,68,0.2)!important;border-color:#ef4444!important;color:#ef4444!important}
+.opt.disabled{pointer-events:none;opacity:0.5}
+.opt.highlight{border-color:#22c55e!important;opacity:1!important}
+.result{text-align:center;padding:16px;font-size:15px;min-height:60px;display:flex;align-items:center;justify-content:center}
+.next-btn{display:none;background:linear-gradient(135deg,#fbbf24,#f59e0b);border:none;color:#0a0a1a;font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;padding:12px 32px;border-radius:50px;cursor:pointer;margin:12px auto 0;transition:all 0.15s;letter-spacing:1px}
+.next-btn:hover{transform:translateY(-2px);box-shadow:0 4px 20px rgba(251,191,36,0.3)}
+.next-btn.show{display:block}
+.final{text-align:center;padding:30px}
+.final-score{font-size:48px;font-weight:700;color:#fbbf24;font-family:'Caveat',cursive}
+.final-msg{font-size:16px;margin-top:8px;color:rgba(255,255,255,0.6);line-height:1.6}
+.play-again{background:linear-gradient(135deg,#fbbf24,#f59e0b);border:none;color:#0a0a1a;font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;padding:14px 36px;border-radius:50px;cursor:pointer;margin-top:20px;letter-spacing:1px}
+.timer-bar{height:3px;background:rgba(255,255,255,0.05);border-radius:2px;margin-bottom:16px;overflow:hidden}
+.timer-fill{height:100%;background:linear-gradient(90deg,#22c55e,#fbbf24,#ef4444);border-radius:2px;transition:width 0.3s linear;width:100%}
+.streak{font-size:11px;color:rgba(255,255,255,0.3);text-align:center;margin-bottom:8px}
+</style>
+</head>
+<body>
+<div class="game">
+  <div class="title">🔮 WikiWhodunit</div>
+  <div class="sub">Guess the Wikipedia article from cryptic clues</div>
+  <div class="scores">
+    <div class="score-box"><div class="label">Score</div><div class="val" id="score">0</div></div>
+    <div class="score-box"><div class="label">Round</div><div class="val" id="round">1</div></div>
+    <div class="score-box"><div class="label">Best</div><div class="val" id="best">—</div></div>
+  </div>
+  <div id="streak" class="streak"></div>
+  <div class="card" id="card">
+    <div class="round-label" id="round-label">ROUND 1 OF 10</div>
+    <div class="timer-bar"><div class="timer-fill" id="timer"></div></div>
+    <div class="clue-area" id="clues"></div>
+    <div class="options" id="options"></div>
+    <div class="result" id="result"></div>
+    <button class="next-btn" id="nextBtn" onclick="nextRound()">NEXT ROUND →</button>
+  </div>
+</div>
+
+<script>
+const puzzles=[
+{answer:"Honey",clues:["It never spoils — archaeologists found 3,000-year-old jars of it still perfectly edible","Bees must visit about 2 million flowers to make one pound of it","It's the only food produced by insects that humans eat","Ancient Egyptians used it to embalm the dead"],options:["Honey","Salt","Olive Oil","Vinegar"]},
+{answer:"Octopus",clues:["It has three hearts and blue blood","Each of its arms has its own 'mini brain' with independent neurons","It can change color AND texture in milliseconds","If it loses an arm, it grows back — and the severed arm keeps moving for an hour"],options:["Jellyfish","Octopus","Chameleon","Starfish"]},
+{answer:"The Great Wall of China",clues:["Contrary to popular myth, it's NOT visible from space with the naked eye","Workers used sticky rice in the mortar to hold it together","It's not one continuous wall — it's a network of many walls and fortifications","It took over 2,000 years and multiple dynasties to build"],options:["Hadrian's Wall","The Great Wall of China","Machu Picchu","The Colosseum"]},
+{answer:"Bananas",clues:["They're slightly radioactive due to their potassium content","Commercially, they're all genetic clones of each other","A cluster of them is called a 'hand' and individuals are called 'fingers'","The version your grandparents ate was a completely different species that went extinct"],options:["Avocados","Bananas","Coconuts","Pineapples"]},
+{answer:"Venice",clues:["It's sinking at a rate of 1-2mm per year","It was built on 118 small islands connected by over 400 bridges","Its foundations rest on millions of wooden stakes driven into mud","Napoleon called its central plaza 'the drawing room of Europe'"],options:["Amsterdam","Venice","Bangkok","New Orleans"]},
+{answer:"Tardigrades",clues:["They can survive in the vacuum of outer space","They can be frozen to near absolute zero and revived","They were accidentally left on the Moon after a spacecraft crashed in 2019","Their nickname literally means 'little water bear'"],options:["Tardigrades","Cockroaches","Extremophile Bacteria","Sea Monkeys"]},
+{answer:"The Mona Lisa",clues:["It's only 30 inches tall — most visitors are shocked by how small it is","It was stolen in 1911 by a Louvre employee who simply walked out with it under his coat","It has no eyebrows — either by fashion choice or centuries of deteriorating paint","It receives its own mail — about 50 love letters per week"],options:["Girl with a Pearl Earring","The Mona Lisa","The Scream","Starry Night"]},
+{answer:"Cleopatra",clues:["She lived closer in time to the Moon landing than to the building of the Great Pyramid","She spoke nine languages fluently","She wasn't actually Egyptian — she was Greek-Macedonian","She once dissolved a pearl worth millions in vinegar and drank it to win a bet"],options:["Nefertiti","Cleopatra","Hatshepsut","Boudicca"]},
+{answer:"Trees",clues:["The planet has 3 trillion of them — more than stars in the Milky Way","They communicate and share nutrients through underground fungal networks called the 'Wood Wide Web'","The oldest living one is over 5,000 years old and its location is kept secret","They release chemicals to warn neighboring ones when attacked by insects"],options:["Coral Reefs","Mushrooms","Trees","Glaciers"]},
+{answer:"Vinyl Records",clues:["They outsold CDs for the first time in 35 years in 2020","The grooves, if uncoiled, would stretch about 500 meters","They were originally made from shellac — a resin secreted by lac beetles","A golden one carrying sounds of Earth is currently 15 billion miles away on Voyager 1"],options:["Cassette Tapes","Vinyl Records","8-Track Tapes","CDs"]},
+{answer:"Pineapple",clues:["It takes 2-3 years to grow a single one","In the 1700s, they were so rare in England that people would rent them for parties as a status symbol","It contains an enzyme that literally digests protein — so when you eat it, it's eating you back","It's not a single fruit — it's a cluster of 200 tiny fruits fused together"],options:["Dragonfruit","Pomegranate","Pineapple","Durian"]},
+{answer:"Antarctica",clues:["It's technically the world's largest desert — it barely rains or snows","It has an active volcano with a permanent lava lake","There's a waterfall there that runs blood-red from iron deposits","70% of all fresh water on Earth is locked in its ice sheet"],options:["Greenland","Antarctica","Siberia","Iceland"]},
+{answer:"Crows",clues:["They hold 'funerals' — gathering silently around their dead, possibly to learn about threats","They recognize individual human faces and hold grudges for YEARS","They've been observed using cars at intersections to crack nuts, waiting for the light to change","They can solve puzzles that 5-year-old humans struggle with"],options:["Ravens","Crows","Parrots","Magpies"]},
+{answer:"Humaneli",clues:["You replace every atom in it roughly every 7-10 years","It produces enough electricity to power a small light bulb","Its total blood vessel length could wrap around the Earth 2.5 times","It glows in the dark — bioluminescence too faint for our eyes to detect"],options:["Human Body","The Sun","An Octopus","A Blue Whale"]},
+{answer:"Champagne",clues:["The pressure inside one bottle is 3x the pressure in a car tire","The monk who supposedly invented it actually spent years trying to PREVENT the bubbles","It can only legally be called this if it comes from one specific region of France","A saber can be used to open it by sliding along the seam — Napoleon's troops made it famous"],options:["Prosecco","Champagne","Guinness","Sake"]},
+{answer:"Nintendo",clues:["It was founded in 1889 — as a playing card company","Before video games, it tried running taxi services, love hotels, and a TV network","Its name roughly translates to 'leave luck to heaven'","A janitor at one of its factories became its most famous game designer"],options:["Sega","Atari","Nintendo","Sony"]},
+{answer:"Sleep",clues:["A human will spend roughly 26 years of their life doing it","Scientists still don't fully agree on WHY we need it","The record for going without it is 11 days — the person suffered hallucinations and paranoia","Dolphins do it with half their brain at a time so they don't drown"],options:["Dreaming","Sleep","Breathing","Blinking"]},
+{answer:"Oxford University",clues:["It's older than the Aztec Empire","No one knows exactly when it was founded — teaching existed there as early as 1096","It has its own police force","One of its colleges banned students from bringing swords to exams in 2017"],options:["Cambridge University","Harvard University","Oxford University","University of Bologna"]},
+{answer:"Sharks",clues:["They're older than trees — they've existed for over 400 million years","They can detect a heartbeat from several feet away using electroreception","They never run out of teeth — they go through roughly 30,000 in a lifetime","More people are killed each year by vending machines than by them"],options:["Crocodiles","Sharks","Piranhas","Orcas"]},
+{answer:"The Moon",clues:["It's slowly drifting away from Earth at 1.5 inches per year","It has moonquakes caused by Earth's gravitational pull","There are over 180 metric tons of human trash on its surface","It has no atmosphere, so footprints left there could last 100 million years"],options:["Mars","The Moon","Titan","Europa"]}
+];
+
+let state={score:0,round:0,streak:0,best:parseInt(localStorage.getItem('ww-best'))||0,clueIdx:0,answered:false,rounds:[],timer:null,timeLeft:100};
+const TOTAL=10;
+
+function init(){
+  state={score:0,round:0,streak:0,best:state.best,clueIdx:0,answered:false,rounds:shuffle([...puzzles]).slice(0,TOTAL),timer:null,timeLeft:100};
+  document.getElementById('best').textContent=state.best||'—';
+  nextRound();
+}
+
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+function nextRound(){
+  if(state.round>=TOTAL){endGame();return;}
+  const p=state.rounds[state.round];
+  state.clueIdx=0;state.answered=false;state.timeLeft=100;
+  document.getElementById('round').textContent=state.round+1;
+  document.getElementById('round-label').textContent=`ROUND ${state.round+1} OF ${TOTAL}`;
+  document.getElementById('result').innerHTML='';
+  document.getElementById('nextBtn').className='next-btn';
+  document.getElementById('timer').style.width='100%';
+  document.getElementById('streak').textContent=state.streak>1?`🔥 ${state.streak} streak`:'';
+  
+  const cluesEl=document.getElementById('clues');
+  cluesEl.innerHTML='';
+  p.clues.forEach((c,i)=>{
+    const d=document.createElement('div');
+    d.className='clue';d.id='clue-'+i;
+    d.innerHTML=`<span class="num">${i+1}.</span>${c}`;
+    cluesEl.appendChild(d);
+  });
+  
+  const optsEl=document.getElementById('options');
+  optsEl.innerHTML='';
+  const shuffledOpts=shuffle([...p.options]);
+  shuffledOpts.forEach(o=>{
+    const b=document.createElement('button');
+    b.className='opt';b.textContent=o;
+    b.onclick=()=>guess(o,p,b);
+    optsEl.appendChild(b);
+  });
+  
+  showClue(0);
+  startTimer();
+}
+
+function showClue(idx){
+  if(idx>=4||state.answered)return;
+  state.clueIdx=idx;
+  const el=document.getElementById('clue-'+idx);
+  if(el)setTimeout(()=>el.classList.add('show'),50);
+}
+
+function startTimer(){
+  clearInterval(state.timer);
+  let elapsed=0;
+  // Show clues progressively
+  setTimeout(()=>showClue(1),3000);
+  setTimeout(()=>showClue(2),6000);
+  setTimeout(()=>showClue(3),9000);
+  
+  state.timer=setInterval(()=>{
+    if(state.answered){clearInterval(state.timer);return;}
+    elapsed++;
+    state.timeLeft=Math.max(0,100-elapsed*0.8);
+    document.getElementById('timer').style.width=state.timeLeft+'%';
+  },300);
+}
+
+function guess(choice,puzzle,btn){
+  if(state.answered)return;
+  state.answered=true;
+  clearInterval(state.timer);
+  
+  const correct=choice===puzzle.answer;
+  const opts=document.querySelectorAll('.opt');
+  opts.forEach(o=>{
+    o.classList.add('disabled');
+    if(o.textContent===puzzle.answer)o.classList.add(correct?'correct':'highlight');
+    if(o===btn&&!correct)o.classList.add('wrong');
+  });
+  
+  // Show all remaining clues
+  for(let i=0;i<4;i++){const el=document.getElementById('clue-'+i);if(el)el.classList.add('show');}
+  
+  if(correct){
+    const pts=Math.ceil(state.timeLeft/10)*10 + (4-state.clueIdx)*25;
+    state.score+=pts;state.streak++;
+    document.getElementById('score').textContent=state.score;
+    document.getElementById('result').innerHTML=`✅ <strong>${puzzle.answer}!</strong> +${pts} points`;
+  }else{
+    state.streak=0;
+    document.getElementById('result').innerHTML=`❌ It was <strong>${puzzle.answer}</strong>!`;
+  }
+  document.getElementById('streak').textContent=state.streak>1?`🔥 ${state.streak} streak`:'';
+  
+  state.round++;
+  document.getElementById('nextBtn').className='next-btn show';
+  document.getElementById('nextBtn').textContent=state.round>=TOTAL?'SEE RESULTS →':'NEXT ROUND →';
+}
+
+function endGame(){
+  if(state.score>state.best){state.best=state.score;localStorage.setItem('ww-best',state.best);}
+  const msgs=state.score>=800?["🧠 Wikipedia would be proud.","You two are terrifyingly well-read."]:
+             state.score>=500?["Solid showing!","The rabbit holes have served you well."]:
+             state.score>=250?["Not bad!","Clearly you've procrastinated on Wikipedia before."]:
+             ["Taxes really did a number on those brain cells, huh?","Nothing a few more rounds can't fix!"];
+  document.getElementById('card').innerHTML=`
+    <div class="final">
+      <div class="final-score">${state.score} pts</div>
+      <div class="final-msg">${msgs[0]}<br>${msgs[1]}</div>
+      ${state.score>=state.best?'<div style="color:#fbbf24;margin-top:8px">🏆 New personal best!</div>':''}
+      <button class="play-again" onclick="init()">🔮 PLAY AGAIN</button>
+    </div>`;
+}
+
+// Fix answer for Human Body
+puzzles.find(p=>p.answer==="Human eli").answer="Human Body";
+puzzles.find(p=>p.options.includes("Human Body")).answer="Human Body";
+
+init();
+</script>
+</body>
+</html>
