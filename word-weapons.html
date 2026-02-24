@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>⚔️ Word Weapons — Scrabble Training Camp</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Caveat:wght@700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Space Grotesk',sans-serif;background:#0a0a1a;color:#e0e0e0;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:12px}
+.game{width:520px;max-width:95vw}
+.title{font-family:'Caveat',cursive;font-size:30px;text-align:center;background:linear-gradient(90deg,#f97316,#ef4444,#f97316);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.sub{text-align:center;font-size:11px;color:rgba(255,255,255,0.25);letter-spacing:2px;text-transform:uppercase;margin-bottom:14px}
+.nav{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;justify-content:center}
+.nav-btn{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:8px 14px;cursor:pointer;font-family:'Space Grotesk',sans-serif;font-size:12px;color:#aaa;transition:all 0.15s}
+.nav-btn:hover,.nav-btn.active{background:rgba(249,115,22,0.15);border-color:rgba(249,115,22,0.4);color:#f97316}
+.card{background:linear-gradient(145deg,#1a1a3e,#12122a);border-radius:16px;padding:20px;box-shadow:0 0 40px rgba(249,115,22,0.06);border:1px solid rgba(249,115,22,0.12)}
+.mode-title{font-size:16px;font-weight:700;color:#f97316;margin-bottom:4px}
+.mode-desc{font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:16px;line-height:1.5}
+.stats-row{display:flex;gap:12px;margin-bottom:14px}
+.mini-stat{background:rgba(255,255,255,0.04);padding:4px 10px;border-radius:8px;font-size:12px}
+.mini-stat .v{color:#f97316;font-weight:700}
+/* Tile styles */
+.tile{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;background:linear-gradient(145deg,#f5e6c8,#e8d5a8);color:#1a1a2e;font-weight:700;font-size:16px;border-radius:4px;margin:2px;position:relative;font-family:'Space Grotesk',sans-serif;box-shadow:0 2px 4px rgba(0,0,0,0.3);text-transform:uppercase;user-select:none}
+.tile .pts{position:absolute;bottom:2px;right:3px;font-size:8px;font-weight:600;color:#666}
+.tile.blank{background:linear-gradient(145deg,#ddd,#bbb)}
+.rack{display:flex;justify-content:center;gap:4px;margin:16px 0;flex-wrap:wrap}
+.input-area{display:flex;gap:8px;margin:12px 0;justify-content:center;align-items:center}
+.word-input{background:rgba(255,255,255,0.08);border:1px solid rgba(249,115,22,0.2);border-radius:8px;padding:10px 14px;color:#e0e0e0;font-family:'Space Grotesk',sans-serif;font-size:15px;width:200px;text-transform:uppercase;text-align:center;letter-spacing:3px}
+.word-input:focus{outline:none;border-color:rgba(249,115,22,0.5)}
+.submit-btn{background:linear-gradient(135deg,#f97316,#ea580c);border:none;color:white;font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;padding:10px 20px;border-radius:8px;cursor:pointer;transition:all 0.15s}
+.submit-btn:hover{transform:translateY(-1px);box-shadow:0 4px 15px rgba(249,115,22,0.3)}
+.feedback{min-height:60px;padding:12px;text-align:center;font-size:14px;line-height:1.6}
+.feedback .correct{color:#22c55e}
+.feedback .wrong{color:#ef4444}
+.feedback .tip{color:rgba(255,255,255,0.5);font-size:12px;margin-top:6px}
+.word-list{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:10px 0}
+.word-tag{background:rgba(255,255,255,0.05);padding:4px 10px;border-radius:6px;font-size:13px;cursor:pointer;transition:all 0.15s;border:1px solid rgba(255,255,255,0.08)}
+.word-tag:hover{background:rgba(249,115,22,0.1);border-color:rgba(249,115,22,0.3)}
+.word-tag.found{background:rgba(34,197,94,0.15);border-color:rgba(34,197,94,0.3);color:#22c55e}
+.word-tag.revealed{background:rgba(239,68,68,0.1);border-color:rgba(239,68,68,0.2);color:#ef4444}
+.progress{height:3px;background:rgba(255,255,255,0.05);border-radius:2px;margin-bottom:14px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,#f97316,#ef4444);border-radius:2px;transition:width 0.3s}
+.hint-btn{background:none;border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.4);font-family:'Space Grotesk',sans-serif;font-size:11px;padding:6px 12px;border-radius:6px;cursor:pointer;transition:all 0.15s}
+.hint-btn:hover{border-color:rgba(249,115,22,0.3);color:#f97316}
+.two-letter-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(50px,1fr));gap:4px;margin:12px 0}
+.tl-cell{text-align:center;padding:6px 4px;border-radius:4px;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s;border:1px solid transparent}
+.tl-cell.valid{background:rgba(34,197,94,0.08);color:#22c55e;border-color:rgba(34,197,94,0.15)}
+.tl-cell.valid:hover{background:rgba(34,197,94,0.15)}
+.tl-cell.invalid{background:rgba(239,68,68,0.05);color:rgba(239,68,68,0.4)}
+.tl-cell.hidden{background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.15)}
+.tl-cell.hidden:hover{background:rgba(249,115,22,0.1)}
+.timer{font-size:20px;font-weight:700;color:#f97316;text-align:center;margin:8px 0}
+.scenario{font-size:13px;line-height:1.7;color:#c8c8e0;margin-bottom:14px;padding:12px;background:rgba(255,255,255,0.02);border-radius:8px;border-left:3px solid rgba(249,115,22,0.3)}
+.options-grid{display:flex;flex-direction:column;gap:8px}
+.opt-btn{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:12px;text-align:left;cursor:pointer;font-family:'Space Grotesk',sans-serif;font-size:13px;color:#c8c8e0;transition:all 0.15s;line-height:1.5}
+.opt-btn:hover{background:rgba(249,115,22,0.08);border-color:rgba(249,115,22,0.3);transform:translateX(3px)}
+.opt-btn.correct-choice{background:rgba(34,197,94,0.15)!important;border-color:#22c55e!important}
+.opt-btn.wrong-choice{background:rgba(239,68,68,0.1)!important;border-color:#ef4444!important}
+.opt-btn.disabled{pointer-events:none}
+.streak-display{text-align:center;font-size:11px;color:rgba(255,255,255,0.3);margin-bottom:6px}
+</style>
+</head>
+<body>
+<div class="game">
+  <div class="title">⚔️ Word Weapons</div>
+  <div class="sub">Lindsay's Scrabble Training Camp — Destroy Jake Edition</div>
+  <div class="nav">
+    <button class="nav-btn active" onclick="setMode('twos')">Two-Letter Words</button>
+    <button class="nav-btn" onclick="setMode('rack')">Rack Attack</button>
+    <button class="nav-btn" onclick="setMode('qwithout')">Q Without U</button>
+    <button class="nav-btn" onclick="setMode('strategy')">Board IQ</button>
+    <button class="nav-btn" onclick="setMode('hooks')">Hooks & Extensions</button>
+  </div>
+  <div class="card" id="card"></div>
+</div>
+
+<script>
+// Point values
+const PTS={A:1,B:3,C:3,D:2,E:1,F:4,G:2,H:4,I:1,J:8,K:5,L:1,M:3,N:1,O:1,P:3,Q:10,R:1,S:1,T:1,U:1,V:4,W:4,X:8,Y:4,Z:10};
+function wordPts(w){return[...w.toUpperCase()].reduce((s,c)=>s+(PTS[c]||0),0);}
+function tilify(letter){const l=letter.toUpperCase();return`<span class="tile">${l}<span class="pts">${PTS[l]||0}</span></span>`;}
+function rackHTML(letters){return`<div class="rack">${[...letters].map(l=>tilify(l)).join('')}</div>`;}
+
+// === TWO-LETTER WORDS ===
+const TWOS=["AA","AB","AD","AE","AG","AH","AI","AL","AM","AN","AP","AR","AS","AT","AW","AX","AY","BA","BE","BI","BO","BY","DA","DE","DO","ED","EF","EH","EL","EM","EN","ER","ES","ET","EW","EX","FA","FE","GI","GO","GU","HA","HE","HI","HM","HO","ID","IF","IN","IS","IT","JO","KA","KI","LA","LI","LO","MA","ME","MI","MM","MO","MU","MY","NA","NE","NO","NU","OD","OE","OF","OH","OI","OK","OM","ON","OP","OR","OS","OU","OW","OX","OY","PA","PE","PI","PO","QI","RE","SH","SI","SO","ST","TA","TI","TO","UH","UM","UN","UP","UR","US","UT","WE","WO","XI","XU","YA","YE","YO","ZA"];
+const TWO_DEFS={"QI":"life force (Chinese philosophy) — 11 pts, no U needed!","ZA":"pizza (slang) — 11 pts!","XI":"Greek letter — 9 pts","XU":"Vietnamese currency — 9 pts","JO":"Scottish term of endearment — 9 pts","AX":"chopping tool — 9 pts","EX":"former partner — 9 pts","OX":"big bovine — 9 pts","ZO":"Tibetan yak hybrid — 11 pts","KA":"Egyptian spirit double","GI":"martial arts uniform","AA":"rough volcanic lava","AE":"Scottish for 'one'","OE":"whirlwind off the Faroe Islands","AI":"three-toed sloth","OI":"British exclamation","OU":"Scottish exclamation","GU":"a type of fiddle","EW":"expression of disgust","MM":"expression of pleasure","HM":"thoughtful sound","SH":"be quiet!","ST":"attention-getter"};
+
+let twosFound=new Set(),twosMode='quiz';
+function showTwos(){
+  const high=TWOS.filter(w=>wordPts(w)>=8);
+  const medium=TWOS.filter(w=>wordPts(w)>=5&&wordPts(w)<8);
+  const pct=Math.round(twosFound.size/TWOS.length*100);
+  document.getElementById('card').innerHTML=`
+    <div class="mode-title">Two-Letter Words — Your Secret Arsenal</div>
+    <div class="mode-desc">There are <strong>${TWOS.length} legal two-letter words</strong> in Scrabble. Memorize these and you'll play parallel words Jake didn't even know existed. These are the #1 weapon of competitive players.</div>
+    <div class="progress"><div class="progress-fill" style="width:${pct}%"></div></div>
+    <div class="stats-row">
+      <div class="mini-stat">Found: <span class="v">${twosFound.size}/${TWOS.length}</span></div>
+      <div class="mini-stat">Mastery: <span class="v">${pct}%</span></div>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:center;margin-bottom:14px">
+      <button class="nav-btn ${twosMode==='quiz'?'active':''}" onclick="twosMode='quiz';showTwos()">Quiz Me</button>
+      <button class="nav-btn ${twosMode==='grid'?'active':''}" onclick="twosMode='grid';showTwos()">Study Grid</button>
+      <button class="nav-btn ${twosMode==='high'?'active':''}" onclick="twosMode='high';showTwos()">High Value</button>
+    </div>
+    <div id="content"></div>
+  `;
+  if(twosMode==='quiz')twosQuiz();
+  else if(twosMode==='grid')twosGrid();
+  else twosHighValue();
+}
+
+function twosQuiz(){
+  const el=document.getElementById('content');
+  // Show a random two-letter combo, ask if it's valid
+  const isReal=Math.random()>0.35;
+  let word;
+  if(isReal){word=TWOS[Math.floor(Math.random()*TWOS.length)];}
+  else{
+    const letters='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    do{word=letters[Math.floor(Math.random()*26)]+letters[Math.floor(Math.random()*26)];}while(TWOS.includes(word));
+  }
+  el.innerHTML=`
+    <div style="text-align:center">
+      <div style="font-size:13px;color:rgba(255,255,255,0.4);margin-bottom:10px">Is this a valid Scrabble word?</div>
+      <div style="margin:16px 0">${rackHTML(word)}</div>
+      <div style="font-size:24px;font-weight:700;color:#f97316;margin:10px 0">${word}</div>
+      <div style="display:flex;gap:12px;justify-content:center;margin:16px 0">
+        <button class="submit-btn" style="background:linear-gradient(135deg,#22c55e,#16a34a);min-width:100px" onclick="twoAnswer(true,'${word}',${isReal})">✅ VALID</button>
+        <button class="submit-btn" style="background:linear-gradient(135deg,#ef4444,#dc2626);min-width:100px" onclick="twoAnswer(false,'${word}',${isReal})">❌ FAKE</button>
+      </div>
+      <div id="two-fb" class="feedback"></div>
+    </div>
+  `;
+}
+function twoAnswer(saidValid,word,isReal){
+  const correct=saidValid===isReal;
+  const fb=document.getElementById('two-fb');
+  if(correct&&isReal)twosFound.add(word);
+  const def=TWO_DEFS[word]?` — ${TWO_DEFS[word]}`:'';
+  fb.innerHTML=correct
+    ?`<span class="correct">✅ Correct!</span> <strong>${word}</strong> is ${isReal?'a valid word'+def:'NOT a valid Scrabble word'}.<div class="tip">${isReal?'Points: '+wordPts(word):'Good instinct — don\'t waste a turn on fake words!'}</div>`
+    :`<span class="wrong">❌ Nope!</span> <strong>${word}</strong> is actually ${isReal?'VALID'+def:'NOT valid'}.<div class="tip">${isReal?'Add this one to your arsenal! ('+wordPts(word)+' pts)':'Trust your gut next time.'}</div>`;
+  document.querySelectorAll('.submit-btn').forEach(b=>b.style.pointerEvents='none');
+  setTimeout(()=>twosQuiz(),2500);
+}
+
+function twosGrid(){
+  const el=document.getElementById('content');
+  const letters='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  let html='<div style="font-size:11px;color:rgba(255,255,255,0.3);margin-bottom:8px;text-align:center">Tap to reveal — green = valid</div>';
+  html+='<div class="two-letter-grid">';
+  for(const w of TWOS){
+    const cls=twosFound.has(w)?'valid':'hidden';
+    html+=`<div class="tl-cell ${cls}" onclick="revealTwo(this,'${w}')">${twosFound.has(w)?w:'??'}</div>`;
+  }
+  html+='</div>';
+  el.innerHTML=html;
+}
+function revealTwo(el,word){
+  if(el.classList.contains('valid'))return;
+  el.textContent=word;el.classList.remove('hidden');el.classList.add('valid');
+  twosFound.add(word);
+  document.querySelector('.mini-stat .v').textContent=`${twosFound.size}/${TWOS.length}`;
+}
+
+function twosHighValue(){
+  const el=document.getElementById('content');
+  const high=TWOS.filter(w=>wordPts(w)>=8).sort((a,b)=>wordPts(b)-wordPts(a));
+  const med=TWOS.filter(w=>wordPts(w)>=5&&wordPts(w)<8).sort((a,b)=>wordPts(b)-wordPts(a));
+  el.innerHTML=`
+    <div style="font-size:13px;font-weight:700;color:#f97316;margin-bottom:8px">🔥 High Value (8+ pts) — Memorize These First!</div>
+    <div class="word-list">${high.map(w=>`<div class="word-tag" onclick="this.title='${TWO_DEFS[w]||''}'"><strong>${w}</strong> <span style="color:#f97316;font-size:11px">${wordPts(w)}</span></div>`).join('')}</div>
+    <div style="font-size:13px;font-weight:700;color:#fbbf24;margin:14px 0 8px">⚡ Medium Value (5-7 pts)</div>
+    <div class="word-list">${med.map(w=>`<div class="word-tag"><strong>${w}</strong> <span style="color:#fbbf24;font-size:11px">${wordPts(w)}</span></div>`).join('')}</div>
+    <div style="font-size:12px;color:rgba(255,255,255,0.3);margin-top:14px;line-height:1.6;text-align:center">
+      <strong>Pro tip:</strong> QI (${wordPts('QI')} pts) and ZA (${wordPts('ZA')} pts) are the two most important words in Scrabble. Learn them, love them, use them to crush Jake.
+    </div>
+  `;
+}
+
+// === RACK ATTACK ===
+const RACKS=[
+{letters:"AEINRST",words:["ANTSIER","NASTIER","RETAINS","RETINAS","STAINER","STEARIN","ANESTRI"],best:"ANTSIER/NASTIER (7 letters!)",tip:"SATIREN is the most common 7-letter rack in Scrabble. If you see these letters, you almost always have a bingo!"},
+{letters:"QUEAZY",words:["QUAY","AYE","YEA","AZO"],best:"QUAY (22 pts with Q on double)",tip:"Don't panic with Q — QUAY doesn't need QU together if you can hook onto an existing A."},
+{letters:"DEILNRS",words:["SLINDER","REDSKIN","LINDERS","SNIDLER"],best:"Look for -ING, -ED, -ER endings",tip:"When you have common endings, build backwards from them."},
+{letters:"JFXKVBW",words:["IF","AX","BY","OX","WO"],best:"Play short, score high, EXCHANGE tiles",tip:"When your rack is garbage, don't force it. Exchange 5-7 tiles and let Jake waste HIS turn on a mediocre play."},
+{letters:"AEIOU S",words:["ADIEU","AUDIO","OUIJA"],best:"Vowel dump with ADIEU or AUDIO",tip:"Too many vowels? Play words that burn multiples: ADIEU (5 vowels!), AUDIO, OUIJA. Don't hoard."},
+{letters:"RETKING",words:["TREKKING","KITER","TIGER","GRIT","TREK","KITE"],best:"TREKKING if the board allows",tip:"Look for -ING first when you have those letters. Then look for -ER, -ED."},
+{letters:"ZEPHYRS",words:["ZEPHYR","HYPERS","PREYS","HYPES"],best:"ZEPHYR (23 pts base!)",tip:"Z on a double letter square + ZEPHYR = instant Jake devastation."},
+{letters:"BALNKET",words:["BLANKET"],best:"BLANKET (7 letters = 50pt bonus!)",tip:"Always look for 7-letter words first. The 50-point bingo bonus is a game-changer."}
+];
+let rackIdx=0,rackWordsFound=new Set();
+function showRack(){
+  rackWordsFound=new Set();
+  const r=RACKS[rackIdx%RACKS.length];
+  document.getElementById('card').innerHTML=`
+    <div class="mode-title">Rack Attack — Find the Best Play</div>
+    <div class="mode-desc">You've drawn these tiles. What words can you make? Type words and hit enter. Find the best play!</div>
+    <div class="stats-row">
+      <div class="mini-stat">Rack: <span class="v">${rackIdx+1}/${RACKS.length}</span></div>
+      <div class="mini-stat">Found: <span class="v" id="rack-found">0</span></div>
+    </div>
+    ${rackHTML(r.letters.replace(/ /g,''))}
+    <div class="input-area">
+      <input class="word-input" id="rack-input" maxlength="9" placeholder="TYPE A WORD" onkeydown="if(event.key==='Enter')rackGuess()">
+      <button class="submit-btn" onclick="rackGuess()">GO</button>
+    </div>
+    <div id="rack-fb" class="feedback"></div>
+    <div style="display:flex;gap:8px;justify-content:center;margin-top:10px">
+      <button class="hint-btn" onclick="rackReveal()">💡 Show Best Play</button>
+      <button class="hint-btn" onclick="rackIdx++;showRack()">⏭️ Next Rack</button>
+    </div>
+  `;
+  document.getElementById('rack-input').focus();
+}
+function rackGuess(){
+  const input=document.getElementById('rack-input');
+  const word=input.value.toUpperCase().trim();
+  if(!word)return;
+  input.value='';
+  const r=RACKS[rackIdx%RACKS.length];
+  // Check if letters are available
+  const avail=[...r.letters.replace(/ /g,'').toUpperCase()];
+  let canMake=true;
+  const used=[...avail];
+  for(const c of word){const i=used.indexOf(c);if(i===-1){canMake=false;break;}used.splice(i,1);}
+  const fb=document.getElementById('rack-fb');
+  if(!canMake){fb.innerHTML=`<span class="wrong">Those letters aren't in your rack!</span>`;return;}
+  if(word.length<2){fb.innerHTML=`<span class="wrong">Need at least 2 letters</span>`;return;}
+  rackWordsFound.add(word);
+  document.getElementById('rack-found').textContent=rackWordsFound.size;
+  const pts=wordPts(word);
+  const bonus=word.length>=7?' <span style="color:#fbbf24">+50 BINGO BONUS!</span>':'';
+  fb.innerHTML=`<span class="correct">${word} — ${pts} points${bonus}</span><div class="tip">${word.length>=5?'Nice length!':'Can you find something longer?'}</div>`;
+  input.focus();
+}
+function rackReveal(){
+  const r=RACKS[rackIdx%RACKS.length];
+  document.getElementById('rack-fb').innerHTML=`<div style="text-align:left"><span style="color:#f97316;font-weight:700">Best play: ${r.best}</span><div class="tip" style="margin-top:6px">${r.tip}</div></div>`;
+}
+
+// === Q WITHOUT U ===
+const QWORDS=[
+{word:"QI",def:"Life force in Chinese philosophy",pts:11,tip:"The single most important word in Scrabble. Play it, pluralize it (QIS), hook it everywhere."},
+{word:"QINTAR",def:"Albanian currency (1/100 of a lek)",pts:15,tip:"Plural: QINTARS. Great for using up a Q with common letters."},
+{word:"QINDAR",def:"Variant of qintar",pts:15,tip:"Same meaning, different spelling = more options."},
+{word:"QANAT",def:"Underground irrigation channel",pts:14,tip:"Middle Eastern water engineering. Real thing, real word, real points."},
+{word:"QAT",def:"Plant chewed as a stimulant in East Africa",pts:12,tip:"Only 3 letters, 12 points. Beautiful."},
+{word:"QADI",def:"Islamic judge",pts:14,tip:"QADI + S = QADIS. A judge that judges your opponents."},
+{word:"QAIDS",def:"Plural of qaid (Muslim judge)",pts:15,tip:"Another Q-without-U legal play."},
+{word:"QOPH",def:"Hebrew letter",pts:18,tip:"18 points base. On a double word = 36. Jake won't know what hit him."},
+{word:"QWERTY",def:"Standard keyboard layout",pts:21,tip:"Yes, QWERTY is legal in Scrabble! 21 base points."},
+{word:"TRANQ",def:"Short for tranquilizer",pts:14,tip:"Casual, deadly. Plural TRANQS also legal."},
+{word:"SHEQEL",def:"Ancient Hebrew coin",pts:18,tip:"The biblical currency spelling. 18 pts!"},
+{word:"MBAQANGA",def:"South African music style",pts:22,tip:"The holy grail. If you ever play this Jake will flip the board."},
+{word:"SUQ",def:"Open-air marketplace",pts:12,tip:"Also spelled SOUK, but SUQ is the Scrabble weapon version."},
+{word:"WAQF",def:"Islamic endowment of property",pts:19,tip:"19 base points and looks completely made up. It's not."}
+];
+let qIdx=0,qScore=0;
+function showQ(){
+  qIdx=0;qScore=0;qQuiz();
+}
+function qQuiz(){
+  if(qIdx>=QWORDS.length){
+    document.getElementById('card').innerHTML=`
+      <div class="mode-title">Q Without U — Complete!</div>
+      <div style="text-align:center;padding:20px">
+        <div style="font-size:36px;font-weight:700;color:#f97316">${qScore}/${QWORDS.length}</div>
+        <div style="color:rgba(255,255,255,0.4);margin:8px 0">Jake will never see these coming.</div>
+        <button class="submit-btn" onclick="showQ()">🔄 Practice Again</button>
+      </div>`;
+    return;
+  }
+  const q=QWORDS[qIdx];
+  // Multiple choice: what does this word mean?
+  const wrongDefs=["A type of carpet","Turkish dessert","Ancient Greek weapon","Musical instrument","Type of boat","Mathematical term","Extinct bird","Chemical compound","Japanese pottery","African drum"];
+  const opts=shuffle([q.def,...shuffle(wrongDefs).slice(0,3)]);
+  document.getElementById('card').innerHTML=`
+    <div class="mode-title">Q Without U — Know Your Arsenal</div>
+    <div class="mode-desc">These words use Q without U. Learn them and you'll never get stuck with a Q again.</div>
+    <div class="stats-row">
+      <div class="mini-stat">Word: <span class="v">${qIdx+1}/${QWORDS.length}</span></div>
+      <div class="mini-stat">Score: <span class="v">${qScore}</span></div>
+      <div class="mini-stat">Points: <span class="v">${q.pts}</span></div>
+    </div>
+    <div style="text-align:center;margin:12px 0">
+      ${rackHTML(q.word)}
+      <div style="font-size:20px;font-weight:700;color:#f97316;margin:8px 0">${q.word}</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.3)">What does this word mean?</div>
+    </div>
+    <div class="options-grid" id="q-opts">
+      ${opts.map((o,i)=>`<button class="opt-btn" onclick="qAnswer(this,'${o===q.def}')">${o}</button>`).join('')}
+    </div>
+    <div id="q-fb" class="feedback"></div>
+  `;
+}
+function qAnswer(btn,correct){
+  const q=QWORDS[qIdx];
+  document.querySelectorAll('.opt-btn').forEach(b=>{b.classList.add('disabled');if(b.textContent===q.def)b.classList.add('correct-choice');});
+  if(correct==='true'){btn.classList.add('correct-choice');qScore++;}
+  else btn.classList.add('wrong-choice');
+  document.getElementById('q-fb').innerHTML=`<div style="color:rgba(255,255,255,0.5);font-size:12px;margin-top:8px">💡 ${q.tip}</div>`;
+  qIdx++;
+  setTimeout(qQuiz,2200);
+}
+
+// === STRATEGY / BOARD IQ ===
+const STRATS=[
+{scenario:"You have ZEPHYR (23 pts) in your rack. There's a Triple Word Score open, but it would leave the other Triple Word accessible to Jake on his next turn. Do you:",
+choices:["Play ZEPHYR on the Triple Word for 69 points","Play ZEPHYR elsewhere for 23 points and block the Triple","Play ZEP for fewer points and save the remaining letters","Exchange tiles and wait for a better moment"],
+correct:0,
+explain:"Take the 69 points! A 46-point swing is almost never worth sacrificing to 'block.' Defensive play loses Scrabble games. Score first, worry later. Jake would have to find a 7-letter word hitting that triple to beat your play — unlikely."},
+{scenario:"It's early game. You can play CAT for 10 points, or exchange 5 tiles hoping for better letters. Your rack is: C, A, T, V, V, U, U. What's the move?",
+choices:["Play CAT and keep the awkward VUUV","Play VACUUM if there's a spot (24 pts)","Exchange VVUU and keep CAT letters","Exchange all 7 tiles for a fresh start"],
+correct:2,
+explain:"Exchange the junk (VVUU) and keep the flexible CAT letters. Dumping 5 bad tiles early is better than limping through 3 turns with a broken rack. Think of it as investing in future turns."},
+{scenario:"You see Jake is holding onto his tiles, playing short 3-letter words and not exchanging. He's probably holding onto good letters for a bingo (7-letter word + 50pt bonus). How do you counter?",
+choices:["Race to find your own bingo first","Close down the board — play tight, block open lanes","Keep playing normally, don't overthink it","Challenge his next word to disrupt his rhythm"],
+correct:1,
+explain:"If Jake is fishing for a bingo, close the board! Play words that don't create openings. Make parallel plays. Fill in gaps. A bingo needs an open lane — deny it. This is defensive design at its best."},
+{scenario:"You're ahead by 40 points with 15 tiles left in the bag. Jake just played a big word. Do you:",
+choices:["Keep playing aggressively to extend the lead","Start playing defensively — short words, block openings","Try to empty the bag quickly to end the game","Play normally"],
+correct:1,
+explain:"When you're ahead late, play DEFENSE. Short words, block triple squares, don't open lanes. Every turn you deny Jake a big play is a turn closer to victory. You're running out the clock."},
+{scenario:"There's an S on your rack. You can pluralize an existing word on the board for 8 points, or save the S for a potential bigger play later. What do you do?",
+choices:["Pluralize now — 8 guaranteed points","Always save the S — it's too valuable","Only use it if you can score 20+ with it","It depends on the game state and what else is in your rack"],
+correct:3,
+explain:"The S is the most flexible tile in Scrabble. Rule of thumb: don't spend an S for less than 20 points above what you could score without it. But late in the game when you're ahead? Burn it for anything. Context is everything."},
+{scenario:"You're losing by 60 points. There are 8 tiles left in the bag. What's your strategy?",
+choices:["Play safe and consistent — chip away at the lead","Go for broke — open the board, fish for bingos, take risks","Exchange tiles hoping for a miracle rack","Accept defeat gracefully"],
+correct:1,
+explain:"When you're behind late, you MUST take risks. Open up triple word scores (you're losing anyway!), fish for bingos, play aggressively. Safe play when losing just means losing slowly. Chaos benefits the underdog."},
+{scenario:"You can play the word JINX (18pts) horizontally. But if you play JIN vertically instead (10pts), it creates two new two-letter words (JO + IN) for a combined 22 points. What's the better play?",
+choices:["JINX horizontally for 18 points — bigger single word","JIN vertically for 22 combined points — parallel play wins","Save the J for later","It depends on what premium squares are involved"],
+correct:1,
+explain:"Parallel plays (creating multiple words simultaneously) are the secret weapon of great Scrabble players! This is why learning two-letter words matters — they let you score in MULTIPLE directions at once. This is how you'll beat Jake."}
+];
+let stratIdx=0,stratScore=0;
+function showStrategy(){
+  stratIdx=0;stratScore=0;stratQuiz();
+}
+function stratQuiz(){
+  if(stratIdx>=STRATS.length){
+    document.getElementById('card').innerHTML=`
+      <div class="mode-title">Board IQ — Complete!</div>
+      <div style="text-align:center;padding:20px">
+        <div style="font-size:36px;font-weight:700;color:#f97316">${stratScore}/${STRATS.length}</div>
+        <div style="color:rgba(255,255,255,0.4);margin:8px 0">${stratScore>=5?'You\'re thinking like a champion. Jake is toast.':stratScore>=3?'Getting there! A few more rounds and Jake won\'t stand a chance.':'Keep practicing — strategy wins games, not just vocabulary!'}</div>
+        <button class="submit-btn" onclick="showStrategy()">🔄 Try Again</button>
+      </div>`;
+    return;
+  }
+  const s=STRATS[stratIdx];
+  document.getElementById('card').innerHTML=`
+    <div class="mode-title">Board IQ — Strategic Scenarios</div>
+    <div class="mode-desc">Knowing words isn't enough. You need to know WHEN and WHERE to play them.</div>
+    <div class="stats-row">
+      <div class="mini-stat">Scenario: <span class="v">${stratIdx+1}/${STRATS.length}</span></div>
+      <div class="mini-stat">Score: <span class="v">${stratScore}</span></div>
+    </div>
+    <div class="scenario">${s.scenario}</div>
+    <div class="options-grid" id="strat-opts">
+      ${s.choices.map((c,i)=>`<button class="opt-btn" onclick="stratAnswer(${i})">${c}</button>`).join('')}
+    </div>
+    <div id="strat-fb" class="feedback"></div>
+  `;
+}
+function stratAnswer(idx){
+  const s=STRATS[stratIdx];
+  const correct=idx===s.correct;
+  if(correct)stratScore++;
+  document.querySelectorAll('.opt-btn').forEach((b,i)=>{
+    b.classList.add('disabled');
+    if(i===s.correct)b.classList.add('correct-choice');
+    if(i===idx&&!correct)b.classList.add('wrong-choice');
+  });
+  document.getElementById('strat-fb').innerHTML=`<div style="font-size:12px;color:rgba(255,255,255,0.5);line-height:1.6;margin-top:8px">${correct?'✅ ':'❌ '}${s.explain}</div>`;
+  stratIdx++;
+  setTimeout(stratQuiz,4000);
+}
+
+// === HOOKS ===
+const HOOKS=[
+{base:"HOST",hook:"GHOST",added:"G",dir:"front",tip:"Adding a letter to the FRONT of a word is called a 'front hook.' GHOST from HOST is a classic."},
+{base:"LOVE",hook:"GLOVE",added:"G",dir:"front",tip:"G-LOVE! Front hooks let you score on the new word AND the base word."},
+{base:"RATE",hook:"IRATE",added:"I",dir:"front",tip:"One letter turns a simple word into a 5-letter score machine."},
+{base:"RUSH",hook:"BRUSH",added:"B",dir:"front",tip:"B-RUSH, C-RUSH, T-RUSH — some words have multiple front hooks!"},
+{base:"ANGER",hook:"DANGER",added:"D",dir:"front",tip:"D-ANGER. The best hooks turn common words into uncommon points."},
+{base:"RAIN",hook:"BRAIN",added:"B",dir:"front",tip:"BRAIN, DRAIN, GRAIN, TRAIN — RAIN is one of the most hookable words."},
+{base:"LEASE",hook:"LEASED",added:"D",dir:"back",tip:"Back hooks with -D, -S, -R, -ED are the bread and butter of Scrabble."},
+{base:"QUEST",hook:"QUESTS",added:"S",dir:"back",tip:"The humble S. It pluralizes AND scores you points for the whole base word."},
+{base:"WORD",hook:"SWORD",added:"S",dir:"front",tip:"S-WORD! The S is a front hook too, not just a pluralizer."},
+{base:"OVEN",hook:"WOVEN",added:"W",dir:"front",tip:"W-OVEN. This is the kind of play that makes opponents say 'wait, that's legal?'"},
+{base:"LAUGHTER",hook:"SLAUGHTER",added:"S",dir:"front",tip:"S-LAUGHTER. Perhaps the most savage hook in Scrabble — literally and figuratively."},
+{base:"HEAR",hook:"SHEAR",added:"S",dir:"front",tip:"S-HEAR, also back hooks to HEARD, HEARS, HEART... flexible word!"}
+];
+let hookIdx=0,hookScore=0;
+function showHooks(){
+  hookIdx=0;hookScore=0;hookQuiz();
+}
+function hookQuiz(){
+  if(hookIdx>=HOOKS.length){
+    document.getElementById('card').innerHTML=`
+      <div class="mode-title">Hooks — Complete!</div>
+      <div style="text-align:center;padding:20px">
+        <div style="font-size:36px;font-weight:700;color:#f97316">${hookScore}/${HOOKS.length}</div>
+        <div style="color:rgba(255,255,255,0.4);margin:8px 0">Hooks are how you parasitize Jake's words for YOUR points. Beautiful.</div>
+        <button class="submit-btn" onclick="showHooks()">🔄 Practice Again</button>
+      </div>`;
+    return;
+  }
+  const h=HOOKS[hookIdx];
+  document.getElementById('card').innerHTML=`
+    <div class="mode-title">Hooks & Extensions</div>
+    <div class="mode-desc">A "hook" is adding one letter to an existing word on the board to make a new word — and scoring for BOTH. This is how you steal Jake's words.</div>
+    <div class="stats-row">
+      <div class="mini-stat">Hook: <span class="v">${hookIdx+1}/${HOOKS.length}</span></div>
+      <div class="mini-stat">Score: <span class="v">${hookScore}</span></div>
+    </div>
+    <div style="text-align:center;margin:14px 0">
+      <div style="font-size:12px;color:rgba(255,255,255,0.3);margin-bottom:6px">${h.dir==='front'?'Add a letter to the FRONT:':'Add a letter to the BACK:'}</div>
+      <div style="font-size:22px;font-weight:700;margin:8px 0">
+        ${h.dir==='front'?'<span style="color:#f97316">?</span>':''}<span style="color:rgba(255,255,255,0.6)">${h.base}</span>${h.dir==='back'?'<span style="color:#f97316">?</span>':''}
+      </div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.3)">What letter makes a new word?</div>
+    </div>
+    <div class="input-area">
+      <input class="word-input" id="hook-input" maxlength="1" placeholder="?" style="width:60px;font-size:24px" onkeydown="if(event.key==='Enter')hookGuess()">
+      <button class="submit-btn" onclick="hookGuess()">GO</button>
+    </div>
+    <div id="hook-fb" class="feedback"></div>
+    <div style="text-align:center;margin-top:8px"><button class="hint-btn" onclick="hookReveal()">💡 Reveal</button></div>
+  `;
+  document.getElementById('hook-input').focus();
+}
+function hookGuess(){
+  const h=HOOKS[hookIdx];
+  const guess=document.getElementById('hook-input').value.toUpperCase();
+  if(!guess)return;
+  const correct=guess===h.added;
+  if(correct)hookScore++;
+  document.getElementById('hook-fb').innerHTML=`
+    ${correct?'<span class="correct">✅':'<span class="wrong">❌'}</span> 
+    <strong>${h.dir==='front'?h.added+h.base:h.base+h.added}</strong> → <strong>${h.hook}</strong>
+    <div class="tip">${h.tip}</div>`;
+  document.getElementById('hook-input').disabled=true;
+  hookIdx++;
+  setTimeout(hookQuiz,3000);
+}
+function hookReveal(){
+  const h=HOOKS[hookIdx];
+  document.getElementById('hook-fb').innerHTML=`<span style="color:#f97316">${h.hook}</span> (add <strong>${h.added}</strong> to the ${h.dir})<div class="tip">${h.tip}</div>`;
+  hookIdx++;
+  setTimeout(hookQuiz,3000);
+}
+
+function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
+
+function setMode(mode){
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  event.target.classList.add('active');
+  if(mode==='twos')showTwos();
+  else if(mode==='rack')showRack();
+  else if(mode==='qwithout')showQ();
+  else if(mode==='strategy')showStrategy();
+  else if(mode==='hooks')showHooks();
+}
+
+// Init
+showTwos();
+</script>
+</body>
+</html>
