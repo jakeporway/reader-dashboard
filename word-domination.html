@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Word Domination Trainer ⚔️</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Segoe UI', system-ui, sans-serif; background: #1a1a2e; color: #e0e0e0; min-height: 100vh; }
+.app { max-width: 800px; margin: 0 auto; padding: 16px; }
+h1 { text-align: center; font-size: 1.6em; margin-bottom: 4px; }
+h1 span { color: #e94560; }
+.subtitle { text-align: center; color: #888; font-size: 0.85em; margin-bottom: 16px; }
+
+/* Tabs */
+.tabs { display: flex; gap: 4px; margin-bottom: 16px; }
+.tab { flex: 1; padding: 10px 8px; background: #16213e; border: 2px solid #0f3460; border-radius: 8px; cursor: pointer; text-align: center; font-size: 0.85em; font-weight: 600; transition: all 0.2s; }
+.tab:hover { background: #0f3460; }
+.tab.active { background: #e94560; border-color: #e94560; color: white; }
+
+/* Panels */
+.panel { display: none; }
+.panel.active { display: block; }
+
+/* Cards */
+.card { background: #16213e; border-radius: 12px; padding: 16px; margin-bottom: 12px; border: 1px solid #0f3460; }
+.card h2 { font-size: 1.1em; margin-bottom: 8px; color: #e94560; }
+.card h3 { font-size: 0.95em; margin-bottom: 6px; color: #53a8b6; }
+
+/* Affix trainer */
+.affix-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 6px; margin: 10px 0; }
+.affix-chip { background: #0f3460; padding: 8px; border-radius: 8px; text-align: center; cursor: pointer; transition: all 0.2s; font-size: 0.85em; }
+.affix-chip:hover { background: #e94560; transform: scale(1.05); }
+.affix-chip .affix { font-weight: 700; font-size: 1.1em; display: block; }
+.affix-chip .meaning { font-size: 0.75em; color: #aaa; margin-top: 2px; }
+
+/* Quiz */
+.quiz-area { text-align: center; padding: 16px; }
+.quiz-word { font-size: 2em; font-weight: 700; margin: 12px 0; letter-spacing: 2px; }
+.quiz-word .highlight { color: #e94560; text-decoration: underline; }
+.quiz-options { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 12px 0; }
+.quiz-btn { padding: 10px 20px; background: #0f3460; border: 2px solid #0f3460; border-radius: 8px; color: white; cursor: pointer; font-size: 0.95em; transition: all 0.2s; }
+.quiz-btn:hover { background: #1a3a6e; }
+.quiz-btn.correct { background: #2d6a4f; border-color: #40916c; }
+.quiz-btn.wrong { background: #6a2d2d; border-color: #916040; }
+.score { font-size: 1.2em; font-weight: 600; color: #53a8b6; }
+.streak { color: #e94560; font-size: 0.9em; }
+
+/* Letter rack */
+.rack-input { display: flex; gap: 8px; margin: 10px 0; align-items: center; }
+.rack-input input { flex: 1; padding: 12px; font-size: 1.4em; letter-spacing: 6px; text-transform: uppercase; background: #0a0a1a; border: 2px solid #0f3460; border-radius: 8px; color: #e94560; font-weight: 700; text-align: center; font-family: monospace; }
+.rack-input input:focus { outline: none; border-color: #e94560; }
+.rack-input input::placeholder { letter-spacing: 1px; font-size: 0.6em; color: #555; }
+.find-btn { padding: 12px 24px; background: #e94560; border: none; border-radius: 8px; color: white; font-weight: 700; cursor: pointer; font-size: 1em; }
+.find-btn:hover { background: #c73e54; }
+
+.word-results { margin-top: 12px; }
+.word-group { margin-bottom: 12px; }
+.word-group h4 { color: #53a8b6; font-size: 0.85em; margin-bottom: 6px; border-bottom: 1px solid #0f3460; padding-bottom: 4px; }
+.word-list { display: flex; flex-wrap: wrap; gap: 6px; }
+.word-tag { background: #0f3460; padding: 4px 10px; border-radius: 6px; font-size: 0.85em; cursor: pointer; transition: all 0.2s; }
+.word-tag:hover { background: #e94560; }
+.word-tag .pts { font-size: 0.75em; color: #53a8b6; margin-left: 4px; }
+.word-def { background: #0a0a1a; padding: 10px; border-radius: 8px; margin-top: 8px; font-size: 0.85em; color: #aaa; display: none; }
+.word-def.show { display: block; }
+
+/* Tile values */
+.tile-ref { display: grid; grid-template-columns: repeat(auto-fill, minmax(40px, 1fr)); gap: 4px; margin: 8px 0; }
+.tile { width: 38px; height: 38px; background: #f4e4bc; color: #1a1a2e; display: flex; align-items: center; justify-content: center; border-radius: 4px; font-weight: 700; font-size: 1em; position: relative; }
+.tile sub { position: absolute; bottom: 2px; right: 3px; font-size: 0.55em; font-weight: 400; }
+
+/* Strategy tips */
+.tip { background: #0a0a1a; padding: 10px; border-radius: 8px; margin: 6px 0; border-left: 3px solid #e94560; font-size: 0.85em; }
+.tip strong { color: #e94560; }
+
+/* Category filter */
+.cat-filter { display: flex; flex-wrap: wrap; gap: 4px; margin: 8px 0; }
+.cat-btn { padding: 4px 10px; background: #0f3460; border: 1px solid #0f3460; border-radius: 12px; color: #aaa; cursor: pointer; font-size: 0.75em; }
+.cat-btn.active { background: #e94560; border-color: #e94560; color: white; }
+
+.hidden { display: none; }
+</style>
+</head>
+<body>
+<div class="app">
+  <h1>⚔️ Word <span>Domination</span> Trainer</h1>
+  <p class="subtitle">Lindsay's path to total annihilation 💀</p>
+
+  <div class="tabs">
+    <div class="tab active" data-tab="affixes">🧩 Beginnings & Endings</div>
+    <div class="tab" data-tab="rack">🔤 My Letters</div>
+    <div class="tab" data-tab="strategy">🧠 Pro Tips</div>
+  </div>
+
+  <!-- PANEL 1: Affix Trainer -->
+  <div class="panel active" id="affixes">
+    <div class="card">
+      <h2>🎯 Affix Quiz</h2>
+      <p style="font-size:0.85em;color:#888;margin-bottom:8px;">Learn common prefixes & suffixes to spot word-building opportunities fast.</p>
+      <div class="cat-filter">
+        <div class="cat-btn active" data-cat="all">All</div>
+        <div class="cat-btn" data-cat="prefix">Prefixes</div>
+        <div class="cat-btn" data-cat="suffix">Suffixes</div>
+      </div>
+      <div class="quiz-area">
+        <div class="score">Score: <span id="score">0</span> / <span id="total">0</span></div>
+        <div class="streak" id="streak"></div>
+        <div class="quiz-word" id="quiz-word"></div>
+        <p id="quiz-prompt" style="color:#888;font-size:0.85em;margin-bottom:8px;"></p>
+        <div class="quiz-options" id="quiz-options"></div>
+        <p id="quiz-explanation" style="margin-top:10px;font-size:0.85em;color:#53a8b6;display:none;"></p>
+        <button class="find-btn" id="next-btn" style="margin-top:10px;display:none;" onclick="nextQuestion()">Next →</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>📚 Reference: Common Prefixes</h2>
+      <div class="affix-grid" id="prefix-ref"></div>
+    </div>
+    <div class="card">
+      <h2>📚 Reference: Common Suffixes</h2>
+      <div class="affix-grid" id="suffix-ref"></div>
+    </div>
+  </div>
+
+  <!-- PANEL 2: Letter Rack -->
+  <div class="panel" id="rack">
+    <div class="card">
+      <h2>🔤 Enter Your Letters</h2>
+      <p style="font-size:0.85em;color:#888;margin-bottom:8px;">Type the letters from your rack (or the board!) and I'll find the best words.</p>
+      <div class="rack-input">
+        <input type="text" id="letters" maxlength="15" placeholder="e.g. AERSTLN" autofocus>
+        <button class="find-btn" onclick="findWords()">Find Words</button>
+      </div>
+      <label style="font-size:0.8em;color:#888;"><input type="checkbox" id="use-blank" style="margin-right:4px;"> I have a blank tile</label>
+      <div id="word-results" class="word-results"></div>
+      <div id="word-def-area" class="word-def"></div>
+    </div>
+
+    <div class="card">
+      <h2>🏆 Tile Values (Scrabble/Crossplay)</h2>
+      <div class="tile-ref" id="tile-ref"></div>
+    </div>
+  </div>
+
+  <!-- PANEL 3: Strategy -->
+  <div class="panel" id="strategy">
+    <div class="card">
+      <h2>🧠 Scrabble/Crossplay Pro Tips</h2>
+      <div class="tip"><strong>Two-letter words are GOLD.</strong> Memorize the legal 2-letter words. They let you play parallel to existing words and score on multiple lines. Key ones: QI, ZA, XI, XU, JO, KA, AE, OE, OI.</div>
+      <div class="tip"><strong>Hook words.</strong> Add one letter to an existing word to make a new one. Example: adding S to QUART → QUARTS, or H to EAR → HEAR. Think of it like parasitic scoring.</div>
+      <div class="tip"><strong>High-value consonant dumps.</strong> Learn short words with J, Q, X, Z: JO, QI (no U needed!), XI, XU, ZA, ZO, ZAP, JAB, JAW, JOT, OX, AX, EX.</div>
+      <div class="tip"><strong>-ING, -TION, -ED, -ER, -EST.</strong> Always scan your rack for these endings. They turn 3-letter words into 6+ letter words → bonus tiles and bingos.</div>
+      <div class="tip"><strong>Rack balance.</strong> Keep roughly 3 consonants + 3 vowels + 1 wildcard/flex. If you're vowel-heavy, dump with short vowel words (AA, AE, AI, OE).</div>
+      <div class="tip"><strong>The S is precious.</strong> Don't waste an S making a basic plural unless it scores 8+ extra points. Save it for hooking onto premium squares.</div>
+      <div class="tip"><strong>Bingo bonus!</strong> Using all 7 tiles = +50 points. Learn common 7-letter stems: SATIRE+?, RETINA+?, SENIOR+? The letters AEINRST make the most bingos.</div>
+      <div class="tip"><strong>Board control.</strong> Don't open up triple word scores for your opponent. Play defensively near the edges if Jake is ahead. Block lanes to premium squares.</div>
+      <div class="tip"><strong>Prefixes to watch:</strong> UN-, RE-, OUT-, OVER-, PRE-, MIS-, DE-. Adding these to existing words on the board can create surprise plays.</div>
+      <div class="tip"><strong>The endgame.</strong> When the bag is nearly empty, count tiles. If you go out first, you get the value of your opponent's remaining tiles added to your score. Rushing to empty your rack can swing 20+ points.</div>
+    </div>
+
+    <div class="card">
+      <h2>🎓 Must-Know 2-Letter Words</h2>
+      <div id="two-letter-words" style="display:flex;flex-wrap:wrap;gap:4px;"></div>
+    </div>
+
+    <div class="card">
+      <h2>⚡ Power Plays</h2>
+      <div class="tip"><strong>Q without U words:</strong> QI, QOPH, QADI, QANAT, QAT, QAID, QAIDS, QATS, QOPHS, TRANQ, MBAQANGA, SHEQEL</div>
+      <div class="tip"><strong>J power words:</strong> JO, JAB, JAW, JOT, JIN, JEE, TAJ, HAJ, RAJ</div>
+      <div class="tip"><strong>X power words:</strong> XI, XU, AX, EX, OX, ZAX, WAX, TAX, VOX, BOX, FOX, HEX, REX, SEX, VEX</div>
+      <div class="tip"><strong>Z power words:</strong> ZA, ZO, ZAP, ZIT, ZAG, ZEN, ZIP, ADZ, AZO, BIZ, COZ, FEZ, FIZ, WIZ, ZEP</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// === DATA ===
+const PREFIXES = [
+  {affix:"UN-", meaning:"not/reverse", words:["UNDO","UNFIT","UNTIE","UNSET","UNPIN"], examples:"UN+DO, UN+FIT, UN+TIE"},
+  {affix:"RE-", meaning:"again", words:["REDO","RESET","REMAP","REFIT","RETAP"], examples:"RE+DO, RE+SET, RE+FIT"},
+  {affix:"OUT-", meaning:"surpass", words:["OUTDO","OUTRUN","OUTWIT","OUTBID"], examples:"OUT+DO, OUT+RUN, OUT+WIT"},
+  {affix:"PRE-", meaning:"before", words:["PRESET","PREWAR","PREPAY","PREMED"], examples:"PRE+SET, PRE+WAR, PRE+PAY"},
+  {affix:"MIS-", meaning:"wrong", words:["MISFIT","MISLAY","MISCUE","MISHAP"], examples:"MIS+FIT, MIS+LAY, MIS+CUE"},
+  {affix:"DE-", meaning:"remove/reverse", words:["DEICE","DELIST","DEFOG","DEGAS"], examples:"DE+ICE, DE+LIST, DE+FOG"},
+  {affix:"DIS-", meaning:"not/apart", words:["DISBAR","DISOWN","DISARM","DISMAY"], examples:"DIS+BAR, DIS+OWN, DIS+ARM"},
+  {affix:"OVER-", meaning:"excess", words:["OVERDO","OVERRUN","OVERLAP"], examples:"OVER+DO, OVER+RUN"},
+  {affix:"EN-", meaning:"cause to", words:["ENRICH","ENCASE","ENTRAP","ENDEAR"], examples:"EN+RICH, EN+TRAP"},
+  {affix:"IN-/IM-", meaning:"not/into", words:["INPUT","INSET","IMPART"], examples:"IN+PUT, IN+SET, IM+PART"},
+  {affix:"UP-", meaning:"higher", words:["UPBEAT","UPDATE","UPHOLD","UPEND"], examples:"UP+BEAT, UP+DATE"},
+  {affix:"BI-", meaning:"two", words:["BIPED","BISECT","BICEP"], examples:"BI+PED, BI+SECT"},
+];
+
+const SUFFIXES = [
+  {affix:"-ED", meaning:"past tense", words:["PLAYED","JUMPED","FIXED","BOXED"], examples:"PLAY+ED, JUMP+ED"},
+  {affix:"-ING", meaning:"ongoing", words:["PLAYING","FIXING","BOXING"], examples:"PLAY+ING, FIX+ING"},
+  {affix:"-ER", meaning:"one who/more", words:["PLAYER","FIXER","BOXER","TALLER"], examples:"PLAY+ER, FIX+ER"},
+  {affix:"-EST", meaning:"most", words:["TALLEST","WIDEST","FASTEST"], examples:"TALL+EST, WIDE+ST"},
+  {affix:"-LY", meaning:"in that way", words:["QUICKLY","SOFTLY","BOLDLY"], examples:"QUICK+LY, SOFT+LY"},
+  {affix:"-TION", meaning:"act of", words:["ACTION","NATION","RATION"], examples:"AC+TION, NA+TION"},
+  {affix:"-NESS", meaning:"state of", words:["SADNESS","ILLNESS","MADNESS"], examples:"SAD+NESS, ILL+NESS"},
+  {affix:"-ABLE", meaning:"can be", words:["FIXABLE","DOABLE","LOVABLE"], examples:"FIX+ABLE, DO+ABLE"},
+  {affix:"-FUL", meaning:"full of", words:["JOYFUL","HOPEFUL","RESTFUL"], examples:"JOY+FUL, REST+FUL"},
+  {affix:"-LESS", meaning:"without", words:["RESTLESS","CARELESS","USELESS"], examples:"REST+LESS, USE+LESS"},
+  {affix:"-ISH", meaning:"somewhat", words:["REDDISH","TALLISH","OAFISH"], examples:"RED+ISH, TALL+ISH"},
+  {affix:"-OUS", meaning:"having", words:["JOYOUS","FAMOUS","POROUS"], examples:"JOY+OUS, FAM+OUS"},
+];
+
+const TILE_VALUES = {A:1,B:3,C:3,D:2,E:1,F:4,G:2,H:4,I:1,J:8,K:5,L:1,M:3,N:1,O:1,P:3,Q:10,R:1,S:1,T:1,U:1,V:4,W:4,X:8,Y:4,Z:10};
+
+const TWO_LETTER = ["AA","AB","AD","AE","AG","AH","AI","AL","AM","AN","AP","AR","AS","AT","AW","AX","AY","BA","BE","BI","BO","BY","DA","DE","DO","ED","EF","EH","EL","EM","EN","ER","ES","ET","EW","EX","FA","FE","GI","GO","GU","HA","HE","HI","HM","HO","ID","IF","IN","IS","IT","JO","KA","KI","LA","LI","LO","MA","ME","MI","MM","MO","MU","MY","NA","NE","NO","NU","OD","OE","OF","OH","OI","OK","OM","ON","OP","OR","OS","OU","OW","OX","OY","PA","PE","PI","PO","QI","RE","SH","SI","SO","ST","TA","TE","TI","TO","UH","UM","UN","UP","US","UT","WE","WO","XI","XU","YA","YE","YO","ZA","ZO"];
+
+// Comprehensive word list for the word finder (common Scrabble words)
+const WORD_LIST = [
+// 2-letter
+...TWO_LETTER,
+// 3-letter common
+"ACE","ACT","ADD","AGE","AGO","AID","AIM","AIR","ALL","AND","ANT","ANY","APE","ARC","ARE","ARK","ARM","ART","ASH","ATE","AWE",
+"BAD","BAG","BAN","BAR","BAT","BAY","BED","BET","BIG","BIT","BOW","BOX","BOY","BUD","BUG","BUN","BUS","BUT","BUY",
+"CAB","CAN","CAP","CAR","CAT","COP","COT","COW","CRY","CUB","CUD","CUP","CUR","CUT",
+"DAB","DAD","DAM","DAY","DEN","DEW","DID","DIG","DIM","DIN","DIP","DOC","DOE","DOG","DON","DOT","DRY","DUB","DUD","DUE","DUG","DUN","DUO","DYE",
+"EAR","EAT","EEL","EGG","ELF","ELK","ELM","EMU","END","ERA","EVE","EWE","EYE",
+"FAN","FAR","FAT","FAX","FED","FEW","FIG","FIN","FIR","FIT","FIX","FLU","FLY","FOB","FOE","FOG","FOP","FOR","FOX","FRY","FUN","FUR",
+"GAB","GAG","GAP","GAS","GAY","GEL","GEM","GET","GIG","GIN","GNU","GOB","GOD","GOT","GUM","GUN","GUT","GUY","GYM",
+"HAD","HAM","HAS","HAT","HAY","HEN","HER","HEW","HEX","HID","HIM","HIP","HIS","HIT","HOB","HOD","HOG","HOP","HOT","HOW","HUB","HUE","HUG","HUM","HUT",
+"ICE","ICY","ILL","IMP","INK","INN","ION","IRE","IRK","ITS","IVY",
+"JAB","JAG","JAM","JAR","JAW","JAY","JET","JIG","JOB","JOG","JOT","JOY","JUG","JUT",
+"KEG","KEN","KEY","KID","KIN","KIT",
+"LAB","LAD","LAG","LAP","LAW","LAX","LAY","LED","LEG","LET","LID","LIE","LIT","LOG","LOT","LOW","LUG",
+"MAD","MAN","MAP","MAR","MAT","MAW","MAX","MAY","MEN","MET","MID","MIX","MOB","MOD","MOM","MOP","MOW","MUD","MUG","MUM","MUT",
+"NAB","NAG","NAP","NET","NEW","NIL","NIT","NOB","NOD","NOR","NOT","NOW","NUB","NUN","NUT",
+"OAF","OAK","OAR","OAT","ODD","ODE","OFF","OFT","OHM","OIL","OLD","ONE","OPT","ORB","ORE","OUR","OUT","OWE","OWL","OWN",
+"PAD","PAN","PAP","PAR","PAT","PAW","PAY","PEA","PEG","PEN","PEP","PER","PET","PEW","PIE","PIG","PIN","PIT","PLY","POD","POP","POT","POW","PRY","PUB","PUG","PUN","PUP","PUS","PUT",
+"RAG","RAM","RAN","RAP","RAT","RAW","RAY","RED","REF","RIB","RID","RIG","RIM","RIP","ROB","ROD","ROE","ROT","ROW","RUB","RUG","RUM","RUN","RUT","RYE",
+"SAC","SAD","SAG","SAP","SAT","SAW","SAY","SEA","SET","SEW","SHE","SHY","SIN","SIP","SIR","SIS","SIT","SIX","SKI","SKY","SLY","SOB","SOD","SON","SOP","SOT","SOW","SOY","SPA","SPY","STY","SUB","SUM","SUN","SUP",
+"TAB","TAD","TAG","TAN","TAP","TAR","TAT","TAX","TEA","TEN","THE","TIE","TIN","TIP","TOE","TON","TOO","TOP","TOT","TOW","TOY","TRY","TUB","TUG","TUN","TWO",
+"URN","USE",
+"VAN","VAT","VET","VEX","VIA","VIE","VOW",
+"WAD","WAG","WAR","WAX","WAY","WEB","WED","WET","WHO","WHY","WIG","WIN","WIS","WIT","WOE","WOK","WON","WOO","WOW",
+"YAK","YAM","YAP","YAW","YEA","YES","YET","YEW","YIN","YOU","YOW",
+"ZAG","ZAP","ZEN","ZIP","ZIT","ZOO",
+// 4-letter
+"ABLE","ACHE","ACID","ACME","ACRE","AGED","AIDE","ANTI","APEX","ARCH","AREA","ARMY",
+"BAIT","BAKE","BALD","BALE","BAND","BANE","BANG","BANK","BARE","BARK","BARN","BASE","BATH","BEAD","BEAM","BEAN","BEAR","BEAT","BEEF","BEEN","BEER","BELL","BELT","BEND","BENT","BEST","BILE","BILL","BIND","BIRD","BITE","BLEW","BLOW","BLUE","BLUR","BOAT","BODY","BOLD","BOLT","BOMB","BOND","BONE","BOOK","BOOM","BOOT","BORE","BORN","BOSS","BOTH","BOWL","BRIM","BULK","BULL","BUMP","BURN","BUST","BUSY",
+"CAFE","CAGE","CAKE","CALF","CALL","CALM","CAME","CAMP","CANE","CAPE","CARD","CARE","CART","CASE","CASH","CAST","CAVE","CHAR","CHAT","CHIP","CHOP","CITE","CITY","CLAD","CLAM","CLAP","CLAW","CLAY","CLIP","CLOD","CLOG","CLOT","CLUB","CLUE","COAL","COAT","CODE","COIL","COIN","COLD","COLE","COLT","COMB","COME","CONE","COOK","COOL","COPE","COPY","CORD","CORE","CORK","CORN","COST","COZY","CRAB","CREW","CROP","CROW","CRUD","CUBE","CURE","CURL","CUTE",
+"DALE","DAME","DAMP","DARE","DARK","DARN","DART","DASH","DATA","DATE","DAWN","DAYS","DEAD","DEAF","DEAL","DEAR","DEBT","DECK","DEED","DEEM","DEEP","DEER","DEFT","DENY","DESK","DIAL","DICE","DIED","DIET","DIME","DINE","DIRE","DIRT","DISC","DISH","DISK","DIVE","DOCK","DOES","DOME","DONE","DOOM","DOOR","DOSE","DOWN","DOZE","DRAB","DRAG","DRAW","DREW","DRIP","DROP","DRUM","DUAL","DUBS","DUCK","DUEL","DUET","DUKE","DULL","DUMB","DUMP","DUNE","DUNK","DUSK","DUST","DUTY",
+"EACH","EARL","EARN","EASE","EAST","EASY","EDGE","EDIT","ELSE","EMIT","EPIC","EURO","EVEN","EVER","EVIL","EXAM","EXEC","EXIT","EXPO","EYED","EYES",
+"FACE","FACT","FADE","FAIL","FAIR","FAKE","FALL","FAME","FANG","FARE","FARM","FAST","FATE","FAWN","FEAR","FEAT","FEED","FEEL","FEET","FELL","FELT","FEND","FERN","FEST","FEUD","FILE","FILL","FILM","FIND","FINE","FIRE","FIRM","FISH","FIST","FLAG","FLAP","FLAT","FLAW","FLEA","FLED","FLEW","FLIP","FLIT","FLOG","FLOP","FLOW","FLUX","FOAM","FOCI","FOIL","FOLD","FOLK","FOND","FONT","FOOD","FOOL","FOOT","FORD","FORE","FORK","FORM","FORT","FOUL","FOUR","FOWL","FREE","FROG","FROM","FUEL","FULL","FUME","FUND","FURY","FUSE","FUSS","FUZZ",
+"GAIN","GAIT","GALE","GALL","GAME","GAPE","GARB","GATE","GAVE","GAZE","GEAR","GENE","GERM","GIFT","GILD","GILL","GIRL","GIST","GIVE","GLAD","GLEE","GLEN","GLIB","GLOB","GLOW","GLUE","GLUM","GLUT","GNAT","GNAW","GOAT","GOES","GOLD","GOLF","GONE","GOOD","GORE","GORY","GOWN","GRAB","GRAM","GRAY","GREW","GRID","GRIM","GRIN","GRIP","GRIT","GROW","GULF","GULL","GUST","GUTS",
+"HACK","HADE","HAIL","HAIR","HALE","HALF","HALL","HALT","HAMS","HAND","HANG","HARE","HARM","HARP","HASH","HASP","HAST","HATE","HAUL","HAVE","HAWK","HAZE","HAZY","HEAD","HEAL","HEAP","HEAR","HEAT","HEED","HEEL","HELD","HELL","HELM","HELP","HEMP","HERD","HERE","HERO","HEWN","HIDE","HIGH","HIKE","HILL","HILT","HIND","HINT","HIRE","HISS","HIVE","HOAX","HOCK","HOED","HOLD","HOLE","HOME","HONE","HOOD","HOOF","HOOK","HOOP","HOPE","HORN","HOSE","HOST","HOUR","HOWL","HUGE","HULL","HUMP","HUNG","HUNT","HURL","HURT","HUSH","HYMN",
+"ICON","IDEA","IDLE","INCH","INTO","IRON","ISLE","ITEM","IOTA",
+"JACK","JADE","JAIL","JAMB","JAPE","JARS","JAVA","JAWS","JAZZ","JEAN","JEER","JERK","JEST","JIBE","JILT","JINX","JIVE","JOBS","JOCK","JOIN","JOKE","JOLT","JOSH","JOUR","JOWL","JOYS","JUDO","JUGS","JUMP","JUNE","JUNK","JURY","JUST","JUTE",
+"KALE","KEEN","KEEP","KEEL","KELP","KEPT","KEYS","KICK","KILL","KILO","KILT","KIND","KING","KISS","KITE","KNACK","KNEE","KNEW","KNIT","KNOB","KNOT","KNOW",
+"LACE","LACK","LACY","LAID","LAIR","LAKE","LAMB","LAME","LAMP","LAND","LANE","LANK","LARD","LARK","LASH","LASS","LAST","LATE","LAUD","LAWN","LAWS","LAZY","LEAD","LEAF","LEAK","LEAN","LEAP","LEFT","LEND","LENS","LENT","LESS","LEST","LEVY","LIAR","LICE","LICK","LIED","LIEU","LIFE","LIFT","LIKE","LIMB","LIME","LIMP","LINE","LINK","LINT","LION","LIST","LIVE","LOAD","LOAF","LOAM","LOAN","LOBE","LOCK","LODE","LOFT","LOGO","LONE","LONG","LOOK","LOOM","LOOP","LORD","LORE","LOSE","LOSS","LOST","LOUD","LOVE","LUCK","LULL","LUMP","LUNG","LURE","LURK","LUSH","LUST",
+"MACE","MADE","MAID","MAIL","MAIN","MAKE","MALE","MALL","MALT","MANE","MANY","MARE","MARK","MARS","MASH","MASK","MASS","MAST","MATE","MAZE","MEAD","MEAL","MEAN","MEAT","MEET","MELD","MELT","MEMO","MEND","MENU","MERE","MESH","MESS","MICA","MICE","MILD","MILE","MILK","MILL","MIME","MIND","MINE","MINT","MIRE","MISS","MIST","MITE","MOAN","MOAT","MODE","MOLD","MOLE","MOLT","MONK","MOOD","MOON","MOOR","MOOT","MORE","MOSS","MOST","MOTH","MOVE","MUCH","MUCK","MULE","MULL","MUSE","MUSH","MUST","MUTE",
+"NAIL","NAME","NAPE","NEAR","NEAT","NECK","NEED","NEST","NEWS","NEXT","NICE","NICK","NINE","NODE","NONE","NOOK","NOON","NORM","NOSE","NOTE","NOUN","NUDE","NULL","NUMB",
+"OATH","OBEY","ODDS","OGRE","OINK","OKAY","OMEN","OMIT","ONCE","ONLY","ONTO","OPAL","OPEN","ORAL","ORCA","OVEN","OVER","OWED","OXEN",
+"PACE","PACK","PACT","PAGE","PAID","PAIL","PAIN","PAIR","PALE","PALM","PANE","PANG","PANT","PARK","PART","PASS","PAST","PATH","PAVE","PAWN","PEAK","PEAR","PEAT","PECK","PEEL","PEER","PELT","PEND","PENS","PERK","PEST","PICK","PIER","PILE","PILL","PINE","PINK","PINT","PIPE","PLAN","PLAT","PLAY","PLEA","PLED","PLOD","PLOT","PLOW","PLOY","PLUG","PLUM","PLUS","POCK","POEM","POET","POKE","POLE","POLL","POLO","POMP","POND","POOL","POOF","POOR","POPE","POPS","PORE","PORK","PORT","POSE","POST","POUR","POUT","PRAY","PREY","PRIM","PROD","PROP","PROW","PULL","PULP","PUMP","PURE","PUSH","PUTT",
+"QUAY","QOPH","QUIZ",
+"RACE","RACK","RAFT","RAGE","RAID","RAIL","RAIN","RAKE","RAMP","RANG","RANK","RANT","RASH","RASP","RATE","RAVE","RAYS","RAZE","READ","REAL","REAM","REAP","REAR","REED","REEF","REEL","REIN","RELY","REND","RENT","REST","RICH","RIDE","RIFT","RILE","RILL","RIME","RIND","RING","RINK","RIOT","RISE","RISK","RITE","ROAD","ROAM","ROAR","ROBE","ROCK","RODE","ROLE","ROLL","ROMP","ROOF","ROOK","ROOM","ROOT","ROPE","ROSE","ROTE","ROUT","ROVE","RUBS","RUDE","RUIN","RULE","RUMP","RUNE","RUNG","RUNT","RUSE","RUSH","RUST",
+"SACK","SAFE","SAGE","SAID","SAIL","SAKE","SALE","SALT","SAME","SAND","SANE","SANG","SANK","SASH","SAVE","SCAN","SCAR","SEAL","SEAM","SEAR","SEAT","SECT","SEED","SEEK","SEEM","SEEN","SELF","SELL","SEND","SENT","SEPT","SEWN","SHED","SHIN","SHIP","SHOD","SHOE","SHOO","SHOP","SHOT","SHOW","SHUT","SICK","SIDE","SIFT","SIGH","SIGN","SILK","SILL","SILO","SILT","SING","SINK","SIRE","SITE","SIZE","SKID","SKIM","SKIN","SKIP","SKIT","SLAB","SLAG","SLAM","SLAP","SLAT","SLAW","SLAY","SLED","SLEW","SLID","SLIM","SLIT","SLOB","SLOP","SLOT","SLOW","SLUG","SLUM","SLUR","SMOG","SNAP","SNAG","SNIP","SNOB","SNOT","SNOW","SNUB","SNUG","SOAK","SOAP","SOAR","SOCK","SODA","SOFA","SOFT","SOIL","SOLD","SOLE","SOME","SONG","SOON","SOOT","SORE","SORT","SOUL","SOUR","SOWN","SPAN","SPAR","SPAT","SPEC","SPED","SPIN","SPIT","SPOT","SPRY","SPUR","STAB","STAG","STAR","STAY","STEM","STEP","STEW","STIR","STOP","STOW","STUB","STUD","STUN","SUCH","SUCK","SUIT","SULK","SUMP","SUNG","SUNK","SURE","SURF","SWAN","SWAP","SWIM","SWUM",
+"TACK","TACT","TAIL","TAKE","TALE","TALK","TALL","TAME","TANG","TANK","TAPE","TAPS","TARN","TARP","TART","TASK","TAXA","TEAK","TEAL","TEAM","TEAR","TELL","TEMP","TEND","TENS","TENT","TERM","TERN","TEST","TEXT","THAN","THAT","THEM","THEN","THEY","THIN","THIS","THUD","THUS","TICK","TIDE","TIDY","TIED","TIER","TILE","TILL","TILT","TIME","TINE","TINY","TIRE","TOAD","TOED","TOIL","TOLD","TOLL","TOMB","TOME","TONE","TOOK","TOOL","TOOT","TOPS","TORE","TORN","TORT","TOSS","TOUR","TOWN","TOYS","TRAP","TRAY","TREE","TREK","TRIM","TRIO","TRIP","TROD","TROT","TRUE","TUBE","TUCK","TUFT","TUNA","TUNE","TURF","TURN","TUSK","TWIN","TWIT","TYPE",
+"UGLY","UNDO","UNIT","UNTO","UPON","URGE","USED","USER",
+"VAIN","VALE","VANE","VARY","VASE","VAST","VEIL","VEIN","VEND","VENT","VERB","VERY","VEST","VETO","VIAL","VICE","VIED","VIEW","VILE","VINE","VISA","VOID","VOLE","VOLT","VOTE","VOWL",
+"WADE","WAGE","WAIL","WAIT","WAKE","WALK","WALL","WAND","WANT","WARD","WARM","WARN","WARP","WART","WARY","WASH","WASP","WAVE","WAVY","WAXY","WAYS","WEAK","WEAN","WEAR","WEED","WEEK","WELD","WELL","WENT","WEPT","WERE","WEST","WHAT","WHEN","WHIG","WHIM","WHIP","WHOM","WICK","WIDE","WIFE","WILD","WILL","WILT","WILY","WIMP","WIND","WINE","WING","WINK","WIPE","WIRE","WISE","WISH","WISP","WITH","WITS","WOKE","WOLD","WOLF","WOMB","WONT","WOOD","WOOL","WORD","WORE","WORK","WORM","WORN","WORT","WOVE","WRAP","WREN","WRIT",
+"YANK","YARD","YARN","YAWN","YEAR","YELL","YOUR",
+"ZANY","ZEAL","ZERO","ZEST","ZINC","ZONE","ZOOM",
+// 5-letter high-scorers
+"JAZZY","FIZZY","FUZZY","DIZZY","PIZZA","WALTZ","QUARTZ","BLITZ","PIZZA","QUICK","QUIET","QUITE","QUEEN","QUOTA","OXIDE","PIXEL","NEXUS","TOXIN","VIXEN","EXULT",
+"ADORE","ANGEL","ARISE","BLAZE","BRACE","BRAVE","BRISK","CHARM","CHASE","CHEAP","CLEAN","CLEAR","CLIMB","CLOSE","CRANE","DANCE","DRAFT","DREAM","DRIFT","DRIVE",
+"EARTH","FABLE","FEAST","FLAME","FLARE","FLESH","FLOAT","FLOCK","FORCE","FORGE","FRAME","FRESH","FROST","GLARE","GLEAM","GLIDE","GLOBE","GRACE","GRAIN","GRAND",
+"GRANT","GRAPE","GRASP","GRAVE","GRAZE","GRIND","GRIPE","HASTE","HEART","HOUSE","IMAGE","JUICE","LARGE","LEARN","LEASE","LIGHT","LOOSE","MEDAL","MINOR","NERVE",
+"NOISE","OCEAN","OLIVE","OUTER","PAINT","PANEL","PASTE","PEACH","PEARL","PHASE","PLAIN","PLANE","PLANT","PLATE","PLEAD","PLEAT","PLUME","POINT","POUND","POWER",
+"PRESS","PRICE","PRIDE","PRIME","PRINT","PRIZE","PRONE","PROSE","PROVE","PRUNE","RAISE","RANGE","REACH","REALM","REIGN","RINSE","RISEN","ROAST","ROUND","ROUTE",
+"SAINT","SCALE","SCARE","SCENE","SCOPE","SCORE","SENSE","SHADE","SHAKE","SHAME","SHAPE","SHARE","SHARP","SHEAR","SHELF","SHELL","SHINE","SHIRT","SHORE","SHORT",
+"SHOUT","SIGHT","SINCE","SKATE","SLATE","SLEEP","SLICE","SLIDE","SLOPE","SMART","SMILE","SMOKE","SNARE","SOLAR","SOLVE","SOUND","SOUTH","SPACE","SPARE","SPEAK",
+"SPEAR","SPEND","SPIKE","SPINE","SPLIT","SPOKE","SPORE","SPORT","SPRAY","STAFF","STAGE","STAIN","STAKE","STALE","STAMP","STAND","STARE","START","STATE","STEAL",
+"STEAM","STEEL","STEEP","STEER","STERN","STILL","STING","STOCK","STONE","STORE","STORM","STORY","STOVE","STRAP","STRAW","STRAY","STRIP","STUDY","STUMP","SURGE",
+"SWAMP","SWEAR","SWEEP","SWEET","SWEPT","SWING","SWORD","TABLE","TASTE","TEACH","THICK","THING","THINK","THOSE","THREE","THROW","TIGER","TIGHT","TITLE","TODAY",
+"TOKEN","TOTAL","TOUCH","TOWER","TRACE","TRACK","TRADE","TRAIL","TRAIN","TRAIT","TREND","TRIAL","TRIBE","TRICK","TROUT","TRUCK","TRULY","TRUMP","TRUNK","TRUST",
+"TRUTH","TWIST","UNDER","UNION","UNITE","UNTIL","UPPER","UPSET","USUAL","UTTER","VALID","VALUE","VAULT","VIDEO","VIGOR","VITAL","VIVID","VOICE","WASTE","WATCH",
+"WATER","WEAVE","WHEAT","WHEEL","WHERE","WHICH","WHILE","WHITE","WHOLE","WHOSE","WOMAN","WORLD","WORTH","WOULD","WOUND","WRITE","YIELD","YOUNG",
+// 6+ letter bonus words
+"QUARTZ","FREEZE","BREEZE","JIGSAW","MATRIX","BISECT","PREFIX","SUFFIX","BAZAAR","ZIGZAG","HIJACK",
+"BANTER","BISQUE","BLANCH","BLOUSE","BOUNTY","BRONZE","CANOPY","CASTLE","CHANCE","CHANGE","CHARGE",
+"IGNORE","IMPACT","IMPORT","INSULT","JOSTLE","JUMBLE","LANTERN","MASTER","NATIVE","NOTICE","OPTION",
+"PALACE","PLANET","PLUNGE","POLITE","REFINE","REMOTE","RESCUE","RESULT","RETAIN","RETIRE","RETURN",
+"SAILOR","SALUTE","SAMPLE","SCRIPT","SEARCH","SECRET","SECURE","SELECT","SETTLE","SHIELD","SHRINK",
+"SIGNAL","SILVER","SIMPLE","SINGLE","SMOOTH","SOCIAL","SPIRAL","SPLINT","STABLE","STREAK","STREAM",
+"STRIDE","STRIKE","STRIVE","STROKE","STRONG","SUBTLE","TENDER","THIRST","THREAD","THRIVE","THRONE",
+"TRANCE","TRAVEL","TRIPLE","UNFOLD","UNIQUE","UNLESS","UNREST","USEFUL","VELVET","VOYAGE","WANDER",
+"WINTER","WONDER","WRAITH","ABSORB","ADVENT","AFFIRM","AGILE","BESTOW","CANDID","DARING","DEVOUT",
+"ASTIRE","SATIRE","RETAIN","RETINA","SINTER","INSERT","INERTS","ESTRIN","SENIOR",
+"NASTIER","ANTSIER","RETAINS","RETINAS","STAINER","STEARIN","NASTIER",
+];
+
+// === STATE ===
+let score = 0, total = 0, streakCount = 0, currentCategory = 'all';
+
+// === TABS ===
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById(tab.dataset.tab).classList.add('active');
+  });
+});
+
+// === AFFIX QUIZ ===
+function getAffixes() {
+  if (currentCategory === 'prefix') return PREFIXES;
+  if (currentCategory === 'suffix') return SUFFIXES;
+  return [...PREFIXES, ...SUFFIXES];
+}
+
+function nextQuestion() {
+  const affixes = getAffixes();
+  const correct = affixes[Math.floor(Math.random() * affixes.length)];
+  const isPrefix = PREFIXES.includes(correct);
+
+  // Pick a random word that uses this affix
+  const word = correct.words[Math.floor(Math.random() * correct.words.length)];
+
+  // Generate wrong answers
+  const wrongPool = affixes.filter(a => a !== correct);
+  const wrongs = [];
+  while (wrongs.length < 3 && wrongPool.length > 0) {
+    const idx = Math.floor(Math.random() * wrongPool.length);
+    wrongs.push(wrongPool.splice(idx, 1)[0]);
+  }
+
+  const options = [correct, ...wrongs].sort(() => Math.random() - 0.5);
+
+  // Highlight the affix part in the word
+  const cleanAffix = correct.affix.replace(/[-\/]/g, '');
+  let highlighted;
+  if (isPrefix) {
+    const len = cleanAffix.length;
+    highlighted = `<span class="highlight">${word.slice(0, len)}</span>${word.slice(len)}`;
+  } else {
+    const suffLen = cleanAffix.length;
+    highlighted = `${word.slice(0, -suffLen)}<span class="highlight">${word.slice(-suffLen)}</span>`;
+  }
+
+  document.getElementById('quiz-word').innerHTML = highlighted;
+  document.getElementById('quiz-prompt').textContent = `What does "${correct.affix}" mean?`;
+  document.getElementById('quiz-explanation').style.display = 'none';
+  document.getElementById('next-btn').style.display = 'none';
+
+  const optEl = document.getElementById('quiz-options');
+  optEl.innerHTML = '';
+  options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'quiz-btn';
+    btn.textContent = `${opt.affix} = "${opt.meaning}"`;
+    btn.onclick = () => handleAnswer(btn, opt === correct, correct);
+    optEl.appendChild(btn);
+  });
+  total++;
+  document.getElementById('total').textContent = total;
+}
+
+function handleAnswer(btn, isCorrect, correct) {
+  document.querySelectorAll('.quiz-btn').forEach(b => b.onclick = null);
+  if (isCorrect) {
+    btn.classList.add('correct');
+    score++;
+    streakCount++;
+    document.getElementById('score').textContent = score;
+  } else {
+    btn.classList.add('wrong');
+    streakCount = 0;
+    document.querySelectorAll('.quiz-btn').forEach(b => {
+      if (b.textContent.includes(correct.affix)) b.classList.add('correct');
+    });
+  }
+  document.getElementById('streak').textContent = streakCount >= 3 ? `🔥 ${streakCount} streak!` : '';
+  document.getElementById('quiz-explanation').textContent = `${correct.affix} means "${correct.meaning}" — e.g. ${correct.examples}`;
+  document.getElementById('quiz-explanation').style.display = 'block';
+  document.getElementById('next-btn').style.display = 'inline-block';
+}
+
+// Category filter
+document.querySelectorAll('.cat-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentCategory = btn.dataset.cat;
+    score = 0; total = 0; streakCount = 0;
+    document.getElementById('score').textContent = 0;
+    document.getElementById('total').textContent = 0;
+    document.getElementById('streak').textContent = '';
+    nextQuestion();
+  });
+});
+
+// === REFERENCE GRIDS ===
+function buildRef(list, containerId) {
+  const el = document.getElementById(containerId);
+  list.forEach(a => {
+    const chip = document.createElement('div');
+    chip.className = 'affix-chip';
+    chip.innerHTML = `<span class="affix">${a.affix}</span><span class="meaning">${a.meaning}</span>`;
+    chip.title = a.examples;
+    el.appendChild(chip);
+  });
+}
+buildRef(PREFIXES, 'prefix-ref');
+buildRef(SUFFIXES, 'suffix-ref');
+
+// === WORD FINDER ===
+function calcScore(word) {
+  return [...word].reduce((s, c) => s + (TILE_VALUES[c] || 0), 0);
+}
+
+function canMakeWord(word, letters, hasBlank) {
+  const avail = {};
+  for (const c of letters) avail[c] = (avail[c] || 0) + 1;
+  let blanksNeeded = 0;
+  for (const c of word) {
+    if (avail[c] && avail[c] > 0) { avail[c]--; }
+    else { blanksNeeded++; }
+  }
+  return blanksNeeded <= (hasBlank ? 1 : 0);
+}
+
+function findWords() {
+  const input = document.getElementById('letters').value.toUpperCase().replace(/[^A-Z]/g, '');
+  if (!input) return;
+  const hasBlank = document.getElementById('use-blank').checked;
+  const letters = input.split('');
+
+  const matches = WORD_LIST.filter(w => w.length <= letters.length + (hasBlank ? 1 : 0) && canMakeWord(w, letters, hasBlank));
+  matches.sort((a, b) => calcScore(b) - calcScore(a));
+
+  // Group by length
+  const groups = {};
+  matches.forEach(w => {
+    const len = w.length;
+    if (!groups[len]) groups[len] = [];
+    if (!groups[len].includes(w)) groups[len].push(w);
+  });
+
+  const container = document.getElementById('word-results');
+  if (matches.length === 0) {
+    container.innerHTML = '<p style="color:#888;text-align:center;padding:16px;">No words found with those letters. Try different ones!</p>';
+    return;
+  }
+
+  let html = `<p style="font-size:0.85em;color:#53a8b6;margin-bottom:8px;">Found ${matches.length} words! Sorted by point value within each group.</p>`;
+
+  // Show longest first
+  const lengths = Object.keys(groups).map(Number).sort((a, b) => b - a);
+  lengths.forEach(len => {
+    const words = groups[len].sort((a, b) => calcScore(b) - calcScore(a)).slice(0, 30);
+    const emoji = len >= 7 ? '🌟' : len >= 5 ? '⭐' : len >= 4 ? '💎' : '';
+    html += `<div class="word-group"><h4>${emoji} ${len}-Letter Words (${groups[len].length})</h4><div class="word-list">`;
+    words.forEach(w => {
+      html += `<span class="word-tag" onclick="showDef('${w}')">${w}<span class="pts">${calcScore(w)}pts</span></span>`;
+    });
+    html += '</div></div>';
+  });
+
+  container.innerHTML = html;
+}
+
+function showDef(word) {
+  const el = document.getElementById('word-def-area');
+  // Identify affixes in the word
+  const foundAffixes = [];
+  PREFIXES.forEach(p => {
+    const clean = p.affix.replace(/[-\/]/g, '');
+    if (word.startsWith(clean)) foundAffixes.push(`Prefix ${p.affix} (${p.meaning})`);
+  });
+  SUFFIXES.forEach(s => {
+    const clean = s.affix.replace(/[-\/]/g, '');
+    if (word.endsWith(clean)) foundAffixes.push(`Suffix ${s.affix} (${s.meaning})`);
+  });
+
+  let info = `<strong>${word}</strong> — ${calcScore(word)} points`;
+  if (foundAffixes.length) info += `<br>🧩 ${foundAffixes.join(', ')}`;
+  info += `<br>💡 Tip: Look for board spots where this connects to existing words!`;
+  el.innerHTML = info;
+  el.classList.add('show');
+}
+
+// Enter key triggers search
+document.getElementById('letters').addEventListener('keypress', e => { if (e.key === 'Enter') findWords(); });
+
+// === TILE VALUES ===
+const tileEl = document.getElementById('tile-ref');
+'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').forEach(c => {
+  const t = document.createElement('div');
+  t.className = 'tile';
+  t.innerHTML = `${c}<sub>${TILE_VALUES[c]}</sub>`;
+  tileEl.appendChild(t);
+});
+
+// === TWO LETTER WORDS ===
+const tlEl = document.getElementById('two-letter-words');
+const highValue2 = ['QI','ZA','ZO','XI','XU','JO','KA','AX','EX','OX'];
+TWO_LETTER.forEach(w => {
+  const tag = document.createElement('span');
+  tag.className = 'word-tag';
+  tag.style.background = highValue2.includes(w) ? '#e94560' : '#0f3460';
+  tag.innerHTML = `${w}<span class="pts">${calcScore(w)}</span>`;
+  tlEl.appendChild(tag);
+});
+
+// Init quiz
+nextQuestion();
+</script>
+</body>
+</html>
