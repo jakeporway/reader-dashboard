@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🦋 Before the Curtain Rises — Madama Butterfly</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Space+Grotesk:wght@400;600&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Cormorant Garamond',serif;background:#0c0a10;color:#e8e0d4;min-height:100vh;overflow-x:hidden}
+.hero{height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;position:relative;padding:20px}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 30%,rgba(200,160,120,0.08),transparent 70%)}
+.butterfly-float{font-size:60px;animation:flutter 4s ease-in-out infinite;margin-bottom:20px}
+@keyframes flutter{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-15px) rotate(2deg)}}
+.hero h1{font-size:clamp(32px,6vw,52px);font-weight:700;color:#e8d5b8;letter-spacing:2px;line-height:1.2}
+.hero h1 em{font-style:italic;color:#c9a87c}
+.hero .tagline{font-size:18px;color:rgba(232,208,180,0.5);margin-top:12px;font-style:italic}
+.hero .dedication{font-size:14px;color:rgba(232,208,180,0.3);margin-top:24px;font-family:'Space Grotesk',sans-serif;letter-spacing:1px}
+.scroll-hint{position:absolute;bottom:30px;color:rgba(232,208,180,0.3);font-size:13px;font-family:'Space Grotesk',sans-serif;animation:bob 2s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(8px)}}
+
+.chapter{max-width:680px;margin:0 auto;padding:60px 24px}
+.chapter-num{font-family:'Space Grotesk',sans-serif;font-size:11px;color:#c9a87c;letter-spacing:4px;text-transform:uppercase;margin-bottom:8px}
+.chapter h2{font-size:clamp(24px,4vw,36px);font-weight:700;color:#e8d5b8;margin-bottom:20px;line-height:1.3}
+.chapter p{font-size:18px;line-height:1.9;color:rgba(232,224,212,0.75);margin-bottom:20px}
+.chapter p strong{color:#e8d5b8;font-weight:600}
+.chapter p em{color:#c9a87c;font-style:italic}
+
+.reveal{background:rgba(201,168,124,0.06);border:1px solid rgba(201,168,124,0.12);border-radius:12px;padding:20px;margin:24px 0;cursor:pointer;transition:all 0.3s}
+.reveal:hover{background:rgba(201,168,124,0.1);border-color:rgba(201,168,124,0.25)}
+.reveal-q{font-size:16px;color:#c9a87c;font-weight:600;display:flex;align-items:center;gap:10px}
+.reveal-q::before{content:'▶';font-size:10px;transition:transform 0.3s}
+.reveal.open .reveal-q::before{transform:rotate(90deg)}
+.reveal-a{max-height:0;overflow:hidden;transition:max-height 0.5s ease,padding 0.3s;font-size:16px;line-height:1.8;color:rgba(232,224,212,0.65)}
+.reveal.open .reveal-a{max-height:600px;padding-top:14px}
+
+.divider{text-align:center;padding:40px 0;color:rgba(201,168,124,0.2);font-size:24px;letter-spacing:12px}
+
+.quote{border-left:2px solid rgba(201,168,124,0.3);padding:16px 24px;margin:28px 0;font-style:italic;font-size:20px;color:rgba(232,224,212,0.6);line-height:1.7}
+.quote .attr{font-size:14px;color:rgba(201,168,124,0.4);font-style:normal;margin-top:8px;font-family:'Space Grotesk',sans-serif}
+
+.listen{display:inline-flex;align-items:center;gap:8px;background:rgba(201,168,124,0.08);border:1px solid rgba(201,168,124,0.15);border-radius:8px;padding:8px 16px;font-family:'Space Grotesk',sans-serif;font-size:13px;color:#c9a87c;text-decoration:none;transition:all 0.2s;margin:8px 4px}
+.listen:hover{background:rgba(201,168,124,0.15);border-color:rgba(201,168,124,0.3)}
+
+.timeline{position:relative;padding-left:30px;margin:24px 0}
+.timeline::before{content:'';position:absolute;left:8px;top:0;bottom:0;width:1px;background:rgba(201,168,124,0.15)}
+.tl-item{position:relative;margin-bottom:20px;padding-left:10px}
+.tl-item::before{content:'';position:absolute;left:-26px;top:8px;width:9px;height:9px;border-radius:50%;background:#c9a87c;border:2px solid #0c0a10}
+.tl-year{font-family:'Space Grotesk',sans-serif;font-size:13px;color:#c9a87c;font-weight:600}
+.tl-text{font-size:16px;color:rgba(232,224,212,0.65);line-height:1.6;margin-top:2px}
+
+.act-card{background:linear-gradient(145deg,rgba(201,168,124,0.06),rgba(201,168,124,0.02));border:1px solid rgba(201,168,124,0.1);border-radius:14px;padding:24px;margin:20px 0}
+.act-label{font-family:'Space Grotesk',sans-serif;font-size:11px;color:#c9a87c;letter-spacing:3px;text-transform:uppercase;margin-bottom:6px}
+.act-title{font-size:22px;font-weight:700;color:#e8d5b8;margin-bottom:10px}
+.act-text{font-size:16px;line-height:1.8;color:rgba(232,224,212,0.65)}
+.act-moment{margin-top:12px;padding-top:12px;border-top:1px solid rgba(201,168,124,0.08);font-size:14px;color:rgba(201,168,124,0.5);font-family:'Space Grotesk',sans-serif}
+
+.fact-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:24px 0}
+.fact{background:rgba(201,168,124,0.04);border:1px solid rgba(201,168,124,0.08);border-radius:10px;padding:16px;text-align:center}
+.fact .emoji{font-size:28px;margin-bottom:6px}
+.fact .f-title{font-size:13px;color:#c9a87c;font-weight:600;margin-bottom:4px}
+.fact .f-text{font-size:13px;color:rgba(232,224,212,0.5);line-height:1.5;font-family:'Space Grotesk',sans-serif}
+
+.finale{text-align:center;padding:80px 24px;max-width:680px;margin:0 auto}
+.finale h2{font-size:32px;color:#e8d5b8;margin-bottom:16px}
+.finale p{font-size:18px;color:rgba(232,224,212,0.5);line-height:1.8}
+.credit{font-family:'Space Grotesk',sans-serif;font-size:11px;color:rgba(255,255,255,0.15);text-align:center;padding:20px;letter-spacing:1px}
+
+@media(max-width:500px){.fact-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="butterfly-float">🦋</div>
+  <h1>Before the Curtain Rises<br><em>Madama Butterfly</em></h1>
+  <div class="tagline">A companion for tonight's performance</div>
+  <div class="dedication">For Jake, Lindsay & Mom — with love from JawnBot ⚡</div>
+  <div class="scroll-hint">↓ scroll to begin ↓</div>
+</div>
+
+<div class="chapter">
+  <div class="chapter-num">I — The Composer</div>
+  <h2>Puccini: The Man Who Felt Too Much</h2>
+  
+  <p><strong>Giacomo Puccini</strong> was born in <em>Lucca, Tuscany</em> in 1858 into a family that had produced church musicians for five generations — 124 consecutive years as music directors of the same cathedral. He was <em>expected</em> to continue the dynasty.</p>
+  
+  <p>He didn't. At 21, he walked 18 miles round-trip to see Verdi's <em>Aida</em> in Pisa, and everything changed. He later wrote: <strong>"When I heard Aida, I felt that a musical window had opened for me."</strong> He abandoned church music forever.</p>
+
+  <div class="reveal" onclick="this.classList.toggle('open')">
+    <div class="reveal-q">🎓 The poverty years most people don't know about</div>
+    <div class="reveal-a">Puccini spent years at the Milan Conservatory so poor he survived on <em>herring and water</em>. He and his roommate shared a single overcoat — whoever had a lesson that day got to wear it. His first opera flopped. His second opera's publisher went bankrupt. He nearly gave up entirely. Then came <em>Manon Lescaut</em> in 1893, and suddenly, at 34, he was the most famous opera composer alive.</div>
+  </div>
+
+  <p>What made Puccini different from his predecessors was his <em>obsessive emotional realism</em>. Verdi painted heroes. Wagner painted gods. <strong>Puccini painted people.</strong> Specifically, women who are destroyed by love — and by the men who don't deserve them.</p>
+
+  <div class="quote">
+    "I have a great weakness for small things. I can only write about things that move me, and when I feel the warmth of a creature who is alive and suffering."
+    <div class="attr">— Giacomo Puccini</div>
+  </div>
+
+  <div class="reveal" onclick="this.classList.toggle('open')">
+    <div class="reveal-q">💀 His full name is absurd (and revealing)</div>
+    <div class="reveal-a"><strong>Giacomo Antonio Domenico Michele Secondo Maria Puccini.</strong> Every name is a tribute to a previous Puccini musician. He carried five generations on his shoulders before he wrote a single note. No wonder he was obsessed with people crushed by expectations they didn't choose.</div>
+  </div>
+</div>
+
+<div class="divider">· · · 🦋 · · ·</div>
+
+<div class="chapter">
+  <div class="chapter-num">II — The Origin Story</div>
+  <h2>How a Short Story Became an Obsession</h2>
+  
+  <p>In 1900, Puccini was in London for the premiere of <em>Tosca</em>. One evening, he wandered into a theater and saw a one-act play by David Belasco called <em>Madame Butterfly</em>. <strong>He didn't speak English.</strong> He couldn't understand a word of the dialogue.</p>
+  
+  <p><em>It didn't matter.</em></p>
+  
+  <p>He wept. He went backstage and begged Belasco for the rights. Belasco later recalled: "I agreed at once. He was <strong>so excited, so desperate</strong> to have the story that I couldn't refuse." Puccini spent the next four years pouring himself into the score.</p>
+
+  <div class="reveal" onclick="this.classList.toggle('open')">
+    <div class="reveal-q">📚 The real story behind the story</div>
+    <div class="reveal-a">Belasco's play was based on an 1898 short story by John Luther Long, whose sister <em>Jennie Correll</em> had lived in Nagasaki and told him stories of a real young Japanese woman abandoned by a Western naval officer. Long blended these with Pierre Loti's 1887 novel <em>Madame Chrysanthème</em>. So the opera is based on a play, based on a short story, based on a sister's letters, based on a real woman's heartbreak. <strong>The pain is at least four layers deep.</strong></div>
+  </div>
+
+  <div class="reveal" onclick="this.classList.toggle('open')">
+    <div class="reveal-q">🎭 The catastrophic premiere</div>
+    <div class="reveal-a">The premiere at La Scala on February 17, 1904 was one of the <strong>worst disasters in opera history</strong>. The audience hissed, laughed, and made animal noises. When Butterfly's kimono billowed in the stage wind, someone shouted <em>"She's pregnant! By Bohème!"</em> (mocking Puccini's previous opera). Critics were savage. Puccini was devastated — but he <em>knew</em> the opera was great. He withdrew it, rewrote it, split the long second act into two, and re-premiered it three months later in Brescia. It was a triumph. He was right.</div>
+  </div>
+</div>
+
+<div class="divider">· · · 🦋 · · ·</div>
+
+<div class="chapter">
+  <div class="chapter-num">III — The Story</div>
+  <h2>What You'll See Tonight</h2>
+  
+  <p><em>Nagasaki, Japan. Early 1900s.</em></p>
+
+  <div class="act-card">
+    <div class="act-label">Act I — The Wedding</div>
+    <div class="act-title">A 15-year-old makes a choice she can't undo</div>
+    <div class="act-text"><strong>Lt. Benjamin Franklin Pinkerton</strong>, a U.S. Navy officer, has arranged to "marry" <strong>Cio-Cio-San</strong> (Butterfly), a 15-year-old former geisha. To him, it's a casual arrangement with an escape clause. To her, it's everything — she has secretly converted to Christianity, renouncing her ancestors' religion, and been disowned by her entire family. When they're alone, she sings of her love with total, devastating sincerity. He sings of desire. <em>They are not singing about the same thing.</em></div>
+    <div class="act-moment">🎵 Listen for: <strong>"Viene la sera"</strong> — one of the most beautiful love duets ever written. Heartbreaking because only one of them means it.</div>
+  </div>
+
+  <div class="act-card">
+    <div class="act-label">Act II — The Wait</div>
+    <div class="act-title">Three years of faith against all evidence</div>
+    <div class="act-text">Three years have passed. Pinkerton is gone. Everyone tells Butterfly he's not coming back. Her maid Suzuki begs her to face reality. Butterfly refuses. She has a child — Pinkerton's son — and she sings the opera's most famous aria about the day his ship will return to the harbor. <strong>She is magnificent, delusional, and completely alone.</strong> Then — a cannon shot. A ship enters the harbor. It's his.</div>
+    <div class="act-moment">🎵 Listen for: <strong>"Un bel dì vedremo"</strong> (One Fine Day) — the aria. You'll recognize the melody. She describes exactly how his return will happen, down to the footsteps on the hill. She's rehearsed this moment for three years.</div>
+  </div>
+
+  <div class="act-card">
+    <div class="act-label">Act III — The Truth</div>
+    <div class="act-title">What the ship actually brought</div>
+    <div class="act-text">Butterfly stays awake all night, watching the harbor. The <strong>Humming Chorus</strong> plays — an entire chorus humming offstage as she waits in the dark with her child. Dawn comes. Pinkerton arrives — <em>with his American wife</em>. He hasn't come for Butterfly. He's come for the child. He can't even face her — he sends the consul instead, then runs away. Butterfly understands everything in an instant. She agrees to give up her son — if Pinkerton comes for him in person. Then she reads the inscription on her father's ceremonial blade: <em>"To die with honor, when one can no longer live with honor."</em></div>
+    <div class="act-moment">🎵 Listen for: <strong>The Humming Chorus</strong> — arguably the most haunting three minutes in all of opera. Pure voices, no words. An entire night of hope compressed into a hum.</div>
+  </div>
+</div>
+
+<div class="divider">· · · 🦋 · · ·</div>
+
+<div class="chapter">
+  <div class="chapter-num">IV — What to Listen For</div>
+  <h2>The Genius in the Details</h2>
+  
+  <p>Puccini spent <em>years</em> researching Japanese music. He met the wife of the Japanese ambassador, who sang him folk songs. He studied pentatonic scales. He embedded real Japanese melodies throughout the score — but filtered through Italian orchestration. The result sounds like <strong>neither Japan nor Italy</strong>, but something entirely new: the sound of two cultures colliding inside one woman's heart.</p>
+
+  <div class="reveal" onclick="this.classList.toggle('open')">
+    <div class="reveal-q">🇺🇸 The Star-Spangled Banner appears (and it's devastating)</div>
+    <div class="reveal-a">Puccini weaves <strong>"The Star-Spangled Banner"</strong> into the orchestral texture whenever Pinkerton or America is referenced. At first it sounds triumphant. By Act III, the same melody sounds <em>monstrous</em>. Puccini doesn't change the notes — he changes everything around them. Same anthem, entirely different meaning. Listen for it.</div>
+  </div>
+
+  <div class="reveal" onclick="this.classList.toggle('open')">
+    <div class="reveal-q">🎵 The "curse" motif you'll hear but might not notice</div>
+    <div class="reveal-a">When Butterfly's uncle (a Buddhist priest) curses her for converting to Christianity, the orchestra plays a dark, angular theme. This motif <em>returns</em> at the very end of the opera. Puccini is telling you: the family's rejection sealed her fate before Pinkerton ever left. The curse was always the real wound.</div>
+  </div>
+
+  <div class="reveal" onclick="this.classList.toggle('open')">
+    <div class="reveal-q">🦋 Why "Butterfly" — the name itself is a metaphor</div>
+    <div class="reveal-a">In Japanese culture, butterflies symbolize the souls of the living and the dead. They represent transformation — but also <em>fragility</em>. A butterfly pinned to a board is still beautiful, but it's dead. Pinkerton literally calls her "Butterfly" — he has already pinned her, collected her, categorized her as an exotic specimen. <strong>Her name is her fate.</strong></div>
+  </div>
+</div>
+
+<div class="divider">· · · 🦋 · · ·</div>
+
+<div class="chapter">
+  <div class="chapter-num">V — Things That Will Make You the Smartest Person at Intermission</div>
+  <h2>Cocktail Party Knowledge</h2>
+  
+  <div class="fact-grid">
+    <div class="fact">
+      <div class="emoji">✍️</div>
+      <div class="f-title">Five Versions</div>
+      <div class="f-text">Puccini wrote FIVE different versions of this opera. The one you'll hear tonight is the 5th, finalized in 1907. He kept tinkering for 3 years after the premiere.</div>
+    </div>
+    <div class="fact">
+      <div class="emoji">🏯</div>
+      <div class="f-title">Nagasaki</div>
+      <div class="f-text">The opera is set in Nagasaki — the same city that would be devastated by an atomic bomb 41 years later. A memorial to Puccini stands in the city's Glover Garden today.</div>
+    </div>
+    <div class="fact">
+      <div class="emoji">⏱️</div>
+      <div class="f-title">Longest Act</div>
+      <div class="f-text">The original Act II was so long (~90 min) the audience at La Scala grew hostile. Splitting it in two was the key fix that saved the opera.</div>
+    </div>
+    <div class="fact">
+      <div class="emoji">🎤</div>
+      <div class="f-title">Caruso Sang It</div>
+      <div class="f-text">The legendary Enrico Caruso sang Pinkerton at the Met premiere in 1907, under Puccini's personal supervision. Even he couldn't make Pinkerton likeable.</div>
+    </div>
+    <div class="fact">
+      <div class="emoji">💔</div>
+      <div class="f-title">Puccini's Pattern</div>
+      <div class="f-text">La bohème: woman dies for love. Tosca: woman dies for love. Butterfly: woman dies for love. Turandot: the one where he tried to let her live — and died before finishing it.</div>
+    </div>
+    <div class="fact">
+      <div class="emoji">🎬</div>
+      <div class="f-title">Still Everywhere</div>
+      <div class="f-text">Miss Saigon is Butterfly set in Vietnam. M. Butterfly is Butterfly inverted. The story has been retold more times than any other opera — because it never stops being relevant.</div>
+    </div>
+  </div>
+</div>
+
+<div class="divider">· · · 🦋 · · ·</div>
+
+<div class="chapter">
+  <div class="chapter-num">VI — The Uncomfortable Truth</div>
+  <h2>Why This Opera Still Matters (and Still Hurts)</h2>
+  
+  <p>Modern audiences wrestle with <em>Madama Butterfly</em>. A 15-year-old bride. An American who treats another culture as a souvenir shop. Orientalism baked into every set design. <strong>These aren't bugs in the opera — they're the point.</strong></p>
+  
+  <p>Puccini didn't write Pinkerton as a hero. He wrote him as a <em>villain who thinks he's the protagonist</em> — a man so blinded by privilege that he genuinely doesn't understand the destruction he causes. The consul Sharpless sees it. Suzuki sees it. The audience sees it. <strong>Pinkerton never does.</strong></p>
+  
+  <p>That's what makes the opera devastating 121 years later: <em>we still recognize the dynamic.</em> Someone with power treats someone without power as a temporary experience. The powerful person moves on. The other person doesn't survive it.</p>
+
+  <div class="quote">
+    "Butterfly is not a victim because she's Japanese, or because she's a woman. She's a victim because she believed completely in someone who never believed in her at all."
+    <div class="attr">— Scholar Arthur Groos</div>
+  </div>
+</div>
+
+<div class="divider">· · · 🦋 · · ·</div>
+
+<div class="finale">
+  <div class="butterfly-float" style="font-size:40px">🦋</div>
+  <h2>Enjoy Tonight</h2>
+  <p>Let the music wash over you. Don't try to understand every word — Puccini designed it so the orchestra tells you everything you need to feel. When the Humming Chorus begins, close your eyes. When "Un bel dì" starts, let it break you a little. That's what it's for.<br><br><em>Have a beautiful evening, all three of you.</em> 💜</p>
+</div>
+
+<div class="credit">crafted with ⚡ by JawnBot for Jake, Lindsay & Mom</div>
+
+</body>
+</html>
