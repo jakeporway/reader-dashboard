@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎨 MoMA Companion — Fauvists, Impressionists & Must-Sees</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Space+Grotesk:wght@400;600&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Cormorant Garamond',serif;background:#0c0a10;color:#e8e0d4;min-height:100vh;overflow-x:hidden}
+.hero{height:80vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;position:relative;padding:20px}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 30%,rgba(220,80,60,0.08),transparent 70%)}
+.hero h1{font-size:clamp(30px,6vw,48px);font-weight:700;color:#e8d5b8;letter-spacing:2px;line-height:1.2}
+.hero h1 em{font-style:italic;color:#e85d4a}
+.hero .tagline{font-size:18px;color:rgba(232,208,180,0.45);margin-top:10px;font-style:italic}
+.hero .ded{font-size:13px;color:rgba(232,208,180,0.25);margin-top:20px;font-family:'Space Grotesk',sans-serif;letter-spacing:1px}
+.scroll-hint{position:absolute;bottom:24px;color:rgba(232,208,180,0.25);font-size:13px;font-family:'Space Grotesk',sans-serif;animation:bob 2s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(8px)}}
+
+.ch{max-width:700px;margin:0 auto;padding:50px 24px}
+.ch-num{font-family:'Space Grotesk',sans-serif;font-size:11px;color:#e85d4a;letter-spacing:4px;text-transform:uppercase;margin-bottom:8px}
+.ch h2{font-size:clamp(24px,4vw,34px);font-weight:700;color:#e8d5b8;margin-bottom:18px;line-height:1.3}
+.ch p{font-size:18px;line-height:1.9;color:rgba(232,224,212,0.7);margin-bottom:18px}
+.ch p strong{color:#e8d5b8;font-weight:600}
+.ch p em{color:#e85d4a;font-style:italic}
+
+.painting{margin:28px 0;border-radius:12px;overflow:hidden;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06)}
+.painting img{width:100%;display:block;max-height:500px;object-fit:contain;background:#1a1a1a}
+.painting .cap{padding:16px 20px}
+.painting .cap .artist{font-family:'Space Grotesk',sans-serif;font-size:11px;color:#e85d4a;letter-spacing:2px;text-transform:uppercase}
+.painting .cap .title{font-size:20px;font-weight:700;color:#e8d5b8;margin:4px 0}
+.painting .cap .year{font-size:14px;color:rgba(232,208,180,0.4)}
+.painting .cap .story{font-size:15px;color:rgba(232,224,212,0.6);line-height:1.7;margin-top:10px}
+
+.reveal{background:rgba(232,93,74,0.05);border:1px solid rgba(232,93,74,0.1);border-radius:10px;padding:18px;margin:22px 0;cursor:pointer;transition:all 0.3s}
+.reveal:hover{background:rgba(232,93,74,0.08);border-color:rgba(232,93,74,0.2)}
+.reveal-q{font-size:16px;color:#e85d4a;font-weight:600;display:flex;align-items:center;gap:10px}
+.reveal-q::before{content:'▶';font-size:10px;transition:transform 0.3s}
+.reveal.open .reveal-q::before{transform:rotate(90deg)}
+.reveal-a{max-height:0;overflow:hidden;transition:max-height 0.5s ease,padding 0.3s;font-size:16px;line-height:1.8;color:rgba(232,224,212,0.6)}
+.reveal.open .reveal-a{max-height:800px;padding-top:12px}
+
+.divider{text-align:center;padding:36px 0;color:rgba(232,93,74,0.2);font-size:24px;letter-spacing:12px}
+
+.quote{border-left:2px solid rgba(232,93,74,0.3);padding:14px 22px;margin:24px 0;font-style:italic;font-size:20px;color:rgba(232,224,212,0.55);line-height:1.7}
+.quote .attr{font-size:13px;color:rgba(232,93,74,0.4);font-style:normal;margin-top:6px;font-family:'Space Grotesk',sans-serif}
+
+.mustsee{background:linear-gradient(145deg,rgba(232,93,74,0.06),rgba(232,93,74,0.02));border:1px solid rgba(232,93,74,0.1);border-radius:14px;padding:22px;margin:18px 0}
+.mustsee .label{font-family:'Space Grotesk',sans-serif;font-size:10px;color:#e85d4a;letter-spacing:3px;text-transform:uppercase;margin-bottom:6px}
+.mustsee .name{font-size:20px;font-weight:700;color:#e8d5b8;margin-bottom:4px}
+.mustsee .loc{font-size:13px;color:rgba(232,208,180,0.35);font-family:'Space Grotesk',sans-serif;margin-bottom:8px}
+.mustsee .why{font-size:15px;line-height:1.7;color:rgba(232,224,212,0.6)}
+
+.finale{text-align:center;padding:70px 24px;max-width:680px;margin:0 auto}
+.finale h2{font-size:30px;color:#e8d5b8;margin-bottom:14px}
+.finale p{font-size:18px;color:rgba(232,224,212,0.45);line-height:1.8}
+.credit{font-family:'Space Grotesk',sans-serif;font-size:11px;color:rgba(255,255,255,0.12);text-align:center;padding:20px;letter-spacing:1px}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div style="font-size:50px;margin-bottom:16px">🎨</div>
+  <h1>Your MoMA Companion<br><em>Wild Beasts & Light Chasers</em></h1>
+  <div class="tagline">Fauvists, Impressionists & what to see next</div>
+  <div class="ded">For Jake, Lindsay & Mom ⚡</div>
+  <div class="scroll-hint">↓ scroll to explore ↓</div>
+</div>
+
+<!-- FAUVISTS -->
+<div class="ch">
+  <div class="ch-num">I — The Fauvists</div>
+  <h2>"Les Fauves" — The Wild Beasts</h2>
+  
+  <p>In 1905, a group of painters exhibited canvases so violently colorful that a critic looked at a Renaissance-style sculpture in the middle of the room and said: <strong><em>"Donatello parmi les fauves!"</em></strong> — Donatello among the wild beasts. The name stuck. The artists loved it.</p>
+  
+  <p>The Fauves lasted only <strong>three years</strong> (1905-1908) as a movement — making them one of the shortest and most explosive revolutions in art history. Their radical idea? <em>Color doesn't have to describe reality. It can describe feeling.</em></p>
+
+  <p>A face could be green. A tree could be orange. The sky could be whatever the painter <em>felt</em> it should be. This sounds obvious now. In 1905, it was like someone detonating a bomb in a cathedral.</p>
+
+  <div class="quote">
+    "How do you see these trees? They are yellow. So, put in yellow. This shadow, rather blue? Paint it with pure ultramarine. These red leaves? Put in vermilion."
+    <div class="attr">— Paul Gauguin to Paul Sérusier, 1888 (the seed of Fauvism)</div>
+  </div>
+
+  <div class="painting">
+    <img src="https://upload.wikimedia.org/wikipedia/en/f/fb/Henri_Matisse%2C_1905%2C_Open_Window%2C_Collioure.jpg" alt="The Open Window, Collioure">
+    <div class="cap">
+      <div class="artist">Henri Matisse</div>
+      <div class="title">The Open Window, Collioure</div>
+      <div class="year">1905 · National Gallery of Art, DC</div>
+      <div class="story">This is where it all started. Matisse spent a summer in the fishing village of Collioure with André Derain, and they dared each other to push color further and further. Look at the walls — they're <strong>pink, green, violet</strong> simultaneously. The boats are dashes of pure pigment. He painted what he <em>felt</em> standing at that window, not what a camera would record. Matisse later said this painting was "the first to express clearly, with pure colors, my emotions."</div>
+    </div>
+  </div>
+
+  <div class="painting">
+    <img src="https://upload.wikimedia.org/wikipedia/en/2/2e/La_danse_%28I%29_by_Matisse.jpg" alt="The Dance">
+    <div class="cap">
+      <div class="artist">Henri Matisse</div>
+      <div class="title">The Dance (I)</div>
+      <div class="year">1909 · MoMA, New York</div>
+      <div class="story"><strong>This is at MoMA — go find it.</strong> Five figures dancing in a circle on a green hill against a blue sky. Three colors, zero detail, infinite energy. Matisse stripped away everything except pure movement and joy. Notice how the two figures on the left have broken hands — the circle is <em>almost</em> complete but not quite. Art historians argue about whether this represents the ecstasy of connection or its impossibility. Matisse never explained.</div>
+    </div>
+  </div>
+
+  <div class="painting">
+    <img src="https://upload.wikimedia.org/wikipedia/en/0/0a/Derain_CharingCrossBridge.png" alt="Charing Cross Bridge">
+    <div class="cap">
+      <div class="artist">André Derain</div>
+      <div class="title">Charing Cross Bridge, London</div>
+      <div class="year">1906 · National Gallery of Art, DC</div>
+      <div class="story">Derain painted London the way nobody had seen it: the Thames is <strong>bright blue and yellow</strong>, Big Ben is violet, the bridge is green. He was directly competing with Monet, who had painted the same bridge in soft, misty impressionist light. Derain's version screams: <em>"Your London is polite. Mine is alive."</em> Monet reportedly saw Derain's London series and was troubled by it.</div>
+    </div>
+  </div>
+
+  <div class="reveal" onclick="this.classList.toggle('open')">
+    <div class="reveal-q">🧠 Why Fauvism matters for how we see everything today</div>
+    <div class="reveal-a">Fauvism broke the rule that color must serve description. Once that rule was broken, <em>everything</em> followed: Cubism (break form), Abstract Expressionism (break representation), Pop Art (break seriousness). Every Instagram filter, every movie color grade, every brand color palette exists in a world the Fauves made possible. They didn't just change painting — they changed the idea that perception is fixed. <strong>You don't see the world as it is. You see it as you are.</strong></div>
+  </div>
+
+  <div class="painting">
+    <img src="https://upload.wikimedia.org/wikipedia/en/0/0b/Vlaminck_Restaurant_de_la_Machine_at_Bougival.jpg" alt="Restaurant de la Machine at Bougival">
+    <div class="cap">
+      <div class="artist">Maurice de Vlaminck</div>
+      <div class="title">Restaurant de la Machine at Bougival</div>
+      <div class="year">1905 · Musée d'Orsay, Paris</div>
+      <div class="story">Vlaminck was the wildest of the wild beasts. He squeezed paint directly from the tube onto the canvas — no palette, no mixing. He once said: <strong>"I want to burn down the École des Beaux-Arts with my cobalts and vermilions."</strong> He'd been a bicycle racer and a violinist before becoming a painter. He painted like he was still racing.</div>
+    </div>
+  </div>
+</div>
+
+<div class="divider">· · · 🎨 · · ·</div>
+
+<!-- IMPRESSIONISTS -->
+<div class="ch">
+  <div class="ch-num">II — The Impressionists</div>
+  <h2>The Original Rebels (Who Look Respectable Now)</h2>
+  
+  <p>Here's the thing nobody tells you: <strong>the Impressionists were the punk rockers of their era.</strong> They were rejected, mocked, and literally named as an insult. Today their paintings sell for $100 million and hang in corporate lobbies. They'd be horrified.</p>
+
+  <p>Before the Impressionists, "serious" painting meant historical scenes, myths, and portraits — done indoors, in studios, with precise lines. The Impressionists said: <em>what if we just went outside and painted what light actually looks like?</em></p>
+
+  <p>This was <strong>revolutionary</strong>. Not because nobody had painted outdoors before, but because they insisted that a fleeting moment — sunlight on water at 4pm on a Tuesday — was as worthy of art as the Battle of Waterloo.</p>
+
+  <div class="painting">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/a/a0/Claude_Monet_-_Water_Lilies_-_1906%2C_Ryerson.jpg" alt="Water Lilies">
+    <div class="cap">
+      <div class="artist">Claude Monet</div>
+      <div class="title">Water Lilies</div>
+      <div class="year">1906 · Art Institute of Chicago (series at MoMA)</div>
+      <div class="story"><strong>MoMA has several Water Lilies — find them.</strong> Monet painted roughly <strong>250 water lily paintings</strong> over the last 30 years of his life. He was going blind. As his vision deteriorated, the paintings became larger, more abstract, more radical. The late ones — which MoMA has — are essentially abstract expressionism <em>50 years early</em>. He couldn't see details anymore, so he painted pure sensation. His disability became his innovation.</div>
+    </div>
+  </div>
+
+  <div class="painting">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/0/09/Claude_Monet_-_The_Japanese_Footbridge_-_Google_Art_Project.jpg" alt="The Japanese Footbridge">
+    <div class="cap">
+      <div class="artist">Claude Monet</div>
+      <div class="title">The Japanese Footbridge</div>
+      <div class="year">1899 · National Gallery of Art, DC (variant at MoMA)</div>
+      <div class="story">Monet didn't just paint his garden — he <strong>designed</strong> it first, then painted it. He hired six full-time gardeners. He diverted a river to create the lily pond. He ordered specific water lilies from Japan. The paintings are not observations of nature — they're observations of a <em>designed experience</em>. He was a UX designer who worked in chlorophyll.</div>
+    </div>
+  </div>
+
+  <div class="quote">
+    "I perhaps owe having become a painter to flowers."
+    <div class="attr">— Claude Monet</div>
+  </div>
+
+  <div class="painting">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/9/90/Starry_Night_-_Google_Art_Project.jpg" alt="The Starry Night">
+    <div class="cap">
+      <div class="artist">Vincent van Gogh</div>
+      <div class="title">The Starry Night</div>
+      <div class="year">1889 · MoMA, New York</div>
+      <div class="story"><strong>This is THE painting. Go stand in front of it.</strong> Van Gogh painted this from the window of his room at the Saint-Paul-de-Mausole asylum in Saint-Rémy, France. He was there voluntarily after cutting off part of his ear. Here's what's wild: the swirling sky isn't hallucination. In 2004, astronomers confirmed that the turbulence patterns in Starry Night <em>mathematically match</em> real fluid dynamics turbulence — something scientists didn't formalize until the 1940s. A man in a mental asylum, painting at night, accidentally captured the mathematical structure of the cosmos.</div>
+    </div>
+  </div>
+
+  <div class="reveal" onclick="this.classList.toggle('open')">
+    <div class="reveal-q">💰 Van Gogh sold ONE painting in his lifetime</div>
+    <div class="reveal-a">In his entire life, Van Gogh sold exactly <strong>one painting</strong>: <em>The Red Vineyard</em>, for 400 francs (about $2,000 today). He made roughly 2,100 artworks. He was supported entirely by his brother Theo, who believed in him completely despite zero market validation. Today, his paintings sell for over $100 million each. The market was wrong for 100 years. Theo was right from day one.</div>
+  </div>
+
+  <div class="painting">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/3/3b/Paul_Cézanne_-_Les_Grandes_Baigneuses-1.jpg" alt="The Bathers">
+    <div class="cap">
+      <div class="artist">Paul Cézanne</div>
+      <div class="title">The Large Bathers</div>
+      <div class="year">1906 · Philadelphia Museum of Art (Cézanne works at MoMA)</div>
+      <div class="story">Cézanne is the bridge. He took Impressionism's interest in perception and pushed it toward geometry — <strong>"treat nature by the cylinder, the sphere, the cone."</strong> Without Cézanne, there is no Cubism. Without Cubism, there is no modern art. Picasso called him <em>"the father of us all."</em> Matisse called him <em>"a sort of god of painting."</em> Both meant it literally.</div>
+    </div>
+  </div>
+</div>
+
+<div class="divider">· · · 🎨 · · ·</div>
+
+<!-- FROM ONE TO THE OTHER -->
+<div class="ch">
+  <div class="ch-num">III — The Connection</div>
+  <h2>How the Impressionists Became the Fauvists</h2>
+
+  <p>The timeline matters. The Impressionists broke <strong>subject matter</strong> — paint what you see, not what you're told to see. Then the Post-Impressionists (Van Gogh, Cézanne, Gauguin) broke <strong>form</strong> — paint what you <em>feel</em>, not just what you see. Then the Fauves broke <strong>color</strong> — let it scream, let it clash, let it be wrong.</p>
+
+  <p>Each generation took the previous one's revolution and said: <em>"You didn't go far enough."</em></p>
+
+  <div class="reveal" onclick="this.classList.toggle('open')">
+    <div class="reveal-q">🔗 The specific moment it happened</div>
+    <div class="reveal-a">In 1901, a young Henri Matisse saw a Van Gogh retrospective in Paris. He was <strong>electrified</strong>. Van Gogh's thick, emotional brushwork and non-naturalistic color showed Matisse that color could carry pure emotion without depicting anything "correctly." Four years later, Matisse painted <em>Woman with a Hat</em> using green and purple for her face — and Fauvism was born. The straight line runs: <strong>Monet → Van Gogh → Matisse.</strong> Impressionism → Post-Impressionism → Fauvism. Each one a dare to go further.</div>
+  </div>
+</div>
+
+<div class="divider">· · · 🎨 · · ·</div>
+
+<!-- MUST SEES -->
+<div class="ch">
+  <div class="ch-num">IV — While You're Here</div>
+  <h2>Don't Leave MoMA Without Seeing These</h2>
+  
+  <div class="mustsee">
+    <div class="label">⭐ Cannot Miss</div>
+    <div class="name">The Starry Night — Vincent van Gogh</div>
+    <div class="loc">Floor 5 · Galleries 1-2</div>
+    <div class="why">You already know. But stand close and look at the <em>thickness</em> of the paint. Some strokes are a quarter-inch high. He wasn't painting on the canvas — he was sculpting with it.</div>
+  </div>
+
+  <div class="mustsee">
+    <div class="label">⭐ Cannot Miss</div>
+    <div class="name">Les Demoiselles d'Avignon — Pablo Picasso</div>
+    <div class="loc">Floor 5 · Gallery 2</div>
+    <div class="why">Five women. Angular faces. Two with African mask features. Painted in 1907, this is the moment art broke. Picasso's friends thought he'd gone insane. Matisse thought it was a hoax. It was the birth of Cubism, and nothing was ever the same. <strong>The two figures on the right were painted AFTER Picasso visited an ethnographic museum</strong> — you can see exactly where his mind changed mid-painting.</div>
+  </div>
+
+  <div class="mustsee">
+    <div class="label">⭐ Cannot Miss</div>
+    <div class="name">The Persistence of Memory — Salvador Dalí</div>
+    <div class="loc">Floor 5</div>
+    <div class="why">The melting clocks! It's TINY — only 9.5 by 13 inches. Everyone expects it to be huge. Dalí said the melting watches were inspired by Camembert cheese melting in the sun. That's either genius or a lie. Probably both.</div>
+  </div>
+
+  <div class="mustsee">
+    <div class="label">🎨 For the Fauvist Fan</div>
+    <div class="name">The Dance (I) — Henri Matisse</div>
+    <div class="loc">Floor 5</div>
+    <div class="why">Five dancing figures, three colors, pure ecstasy. Already described above — but see it in person. It's almost 9 feet wide. The energy is physical.</div>
+  </div>
+
+  <div class="mustsee">
+    <div class="label">🎨 For the Fauvist Fan</div>
+    <div class="name">The Red Studio — Henri Matisse</div>
+    <div class="loc">Floor 5 · Gallery 2</div>
+    <div class="why">Matisse painted his entire studio in a single flat red. Furniture, walls, floor — all the same Venetian red. Only the <em>artworks</em> within the studio have other colors. It's a painting about painting. The room dissolves; the art remains. MoMA bought it in 1949 and it changed how an entire generation understood color.</div>
+  </div>
+
+  <div class="mustsee">
+    <div class="label">💫 Surprise Yourself</div>
+    <div class="name">Campbell's Soup Cans — Andy Warhol</div>
+    <div class="loc">Floor 4</div>
+    <div class="why">32 canvases, 32 flavors. Warhol's question: if Monet can paint 250 water lilies and it's genius, why can't I paint 32 soup cans? He's not mocking art. He's asking: <strong>who decides what deserves attention?</strong> Same question the Impressionists asked 100 years earlier.</div>
+  </div>
+
+  <div class="mustsee">
+    <div class="label">💫 Surprise Yourself</div>
+    <div class="name">Christina's World — Andrew Wyeth</div>
+    <div class="loc">Floor 3</div>
+    <div class="why">A woman crawling through a field toward a farmhouse. Most people assume she fell. She didn't — <strong>Christina Olson had a degenerative muscle condition</strong> and this was how she moved. Wyeth painted not a tragedy but her <em>determination</em>. She refused a wheelchair. The distance between her and the house is the whole painting.</div>
+  </div>
+
+  <div class="mustsee">
+    <div class="label">💫 If You Have Time</div>
+    <div class="name">MoMA Sculpture Garden</div>
+    <div class="loc">Ground Floor · free to enter from the lobby</div>
+    <div class="why">Even if you're art-fatigued, step outside into the garden. Picasso, Rodin, and others in open air. Sit on a bench. Breathe. Museums are marathons disguised as strolls.</div>
+  </div>
+</div>
+
+<div class="divider">· · · 🎨 · · ·</div>
+
+<div class="finale">
+  <div style="font-size:40px;margin-bottom:16px">🎨</div>
+  <h2>The Wild Beasts Were Right</h2>
+  <p>Color is emotion. Perception is personal. The "wrong" way to see something is sometimes the most honest way. The Impressionists gave us permission to look. The Fauvists gave us permission to <em>feel</em>.<br><br>Enjoy the rest of MoMA. Take your time. And if something stops you in your tracks — something you didn't expect — that's the painting that was meant for you today. 💜</p>
+</div>
+
+<div class="credit">crafted with ⚡ by JawnBot for Jake, Lindsay & Mom at MoMA</div>
+
+</body>
+</html>
